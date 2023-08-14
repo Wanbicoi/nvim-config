@@ -69,6 +69,9 @@ require('lazy').setup({
 
 -- [[ Setting options ]]
 
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
 -- Make line numbers default
 vim.o.number = true
 vim.o.relativenumber = true
@@ -94,8 +97,8 @@ vim.o.clipboard = 'unnamedplus'
 vim.o.breakindent = true
 
 -- Save undo history
-vim.o.undofile = true
-vim.o.swapfile = false
+vim.go.undofile = true
+vim.go.swapfile = false
 
 -- Case-insensitive searching UNLESS \C or capital in search
 vim.o.ignorecase = true
@@ -104,6 +107,7 @@ vim.o.smartcase = true
 -- Keep signcolumn on by default
 vim.wo.signcolumn = 'yes'
 vim.o.wrap = false
+
 -- Decrease update time
 vim.o.updatetime = 250
 vim.o.timeoutlen = 300
@@ -122,29 +126,27 @@ vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 
 -- Don't copy the replaced text after pasting in visual mode
 -- https://vim.fandom.com/wiki/Replace_a_word_with_yanked_text#Alternative_mapping_for_paste
-vim.keymap.set('x', 'p', 'p:let @+=@0<CR>:let @"=@0<CR>', { silent = true })
+vim.keymap.set('v', 'p', 'p:let @+=@0<CR>:let @"=@0<CR>', { silent = true })
 
 -- Remap for dealing with word wrap vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
-
 -- Buffers manager
-vim.keymap.set('n', '<Tab>', '<cmd>bnext<cr>')
-vim.keymap.set('n', '<S-Tab>', '<cmd>bprevious<cr>')
-vim.keymap.set('n', '<leader>x', '<cmd>bd<cr>', { desc = "Close current buffer" })
-vim.keymap.set('n', '<leader>X', '<cmd>:%bd|e#<cr>', { desc = "Close other buffers" })
-
-vim.keymap.set('n', '<leader>X', '<cmd>:%bd|e#<cr>', { desc = "Close other buffers" })
+vim.keymap.set('n', '<leader>n', '<cmd>bnext<cr>')
+vim.keymap.set('n', '<leader>N', '<cmd>bprevious<cr>')
+vim.keymap.set('n', '<leader>x', '<cmd>Bdelete<cr>', { desc = 'Close current buffer' })
+vim.keymap.set('n', '<leader>X', '<cmd>:%bd|e#<cr>', { desc = 'Close other buffers' })
 
 -- Window navigate
-vim.keymap.set('n', '<C-h>', '<C-w>h', { desc = "Window left" })
-vim.keymap.set('n', '<C-l>', '<C-w>l', { desc = "Window right" })
-vim.keymap.set('n', '<C-j>', '<C-w>j', { desc = "Window down" })
-vim.keymap.set('n', '<C-k>', '<C-w>k', { desc = "Window up" })
+vim.keymap.set('n', '<C-h>', '<C-w>h', { desc = 'Window left' })
+vim.keymap.set('n', '<C-l>', '<C-w>l', { desc = 'Window right' })
+vim.keymap.set('n', '<C-j>', '<C-w>j', { desc = 'Window down' })
+vim.keymap.set('n', '<C-k>', '<C-w>k', { desc = 'Window up' })
 
+vim.keymap.set('n', '<C-c>', '<cmd> %y+ <CR>', { desc = 'Copy whole file' })
+vim.keymap.set('n', '<esc>', '<cmd>noh<cr>', { desc = 'No highlight', silent = true })
 
-vim.keymap.set('n', '<C-c>', '<cmd> %y+ <CR>', { desc = "Copy whole file" })
-vim.keymap.set('n', '<esc>', '<cmd>noh<cr>', { desc = "No highlight", silent = true })
+vim.keymap.set('n', '<leader>e', '<cmd>NvimTreeToggle<cr>', { desc = 'NvimTreeToggle' })
 
 -- [[ Auto commands ]]
 -- High light on yank
@@ -165,146 +167,9 @@ vim.api.nvim_create_autocmd('BufWritePre', {
 })
 
 -- Diagnostic keymaps
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
-
--- [[ Configure LSP ]]
---  This function gets run when an LSP connects to a particular buffer.
-local on_attach = function(_, bufnr)
-  local nmap = function(keys, func, desc)
-    if desc then
-      desc = 'LSP: ' .. desc
-    end
-
-    vim.keymap.set('n', keys, func, { buffer = bufnr, desc = desc })
-  end
-
-  nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
-  nmap('<leader>.', vim.lsp.buf.code_action, 'Code action')
-
-  nmap('gD', require('telescope.builtin').lsp_type_definitions, '[G]oto [T]ype [D]efinition')
-  nmap('gd', require('telescope.builtin').lsp_definitions, '[G]oto [d]efinition')
-  nmap('gr', require('telescope.builtin').lsp_references, '[G]oto [r]eferences')
-  nmap('gI', require('telescope.builtin').lsp_implementations, '[G]oto [i]mplementation')
-  nmap('gi', require('telescope.builtin').lsp_incoming_calls, '[G]oto [I]ncoming calls')
-  nmap('go', require('telescope.builtin').lsp_outgoing_calls, '[G]oto [o]utgoing calls')
-
-  -- See `:help K` for why this keymap
-  nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
-  -- nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
-
-  -- nmap('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
-  -- nmap('<leader>wa', vim.lsp.buf.add_workspace_folder, '[W]orkspace [A]dd Folder')
-  -- nmap('<leader>wr', vim.lsp.buf.remove_workspace_folder, '[W]orkspace [R]emove Folder')
-  -- nmap('<leader>wl', function()
-  --   print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-  -- end, '[W]orkspace [L]ist Folders')
-end
-
--- typescript specification
-
-local servers = {
-  tailwindcss = {},
-  cssls = {},
-  jsonls = {},
-  html = { filetypes = { 'html', 'twig', 'hbs' } },
-  lua_ls = {
-    Lua = {
-      workspace = { checkThirdParty = false },
-      telemetry = { enable = false },
-    },
-  },
-}
-
--- nvim-cmp supports additional completion capabilities, so broadcast that to servers
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
-
-
-require("typescript").setup({
-  server = { -- pass options to lspconfig's setup method
-    on_attach = on_attach,
-    capabilities = capabilities
-  },
-})
--- Ensure the servers above are installed
-local mason_lspconfig = require 'mason-lspconfig'
-
-mason_lspconfig.setup {
-  ensure_installed = vim.tbl_keys(servers),
-}
-
-mason_lspconfig.setup_handlers {
-  function(server_name)
-    require('lspconfig')[server_name].setup {
-      capabilities = capabilities,
-      on_attach = on_attach,
-      settings = servers[server_name],
-      filetypes = (servers[server_name] or {}).filetypes,
-    }
-  end
-}
-
--- [[ Configure nvim-cmp ]]
--- See `:help cmp`
-local cmp = require 'cmp'
-local luasnip = require 'luasnip'
-require('luasnip.loaders.from_vscode').lazy_load()
-
-luasnip.config.setup {}
-local lspkind = require('lspkind')
-cmp.setup {
-  window = {
-    completion = cmp.config.window.bordered({ scrollbar = false }),
-    documentation = cmp.config.window.bordered({ scrollbar = false }),
-  },
-  formatting = {
-    fields = { "kind", "abbr", "menu" },
-    format = function(entry, vim_item)
-      local kind = require("lspkind").cmp_format({ mode = "symbol_text", maxwidth = 50 })(entry, vim_item)
-      local strings = vim.split(kind.kind, "%s", { trimempty = true })
-      kind.kind = " " .. (strings[1] or "") .. " "
-      kind.menu = "    (" .. (strings[2] or "") .. ")"
-
-      return kind
-    end,
-  },
-  snippet = {
-    expand = function(args)
-      luasnip.lsp_expand(args.body)
-    end,
-  },
-  mapping = cmp.mapping.preset.insert {
-    ['<C-n>'] = cmp.mapping.select_next_item(),
-    ['<C-p>'] = cmp.mapping.select_prev_item(),
-    ['<C-d>'] = cmp.mapping.scroll_docs(-4),
-    ['<C-f>'] = cmp.mapping.scroll_docs(4),
-    ['<C-Space>'] = cmp.mapping.complete {},
-    ['<CR>'] = cmp.mapping.confirm {
-      behavior = cmp.ConfirmBehavior.Replace,
-      select = true,
-    },
-    ['<Tab>'] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_next_item()
-      elseif luasnip.expand_or_locally_jumpable() then
-        luasnip.expand_or_jump()
-      else
-        fallback()
-      end
-    end, { 'i', 's' }),
-    ['<S-Tab>'] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_prev_item()
-      elseif luasnip.locally_jumpable(-1) then
-        luasnip.jump(-1)
-      else
-        fallback()
-      end
-    end, { 'i', 's' }),
-  },
-  sources = {
-    { name = 'nvim_lsp' },
-    { name = 'luasnip' },
-  },
-}
+vim.keymap.set('n', '[d', function()
+  vim.diagnostic.goto_prev { float = { border = 'rounded' } }
+end, { desc = 'Go to previous diagnostic message' })
+vim.keymap.set('n', ']d', function()
+  vim.diagnostic.goto_next { float = { border = 'rounded' } }
+end, { desc = 'Go to next diagnostic message' })

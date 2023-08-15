@@ -382,9 +382,6 @@ return {
 
       vim.keymap.set('n', '<leader>sp', '<cmd>Telescope projects<cr>', { desc = '[S]earch recent [P]rojects' })
       vim.keymap.set('n', '<leader>sr', '<cmd>Telescope resume<cr>', { desc = '[S]earch [R]esume' })
-      vim.keymap.set('n', '<leader>o', function()
-        require('oil').toggle_float(vim.fn.expand '%:h:p')
-      end, { desc = '[O]il current file directory' })
 
       -- vim.keymap.set(
       --   'n',
@@ -614,6 +611,22 @@ return {
   },
   {
     'stevearc/oil.nvim',
+    keys = {
+      {
+        '<leader>O',
+        function()
+          require('oil').toggle_float(vim.fn.expand '%:h:p')
+        end,
+        desc = '[O]il float current file directory',
+      },
+      {
+        '<leader>o',
+        function()
+          require('oil').open(vim.fn.expand '%:h:p')
+        end,
+        desc = '[O]il current file directory',
+      },
+    },
     opts = {},
     event = 'VeryLazy',
   },
@@ -648,6 +661,30 @@ return {
       -- vim.cmd 'highlight IndentBlanklineChar guifg=#006070 gui=nocombine'
       -- vim.cmd 'highlight NormalFloat guibg=NONE'
       -- vim.cmd 'highlight FloatBorder guibg=NONE'
+    end,
+  },
+
+  {
+    'akinsho/bufferline.nvim',
+    version = '*',
+    dependencies = 'nvim-tree/nvim-web-devicons',
+    config = function()
+      require('bufferline').setup {
+        options = {
+          separator_style = 'slant',
+          diagnostics = 'nvim_lsp',
+          indicator = {
+            style = 'icon',
+          },
+          diagnostics_indicator = function(count, level)
+            local icon = level:match 'error' and ' ' or ' '
+            return icon .. count
+          end,
+        },
+      }
+
+      vim.keymap.set('n', ']b', '<cmd>BufferLineCycleNext<cr>')
+      vim.keymap.set('n', '[b', '<cmd>BufferLineCyclePrev<cr>')
     end,
   },
 

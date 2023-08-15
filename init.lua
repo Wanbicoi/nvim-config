@@ -132,10 +132,10 @@ vim.keymap.set('v', 'p', 'p:let @+=@0<CR>:let @"=@0<CR>', { silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
 -- Buffers manager
-vim.keymap.set('n', '<leader>n', '<cmd>bnext<cr>')
-vim.keymap.set('n', '<leader>N', '<cmd>bprevious<cr>')
+-- vim.keymap.set('n', '<leader>n', '<cmd>bnext<cr>')
+-- vim.keymap.set('n', '<leader>N', '<cmd>bprevious<cr>')
 vim.keymap.set('n', '<leader>x', '<cmd>Bdelete<cr>', { desc = 'Close current buffer' })
-vim.keymap.set('n', '<leader>X', '<cmd>:%bd|e#<cr>', { desc = 'Close other buffers' })
+-- vim.keymap.set('n', '<leader>X', '<cmd>:%bd|e#<cr>', { desc = 'Close other buffers' })
 
 -- Window navigate
 vim.keymap.set('n', '<C-h>', '<C-w>h', { desc = 'Window left' })

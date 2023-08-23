@@ -1,11 +1,10 @@
--- You can add your own plugins here or in other files in this directory!
---  I promise not to create any merge conflicts in this directory :)
---
--- See the kickstart.nvim README for more information
--- TODO move this file to ../lua/plugins.lua
 return {
+  {
+    'pmizio/typescript-tools.nvim',
+    dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
+    opts = {},
+  },
   -- Detect tabstop and shiftwidth automatically
-  -- 'tpope/vim-sleuth',
   {
     'windwp/nvim-autopairs',
     event = 'InsertEnter',
@@ -17,7 +16,6 @@ return {
     -- LSP Configuration & Plugins
     'neovim/nvim-lspconfig',
     dependencies = {
-      'jose-elias-alvarez/typescript.nvim',
       -- Automatically install LSPs to stdpath for neovim
       { 'williamboman/mason.nvim', config = true },
       'williamboman/mason-lspconfig.nvim',
@@ -39,7 +37,7 @@ return {
       },
 
       -- Additional lua configuration, makes nvim stuff amazing!
-      { 'folke/neodev.nvim',       opts = {} },
+      { 'folke/neodev.nvim', opts = {} },
     },
     event = 'VeryLazy',
     config = function()
@@ -66,8 +64,7 @@ return {
 
         -- See `:help K` for why this keymap
         vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, { border = 'rounded' })
-        vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(vim.lsp.handlers.signature_help,
-          { border = 'rounded' })
+        vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = 'rounded' })
         nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
         nmap('gh', vim.lsp.buf.signature_help, 'Signature Documentation')
 
@@ -115,7 +112,7 @@ return {
             filetypes = (servers[server_name] or {}).filetypes,
           }
 
-          require('typescript').setup {
+          require('typescript-tools').setup {
             server = { -- pass options to lspconfig's setup method
               on_attach = on_attach,
               capabilities = capabilities,
@@ -166,7 +163,7 @@ return {
               mode = 'symbol_text',
               maxwidth = 50,
               symbol_map = { TabNine = '' },
-            } (entry, vim_item)
+            }(entry, vim_item)
             local strings = vim.split(kind.kind, '%s', { trimempty = true })
             kind.kind = ' ' .. (strings[1] or '') .. ' '
             kind.menu = '    [' .. (strings[2] or '') .. ']'
@@ -269,7 +266,7 @@ return {
     config = function()
       require('null-ls').setup {
         sources = {
-          require('null-ls').builtins.formatting.stylua,    -- shell script formatting
+          require('null-ls').builtins.formatting.stylua, -- shell script formatting
           require('null-ls').builtins.formatting.prettierd, -- markdown formatting
           -- require('null-ls').builtins.diagnostics.eslint,
           -- require('null-ls').builtins.code_actions.eslint,
@@ -279,7 +276,7 @@ return {
   },
 
   -- Useful plugin to show you pending keybinds.
-  { 'folke/which-key.nvim',  opts = {} },
+  { 'folke/which-key.nvim', opts = {} },
   {
     -- Adds git releated signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
@@ -288,8 +285,7 @@ return {
       current_line_blame = true,
       current_line_blame_formatter = '<author>',
       on_attach = function(bufnr)
-        vim.keymap.set('n', '<leader>gp', require('gitsigns').prev_hunk,
-          { buffer = bufnr, desc = '[G]o to [P]revious Hunk' })
+        vim.keymap.set('n', '<leader>gp', require('gitsigns').prev_hunk, { buffer = bufnr, desc = '[G]o to [P]revious Hunk' })
         vim.keymap.set('n', ']h', require('gitsigns').next_hunk, { buffer = bufnr, desc = 'Next Hunk' })
         vim.keymap.set('n', '[h', require('gitsigns').prev_hunk, { buffer = bufnr, desc = 'Prev Hunk' })
         vim.keymap.set('n', '<leader>ph', require('gitsigns').preview_hunk, { buffer = bufnr, desc = '[P]review [H]unk' })
@@ -300,30 +296,28 @@ return {
   {
     'nvim-lualine/lualine.nvim',
     config = function()
-      local cs_dracula = require 'lualine.themes.dracula'
-      -- cs_dracula.normal.c.bg = NONE
-      -- cs_dracula.insert.c.bg = NONE
-      -- cs_dracula.visual.c.bg = NONE
-      -- cs_dracula.replace.c.bg = NONE
-      -- cs_dracula.inactive.c.bg = NONE
       require('lualine').setup {
-        options = { theme = cs_dracula, globalstatus = true },
+        options = { globalstatus = true },
         sections = {
-          lualine_c = { { 'filename', path = 1 } },
+          lualine_b = { 'branch', 'diagnostics' },
+          lualine_c = { { 'filename', path = 3 } },
         },
       }
     end,
   },
-
   {
-    -- Add indentation guides even on blank lines
     'lukas-reineke/indent-blankline.nvim',
-    -- Enable `lukas-reineke/indent-blankline.nvim`
-    -- See `:help indent_blankline.txt`
-    event = 'BufEnter',
-    opts = {
-      show_current_context = true,
+    dependencies = {
+      {
+        'echasnovski/mini.nvim',
+        version = '*',
+        config = function()
+          require('mini.indentscope').setup { symbol = '│' }
+        end,
+      },
     },
+    event = 'BufEnter',
+    opts = {},
   },
 
   -- Fuzzy Finder (files, lsp, etc)
@@ -652,11 +646,19 @@ return {
           -- conditionals = 'italic',
           virtual_text = 'bold',
         },
+        colors = {
+          cursorline = '#eeeeee', -- This is optional. The default cursorline color is based on the background
+        },
+        options = {
+          cursorline = true,
+        },
         -- options = {
         --   transparency = true,
         -- },
       }
-      vim.cmd.colorscheme 'onedark'
+      vim.cmd.colorscheme 'onelight'
+
+      vim.cmd 'highlight Cursor guifg=#7f7f7f'
 
       -- vim.cmd 'highlight IndentBlanklineChar guifg=#006070 gui=nocombine'
       -- vim.cmd 'highlight NormalFloat guibg=NONE'
@@ -687,6 +689,68 @@ return {
       vim.keymap.set('n', '[b', '<cmd>BufferLineCyclePrev<cr>')
     end,
   },
+  {
+    'mbbill/undotree',
+    event = 'VeryLazy',
+  },
+  {
+    'utilyre/barbecue.nvim',
+    name = 'barbecue',
+    version = '*',
+    dependencies = {
+      'SmiteshP/nvim-navic',
+      'nvim-tree/nvim-web-devicons', -- optional dependency
+    },
+    opts = {
+      -- configurations go here
+    },
+  },
+
+  {
+    'akinsho/toggleterm.nvim',
+    version = '*',
+    config = function()
+      require('toggleterm').setup {
+        highlights = {
+          Normal = {
+            guibg = NONE,
+          },
+        },
+      }
+      vim.keymap.set('n', '<leader>tf', '<cmd>ToggleTerm direction=float<cr>', { desc = '[T]oggle [f]loat term' })
+      vim.keymap.set('n', '<leader>th', ':ToggleTerm direction=horizontal<cr>', { desc = '[T]oggle [h]orizontal term' })
+      vim.keymap.set('n', '<leader>tv', ':ToggleTerm direction=vertical<cr>', { desc = '[T]oggle [v]ertical term' })
+      vim.keymap.set('n', '<leader>ts', '<cmd>TermSelect <cr>', { desc = '[T]erm [s]elect' })
+      vim.keymap.set('n', '<leader>tt', '<cmd>ToggleTermToggleAll <cr>', { desc = '[T]oggle term [t]oggle all' })
+
+      function _G.set_terminal_keymaps()
+        local opts = { buffer = 0 }
+        vim.keymap.set('t', 'jj', [[<C-\><C-n>]], opts)
+        vim.keymap.set('t', '<C-h>', [[<Cmd>wincmd h<CR>]], opts)
+        vim.keymap.set('t', '<C-j>', [[<Cmd>wincmd j<CR>]], opts)
+        vim.keymap.set('t', '<C-k>', [[<Cmd>wincmd k<CR>]], opts)
+        vim.keymap.set('t', '<C-l>', [[<Cmd>wincmd l<CR>]], opts)
+      end
+
+      vim.cmd 'autocmd! TermOpen term://* lua set_terminal_keymaps()'
+    end,
+  },
+  {
+    'max397574/better-escape.nvim',
+    config = function()
+      require('better_escape').setup {
+        mapping = { 'jj' },
+      }
+    end,
+  },
+  -- {
+  --   'Bekaboo/dropbar.nvim',
+  --   event = 'VeryLazy',
+  --   config = function()
+  --     require('dropbar').setup()
+  --     vim.keymap.set('n', '<leader>q', "<cmd>lua require('dropbar.api').pick()<cr>", { desc = 'Dropbar' })
+  --   end,
+  -- },
 
   -- require 'kickstart.plugins.autoformat',
   -- require 'kickstart.plugins.debug',

@@ -118,10 +118,13 @@ vim.o.completeopt = 'menuone,noselect'
 -- NOTE: You should make sure your terminal supports this
 vim.o.termguicolors = true
 
+vim.cmd "set shada=!,'100,s10,h,<10000"
+
 -- [[ Basic Keymaps ]]
 
 -- Keymaps for better default experience
 -- See `:help vim.keymap.set()`
+
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 
 -- Don't copy the replaced text after pasting in visual mode
@@ -138,6 +141,7 @@ vim.keymap.set('n', '<leader>x', '<cmd>Bdelete<cr>', { desc = 'Close current buf
 -- vim.keymap.set('n', '<leader>X', '<cmd>:%bd|e#<cr>', { desc = 'Close other buffers' })
 
 -- Window navigate
+
 vim.keymap.set('n', '<C-h>', '<C-w>h', { desc = 'Window left' })
 vim.keymap.set('n', '<C-l>', '<C-w>l', { desc = 'Window right' })
 vim.keymap.set('n', '<C-j>', '<C-w>j', { desc = 'Window down' })
@@ -147,6 +151,14 @@ vim.keymap.set('n', '<C-c>', '<cmd> %y+ <CR>', { desc = 'Copy whole file' })
 vim.keymap.set('n', '<esc>', '<cmd>noh<cr>', { desc = 'No highlight', silent = true })
 
 vim.keymap.set('n', '<leader>e', '<cmd>NvimTreeToggle<cr>', { desc = 'NvimTreeToggle' })
+
+-- Diagnostic keymaps
+vim.keymap.set('n', '[d', function()
+  vim.diagnostic.goto_prev { float = { border = 'rounded' } }
+end, { desc = 'Go to previous diagnostic message' })
+vim.keymap.set('n', ']d', function()
+  vim.diagnostic.goto_next { float = { border = 'rounded' } }
+end, { desc = 'Go to next diagnostic message' })
 
 -- [[ Auto commands ]]
 -- High light on yank
@@ -165,11 +177,3 @@ vim.api.nvim_create_autocmd('BufWritePre', {
   end,
   pattern = '*',
 })
-
--- Diagnostic keymaps
-vim.keymap.set('n', '[d', function()
-  vim.diagnostic.goto_prev { float = { border = 'rounded' } }
-end, { desc = 'Go to previous diagnostic message' })
-vim.keymap.set('n', ']d', function()
-  vim.diagnostic.goto_next { float = { border = 'rounded' } }
-end, { desc = 'Go to next diagnostic message' })

@@ -1,3 +1,6 @@
+---@diagnostic disable: missing-fields
+local augroup = vim.api.nvim_create_augroup('LspFormatting', {})
+
 return {
   {
     'pmizio/typescript-tools.nvim',
@@ -80,7 +83,6 @@ return {
 
       local servers = {
         tailwindcss = {},
-        prismals = {},
         cssls = {},
         jsonls = {},
         html = { filetypes = { 'html', 'twig', 'hbs' } },
@@ -134,18 +136,18 @@ return {
 
       'saadparwaiz1/cmp_luasnip',
       'hrsh7th/cmp-nvim-lsp',
-      'tzachar/cmp-tabnine',
+      -- 'tzachar/cmp-tabnine',
       'hrsh7th/cmp-nvim-lsp-signature-help',
       'hrsh7th/cmp-buffer',
     },
     config = function()
-      require('lazy').setup {
-        {
-          'tzachar/cmp-tabnine',
-          build = 'powershell ./install.ps1',
-          dependencies = 'hrsh7th/nvim-cmp',
-        },
-      }
+      -- require('lazy').setup {
+      --   {
+      --     'tzachar/cmp-tabnine',
+      --     build = './install.sh',
+      --     dependencies = 'hrsh7th/nvim-cmp',
+      --   },
+      -- }
       local cmp = require 'cmp'
       local luasnip = require 'luasnip'
       require('luasnip.loaders.from_vscode').lazy_load()
@@ -253,7 +255,8 @@ return {
           { name = 'luasnip' },
           { name = 'nvim_lsp_signature_help' },
           { name = 'buffer' },
-          { name = 'cmp_tabnine' },
+          { name = 'orgmode' },
+          -- { name = 'cmp_tabnine' },
           -- { name = 'codeium' },
         },
       }
@@ -268,9 +271,22 @@ return {
         sources = {
           require('null-ls').builtins.formatting.stylua, -- shell script formatting
           require('null-ls').builtins.formatting.prettierd, -- markdown formatting
+          require('null-ls').builtins.formatting.clang_format, -- markdown formatting
           -- require('null-ls').builtins.diagnostics.eslint,
           -- require('null-ls').builtins.code_actions.eslint,
         },
+        on_attach = function(client, bufnr)
+          if client.supports_method 'textDocument/formatting' then
+            vim.api.nvim_clear_autocmds { group = augroup, buffer = bufnr }
+            vim.api.nvim_create_autocmd('BufWritePost', {
+              group = augroup,
+              buffer = bufnr,
+              callback = function()
+                vim.lsp.buf.format()
+              end,
+            })
+          end
+        end,
       }
     end,
   },
@@ -299,7 +315,7 @@ return {
       require('lualine').setup {
         options = { globalstatus = true },
         sections = {
-          lualine_b = { 'branch', 'diagnostics' },
+          -- lualine_b = { 'branch', 'diagnostics' },
           lualine_c = { { 'filename', path = 3 } },
         },
       }
@@ -607,21 +623,27 @@ return {
     'stevearc/oil.nvim',
     keys = {
       {
-        '<leader>O',
+        '<leader>o',
         function()
           require('oil').toggle_float(vim.fn.expand '%:h:p')
         end,
         desc = '[O]il float current file directory',
       },
       {
-        '<leader>o',
+        '<leader>O',
         function()
           require('oil').open(vim.fn.expand '%:h:p')
         end,
         desc = '[O]il current file directory',
       },
     },
-    opts = {},
+    opts = {
+      float = {
+        border = 'single',
+        padding = 4,
+        max_width = 75,
+      },
+    },
     event = 'VeryLazy',
   },
 
@@ -656,14 +678,21 @@ return {
         --   transparency = true,
         -- },
       }
-      vim.cmd.colorscheme 'onelight'
+      -- vim.cmd.colorscheme 'onelight'
 
-      vim.cmd 'highlight Cursor guifg=#7f7f7f'
+      -- vim.cmd 'highlight Cursor guifg=#7f7f7f'
 
       -- vim.cmd 'highlight IndentBlanklineChar guifg=#006070 gui=nocombine'
       -- vim.cmd 'highlight NormalFloat guibg=NONE'
       -- vim.cmd 'highlight FloatBorder guibg=NONE'
     end,
+  },
+  {
+    "arcticicestudio/nord-vim",
+    config = function ()
+      vim.cmd.colorscheme 'nord'
+      
+    end
   },
 
   {
@@ -725,7 +754,7 @@ return {
 
       function _G.set_terminal_keymaps()
         local opts = { buffer = 0 }
-        vim.keymap.set('t', 'jj', [[<C-\><C-n>]], opts)
+        vim.keymap.set('t', '<C-\\>', [[<C-\><C-n>]], opts)
         vim.keymap.set('t', '<C-h>', [[<Cmd>wincmd h<CR>]], opts)
         vim.keymap.set('t', '<C-j>', [[<Cmd>wincmd j<CR>]], opts)
         vim.keymap.set('t', '<C-k>', [[<Cmd>wincmd k<CR>]], opts)
@@ -736,13 +765,61 @@ return {
     end,
   },
   {
-    'max397574/better-escape.nvim',
+    'rest-nvim/rest.nvim',
+    requires = { 'nvim-lua/plenary.nvim' },
     config = function()
-      require('better_escape').setup {
-        mapping = { 'jj' },
+      require('rest-nvim').setup {
+        -- result_split_horizontal = false,
+        result_split_in_place = true,
+        result = {
+          show_url = false,
+          show_curl_command = false,
+          show_http_info = true,
+          show_headers = false,
+        },
       }
+      vim.keymap.set('n', '<leader>rr', '<Plug>RestNvim', { desc = '[R]est [R]un' })
+      vim.keymap.set('n', '<leader>rl', '<Plug>RestNvimLast', { desc = '[R]est [L]ast' })
+      vim.keymap.set('n', '<leader>rp', '<Plug>RestNvimPreview', { desc = '[R]est [P]review' })
     end,
   },
+  {
+    'ThePrimeagen/refactoring.nvim',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'nvim-treesitter/nvim-treesitter',
+    },
+    config = function()
+      require('refactoring').setup()
+
+      -- load refactoring Telescope extension
+      require("telescope").load_extension("refactoring")
+      vim.keymap.set(
+        {"n", "x"},
+        "<leader>R",
+        function() require('telescope').extensions.refactoring.refactors() end
+      )
+    end,
+  },
+  --   {
+  --     'nvim-orgmode/orgmode',
+  --     event = "VeryLazy",
+  --     config = function()
+  -- require('orgmode').setup_ts_grammar()
+  --     require('orgmode').setup({
+  --       org_agenda_files = '~/orgfiles/**/*',
+  --       org_default_notes_file = '~/orgfiles/refile.org',
+  --     })
+  --     end,
+  --   },
+  -- {
+  --   'max397574/better-escape.nvim',
+  --   config = function()
+  --     require('better_escape').setup {
+  --       mapping = { 'jj' },
+  --     }
+  --   end,
+  -- },
   -- {
   --   'Bekaboo/dropbar.nvim',
   --   event = 'VeryLazy',

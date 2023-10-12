@@ -177,3 +177,31 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 --   end,
 --   pattern = '*',
 -- })
+
+-- Define a variable to keep track of the current theme
+vim.g.current_theme = 'dark'
+
+-- Function to toggle between themes
+function ToggleTheme()
+  if vim.g.current_theme == 'light' then
+    -- Set the dark theme
+    -- vim.cmd 'colorscheme nord'
+    vim.g.current_theme = 'dark'
+    vim.cmd 'set background=dark'
+  else
+    -- Set the light theme
+    -- vim.cmd 'colorscheme onelight'
+    vim.g.current_theme = 'light'
+    vim.cmd 'set background=light'
+  end
+end
+
+-- Map a key combination to toggle the theme, for example, <F5>
+vim.api.nvim_set_keymap('n', '<F5>', ':lua ToggleTheme()<CR>', { noremap = true, silent = true })
+
+vim.g.gruvbox_material_foreground = 'mix'
+vim.g.gruvbox_material_enable_italic=1
+vim.g.gruvbox_material_enable_bold=1
+vim.g.gruvbox_material_sign_column_background='grey'
+vim.g.gruvbox_material_better_performance=1
+vim.cmd [[colorscheme gruvbox-material]]

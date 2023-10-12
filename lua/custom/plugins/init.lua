@@ -323,6 +323,10 @@ return {
   },
   {
     'lukas-reineke/indent-blankline.nvim',
+    main = 'ibl',
+    opts = {
+      scope = { enabled = false },
+    },
     dependencies = {
       {
         'echasnovski/mini.nvim',
@@ -333,7 +337,6 @@ return {
       },
     },
     event = 'BufEnter',
-    opts = {},
   },
 
   -- Fuzzy Finder (files, lsp, etc)
@@ -623,18 +626,11 @@ return {
     'stevearc/oil.nvim',
     keys = {
       {
-        '<leader>o',
+        '-',
         function()
           require('oil').toggle_float(vim.fn.expand '%:h:p')
         end,
         desc = '[O]il float current file directory',
-      },
-      {
-        '<leader>O',
-        function()
-          require('oil').open(vim.fn.expand '%:h:p')
-        end,
-        desc = '[O]il current file directory',
       },
     },
     opts = {
@@ -687,14 +683,8 @@ return {
       -- vim.cmd 'highlight FloatBorder guibg=NONE'
     end,
   },
-  {
-    "arcticicestudio/nord-vim",
-    config = function ()
-      vim.cmd.colorscheme 'nord'
-      
-    end
-  },
-
+  { 'arcticicestudio/nord-vim', },
+  { 'sainnhe/gruvbox-material', },
   {
     'akinsho/bufferline.nvim',
     version = '*',
@@ -793,13 +783,22 @@ return {
       require('refactoring').setup()
 
       -- load refactoring Telescope extension
-      require("telescope").load_extension("refactoring")
-      vim.keymap.set(
-        {"n", "x"},
-        "<leader>R",
-        function() require('telescope').extensions.refactoring.refactors() end
-      )
+      require('telescope').load_extension 'refactoring'
+      vim.keymap.set({ 'n', 'x' }, '<leader>R', function()
+        require('telescope').extensions.refactoring.refactors()
+      end)
     end,
+  },
+  {
+    'simrat39/symbols-outline.nvim',
+    opts = {},
+    keys = {
+      {
+        '<leader>so',
+        '<cmd>SymbolsOutline<cr>',
+        desc = '[S]ymbols [O]utline',
+      },
+    },
   },
   --   {
   --     'nvim-orgmode/orgmode',

@@ -197,7 +197,7 @@ return {
     end,
   },
   { "nvim-focus/focus.nvim", opts = {} },
-  { "j-hui/fidget.nvim", tag = "legacy", event = "LspAttach", opts = {} },
+  { "j-hui/fidget.nvim", tag = "legacy", evevt = "LspAttach", opts = {} },
   -- { "hinell/lsp-timeout.nvim", event = "LspAttach" },
   {
     "norcalli/nvim-colorizer.lua",
@@ -210,7 +210,7 @@ return {
     version = "*", -- Use for stability; omit to use `main` branch for the latest features
     event = "VeryLazy",
     config = function()
-      require("nvim-surround").setup({})
+      require("nvim-surround").setup()
     end,
   },
   {
@@ -221,15 +221,10 @@ return {
       },
     },
   },
-
   {
-    "glacambre/firenvim",
-
-    -- Lazy load firenvim
-    -- Explanation: https://github.com/folke/lazy.nvim/discussions/463#discussioncomment-4819297
-    lazy = not vim.g.started_by_firenvim,
-    build = function()
-      vim.fn["firenvim#install"](0)
-    end,
+    "ahmedkhalf/project.nvim",
+    opts = {
+      manual_mode = false,
+    },
   },
 }

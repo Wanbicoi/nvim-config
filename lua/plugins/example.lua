@@ -1,13 +1,4 @@
 return {
-
-  {
-    "akinsho/bufferline.nvim",
-    opts = {
-      options = {
-        separator_style = "slant",
-      },
-    },
-  },
   {
     "folke/todo-comments.nvim",
     opts = {
@@ -18,18 +9,6 @@ return {
         pattern = [[\b(KEYWORDS)\b]], -- match without the extra colon. You'll likely get false positives
       },
     },
-  },
-  {
-    "nvim-tree/nvim-tree.lua",
-    opts = {
-      sync_root_with_cwd = true,
-      respect_buf_cwd = true,
-      update_focused_file = {
-        enable = true,
-        update_root = true,
-      },
-    },
-    event = "VeryLazy",
   },
   {
     "akinsho/toggleterm.nvim",
@@ -79,27 +58,13 @@ return {
       keys[#keys + 1] = { "gi", "<cmd>Telescope lsp_incoming_calls<cr>", desc = "Goto Incoming Calls" }
     end,
   },
-  -- add gruvbox
   { "sainnhe/gruvbox-material" },
-
-  {
-    "folke/tokyonight.nvim",
-    lazy = true,
-    opts = { style = "moon" },
-  },
   -- Configure LazyVim to load gruvbox
   {
     "LazyVim/LazyVim",
     opts = {
       colorscheme = "gruvbox-material",
     },
-  },
-
-  {
-    "simrat39/symbols-outline.nvim",
-    cmd = "SymbolsOutline",
-    keys = { { "<leader>cs", "<cmd>SymbolsOutline<cr>", desc = "Symbols Outline" } },
-    config = true,
   },
   {
     "stevearc/oil.nvim",
@@ -119,17 +84,6 @@ return {
     },
     event = "VeryLazy",
   },
-
-  -- override nvim-cmp and add cmp-emoji
-  {
-    "hrsh7th/nvim-cmp",
-    dependencies = { "hrsh7th/cmp-emoji" },
-    ---@param opts cmp.ConfigSchema
-    opts = function(_, opts)
-      table.insert(opts.sources, { name = "emoji" })
-    end,
-  },
-
   {
     "nvim-treesitter/nvim-treesitter",
     opts = function(_, opts)
@@ -175,12 +129,6 @@ return {
       autotag = {
         enable = true,
       },
-    },
-  },
-  {
-    "ahmedkhalf/project.nvim",
-    opts = {
-      manual_mode = false,
     },
   },
   {

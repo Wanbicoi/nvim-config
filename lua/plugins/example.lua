@@ -73,32 +73,11 @@ return {
   -- LSP keymaps
   {
     "neovim/nvim-lspconfig",
-    dependencies = {
-      "pmizio/typescript-tools.nvim",
-      init = function()
-        require("lazyvim.util").lsp.on_attach(function(_, buffer)
-          -- stylua: ignore
-          vim.keymap.set( "n", "<leader>co", "<cmd>TSToolsOrganizeImports<cr>", { buffer = buffer, desc = "Organize Imports" })
-          -- stylua: ignore
-          vim.keymap.set( "n", "<leader>ci", "<cmd>TSToolsAddMissingImports<cr>", { buffer = buffer, desc = "Add Missing Imports" })
-          -- stylua: ignore
-          vim.keymap.set("n", "<leader>cR", "<cmd>TSToolsRenameFile<cr>", { desc = "Rename File", buffer = buffer })
-        end)
-      end,
-    },
     init = function()
       local keys = require("lazyvim.plugins.lsp.keymaps").get()
       -- stylua: ignore
       keys[#keys + 1] = { "gi", "<cmd>Telescope lsp_incoming_calls<cr>", desc = "Goto Incoming Calls" }
     end,
-    opts = {
-      setup = {
-        tsserver = function(_, opts)
-          require("typescript-tools").setup({ server = opts })
-          return true
-        end,
-      },
-    },
   },
   -- add gruvbox
   { "sainnhe/gruvbox-material" },
@@ -159,32 +138,9 @@ return {
         "tsx",
         "typescript",
       })
+      opts.incremental_selection.keymaps.init_selection = "<enter>"
+      opts.incremental_selection.keymaps.node_incremental = "<enter>"
     end,
-  },
-
-  { import = "lazyvim.plugins.extras.lang.json" },
-
-  {
-    "folke/flash.nvim",
-    event = "VeryLazy",
-    ---@type Flash.Config
-    opts = {
-      modes = {
-        search = {
-          enabled = false,
-        },
-        char = {
-          enabled = false,
-        },
-      },
-    },
-
-    -- stylua: ignore
-    keys = {
-      { "<Enter>", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash", },
-      { "s", false},
-      { "S", false},
-    },
   },
   { "wakatime/vim-wakatime" },
   {
@@ -197,8 +153,7 @@ return {
     end,
   },
   { "nvim-focus/focus.nvim", opts = {} },
-  { "j-hui/fidget.nvim", tag = "legacy", evevt = "LspAttach", opts = {} },
-  -- { "hinell/lsp-timeout.nvim", event = "LspAttach" },
+  { "j-hui/fidget.nvim", tag = "legacy", event = "LspAttach", opts = {} },
   {
     "norcalli/nvim-colorizer.lua",
     config = function()
@@ -212,6 +167,7 @@ return {
     config = function()
       require("nvim-surround").setup()
     end,
+    vscode = true,
   },
   {
     "nvim-treesitter/nvim-treesitter",
@@ -225,6 +181,12 @@ return {
     "ahmedkhalf/project.nvim",
     opts = {
       manual_mode = false,
+    },
+  },
+  {
+    "nvim-lspconfig",
+    opts = {
+      inlay_hints = { enabled = false },
     },
   },
 }

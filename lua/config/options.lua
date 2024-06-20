@@ -3,3 +3,4 @@
 -- Add any additional options here
 vim.opt.spell = false
 vim.opt.swapfile = false
+vim.g.lazygit_config = false

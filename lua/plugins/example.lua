@@ -1,5 +1,16 @@
 return {
   {
+    "akinsho/bufferline.nvim",
+    opts = {
+      options = {
+        separator_style = "slant",
+        indicator = {
+          style = "underline",
+        },
+      },
+    },
+  },
+  {
     "folke/todo-comments.nvim",
     opts = {
       highlight = {

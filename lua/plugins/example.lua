@@ -42,7 +42,7 @@ return {
     "stevearc/oil.nvim",
     keys = {
       -- stylua: ignore
-      { "-", function() require("oil").toggle_float(vim.fn.expand("%:h:p")) end, desc = "[O]il float current file directory", },
+      { "-", function() require("oil").open(vim.fn.expand("%:h:p")) end, desc = "[O]il float current file directory", },
     },
     opts = {
       float = {

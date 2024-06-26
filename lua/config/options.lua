@@ -4,9 +4,10 @@
 vim.opt.spell = false
 vim.opt.swapfile = false
 vim.g.lazygit_config = false
+vim.o.guifont = "CaskaydiaCove NF:h12" -- text below applies for VimScript
+vim.g.root_spec = { ".git", "lsp", "lua", "cwd" }
 
 if vim.g.nvui then
-  vim.cmd([[set guifont=CaskaydiaCove\ NF:h12 ]])
   vim.cmd([[NvuiAnimationsEnabled 1]])
   vim.cmd([[NvuiCmdline 1]])
   vim.cmd([[NvuiCmdCenterXPos 0.5]])
@@ -17,4 +18,8 @@ if vim.g.nvui then
   vim.cmd([[NvuiCmdFontFamily CaskaydiaCove NF]])
   vim.cmd([[NvuiCmdBigFontScaleFactor 1]])
   vim.cmd([[NvuiSnapshotLimit 10]])
+end
+
+if vim.g.neovide then
+  vim.g.neovide_cursor_vfx_mode = "pixiedust"
 end

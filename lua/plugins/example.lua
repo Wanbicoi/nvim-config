@@ -84,7 +84,10 @@ return {
       opts.sources = cmp.config.sources(vim.list_extend(opts.sources, { { name = "nvim_lsp_signature_help" } }))
     end,
   },
-  { "nvim-focus/focus.nvim", opts = {} },
+  {
+    "folke/zen-mode.nvim",
+    opts = {},
+  },
   { "j-hui/fidget.nvim", tag = "legacy", event = "LspAttach", opts = {} },
   {
     "kylechui/nvim-surround",

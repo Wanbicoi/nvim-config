@@ -3,14 +3,10 @@
 -- Add any additional keymaps here
 
 if not vim.g.vscode then
-  vim.g.current_theme = "dark"
-  -- vim.cmd("set background=dark")
   function ToggleTheme()
-    if vim.g.current_theme == "light" then
-      vim.g.current_theme = "dark"
+    if vim.o.background == "light" then
       vim.cmd("set background=dark")
     else
-      vim.g.current_theme = "light"
       vim.cmd("set background=light")
     end
   end

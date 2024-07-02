@@ -4,10 +4,11 @@
 vim.opt.spell = false
 vim.opt.swapfile = false
 vim.g.lazygit_config = false
-vim.o.guifont = "CaskaydiaCove NF:h12" -- text below applies for VimScript
 vim.g.root_spec = { ".git", "lsp", "lua", "cwd" }
+vim.o.background = "light"
 
 if vim.g.nvui then
+  vim.o.guifont = "CaskaydiaCove NF:h12"
   vim.cmd([[NvuiAnimationsEnabled 1]])
   vim.cmd([[NvuiCmdline 1]])
   vim.cmd([[NvuiCmdCenterXPos 0.5]])

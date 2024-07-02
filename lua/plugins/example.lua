@@ -42,13 +42,6 @@ return {
       inlay_hints = { enabled = false },
     },
   },
-  { "sainnhe/gruvbox-material" },
-  {
-    "LazyVim/LazyVim",
-    opts = {
-      colorscheme = "gruvbox-material",
-    },
-  },
   {
     "stevearc/oil.nvim",
     keys = {

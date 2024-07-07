@@ -3,7 +3,7 @@ return {
     "akinsho/bufferline.nvim",
     opts = {
       options = {
-        separator_style = "slant",
+        -- separator_style = "slant",
         indicator = {
           style = "underline",
         },
@@ -44,6 +44,7 @@ return {
   },
   {
     "stevearc/oil.nvim",
+    enabled = false,
     keys = {
       -- stylua: ignore
       { "-", function() require("oil").open(vim.fn.expand("%:h:p")) end, desc = "[O]il float current file directory", },
@@ -59,6 +60,26 @@ return {
       },
     },
     event = "VeryLazy",
+  },
+  ---@type LazySpec
+  {
+    "mikavilpas/yazi.nvim",
+    event = "VeryLazy",
+    keys = {
+      -- 👇 in this section, choose your own keymappings!
+      {
+        "-",
+        function()
+          require("yazi").yazi(nil, vim.fn.expand("%:h:p"))
+        end,
+        desc = "Open the file manager",
+      },
+    },
+    ---@type YaziConfig
+    opts = {
+      -- if you want to open yazi instead of netrw, see below for more info
+      open_for_directories = false,
+    },
   },
   {
     "nvim-treesitter/nvim-treesitter",
@@ -77,10 +98,6 @@ return {
       opts.sources = cmp.config.sources(vim.list_extend(opts.sources, { { name = "nvim_lsp_signature_help" } }))
     end,
   },
-  {
-    "folke/zen-mode.nvim",
-    opts = {},
-  },
   { "j-hui/fidget.nvim", tag = "legacy", event = "LspAttach", opts = {} },
   {
     "kylechui/nvim-surround",
@@ -90,5 +107,17 @@ return {
       require("nvim-surround").setup()
     end,
     vscode = true,
+  },
+  {
+    "nvim-telescope/telescope.nvim",
+    opts = {
+      defaults = {
+        sorting_strategy = "ascending",
+        layout_strategy = "center",
+        layout_config = {
+          width = 0.7,
+        },
+      },
+    },
   },
 }

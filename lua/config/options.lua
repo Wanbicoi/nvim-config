@@ -5,7 +5,8 @@ vim.opt.spell = false
 vim.opt.swapfile = false
 vim.g.lazygit_config = false
 vim.g.root_spec = { ".git", "lsp", "lua", "cwd" }
-vim.o.background = "light"
+-- vim.o.background = "light"
+vim.o.cursorlineopt = "number"
 
 if vim.g.nvui then
   vim.o.guifont = "CaskaydiaCove NF:h12"

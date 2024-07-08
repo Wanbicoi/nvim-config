@@ -37,6 +37,23 @@ return {
       local keys = require("lazyvim.plugins.lsp.keymaps").get()
       -- stylua: ignore
       keys[#keys + 1] = { "gi", "<cmd>Telescope lsp_incoming_calls<cr>", desc = "Goto Incoming Calls" }
+      -- Define the border style
+      local border = {
+        { "╭", "FloatBorder" },
+        { "─", "FloatBorder" },
+        { "╮", "FloatBorder" },
+        { "│", "FloatBorder" },
+        { "╯", "FloatBorder" },
+        { "─", "FloatBorder" },
+        { "╰", "FloatBorder" },
+        { "│", "FloatBorder" },
+      }
+      vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
+        border = border,
+      })
+      vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, {
+        border = border,
+      })
     end,
     opts = {
       inlay_hints = { enabled = false },
@@ -98,7 +115,7 @@ return {
       opts.sources = cmp.config.sources(vim.list_extend(opts.sources, { { name = "nvim_lsp_signature_help" } }))
     end,
   },
-  { "j-hui/fidget.nvim", tag = "legacy", event = "LspAttach", opts = {} },
+  { "j-hui/fidget.nvim", event = "LspAttach", opts = {}, enabled = false },
   {
     "kylechui/nvim-surround",
     version = "*", -- Use for stability; omit to use `main` branch for the latest features

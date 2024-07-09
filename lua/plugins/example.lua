@@ -3,7 +3,6 @@ return {
     "akinsho/bufferline.nvim",
     opts = {
       options = {
-        -- separator_style = "slant",
         indicator = {
           style = "underline",
         },
@@ -37,46 +36,10 @@ return {
       local keys = require("lazyvim.plugins.lsp.keymaps").get()
       -- stylua: ignore
       keys[#keys + 1] = { "gi", "<cmd>Telescope lsp_incoming_calls<cr>", desc = "Goto Incoming Calls" }
-      -- Define the border style
-      local border = {
-        { "╭", "FloatBorder" },
-        { "─", "FloatBorder" },
-        { "╮", "FloatBorder" },
-        { "│", "FloatBorder" },
-        { "╯", "FloatBorder" },
-        { "─", "FloatBorder" },
-        { "╰", "FloatBorder" },
-        { "│", "FloatBorder" },
-      }
-      vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
-        border = border,
-      })
-      vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, {
-        border = border,
-      })
     end,
     opts = {
       inlay_hints = { enabled = false },
     },
-  },
-  {
-    "stevearc/oil.nvim",
-    enabled = false,
-    keys = {
-      -- stylua: ignore
-      { "-", function() require("oil").open(vim.fn.expand("%:h:p")) end, desc = "[O]il float current file directory", },
-    },
-    opts = {
-      float = {
-        border = "single",
-        padding = 4,
-        max_width = 75,
-      },
-      keymaps = {
-        ["q"] = "actions.close",
-      },
-    },
-    event = "VeryLazy",
   },
   ---@type LazySpec
   {
@@ -95,7 +58,7 @@ return {
     ---@type YaziConfig
     opts = {
       -- if you want to open yazi instead of netrw, see below for more info
-      open_for_directories = false,
+      open_for_directories = true,
     },
   },
   {
@@ -107,25 +70,6 @@ return {
   },
   { "wakatime/vim-wakatime" },
   {
-    "hrsh7th/nvim-cmp",
-    dependencies = { "hrsh7th/cmp-nvim-lsp-signature-help" },
-    ---@param opts cmp.ConfigSchema
-    opts = function(_, opts)
-      local cmp = require("cmp")
-      opts.sources = cmp.config.sources(vim.list_extend(opts.sources, { { name = "nvim_lsp_signature_help" } }))
-    end,
-  },
-  { "j-hui/fidget.nvim", event = "LspAttach", opts = {}, enabled = false },
-  {
-    "kylechui/nvim-surround",
-    version = "*", -- Use for stability; omit to use `main` branch for the latest features
-    event = "VeryLazy",
-    config = function()
-      require("nvim-surround").setup()
-    end,
-    vscode = true,
-  },
-  {
     "nvim-telescope/telescope.nvim",
     opts = {
       defaults = {
@@ -134,6 +78,22 @@ return {
         layout_config = {
           width = 0.7,
         },
+      },
+    },
+  },
+  {
+    "folke/noice.nvim",
+    opts = {
+      presets = {
+        lsp_doc_border = true,
+      },
+    },
+  },
+  {
+    "folke/which-key.nvim",
+    opts = {
+      window = {
+        border = "single", -- none, single, double, shadow
       },
     },
   },

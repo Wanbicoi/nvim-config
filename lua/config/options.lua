@@ -8,7 +8,6 @@ vim.opt.swapfile = false
 vim.g.lazygit_config = false
 vim.g.root_spec = { ".git", "lsp", "lua", "cwd" }
 vim.o.cursorlineopt = "number"
--- vim.o.background = "light"
 
 if vim.g.nvui then
   vim.o.guifont = "CaskaydiaCove NF:h12"

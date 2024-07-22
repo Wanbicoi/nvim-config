@@ -41,7 +41,6 @@ return {
       inlay_hints = { enabled = false },
     },
   },
-  ---@type LazySpec
   {
     "mikavilpas/yazi.nvim",
     event = "VeryLazy",
@@ -92,9 +91,46 @@ return {
   {
     "folke/which-key.nvim",
     opts = {
-      window = {
+      win = {
         border = "single", -- none, single, double, shadow
       },
     },
+  },
+  {
+    "epwalsh/obsidian.nvim",
+    version = "*", -- recommended, use latest release instead of latest commit
+    lazy = true,
+    ft = "markdown",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    opts = {
+      workspaces = {
+        {
+          name = "til",
+          path = "~/source/repos/til",
+        },
+      },
+      ui = {
+        enable = false,
+      },
+      mappings = {},
+      notes_subdir = "notes",
+      disable_frontmatter = true,
+    },
+    init = function()
+      require("lint").linters["markdownlint-cli2"].args = {
+        "--config",
+        '{ "config": { "MD013": false } }',
+      }
+    end,
+  },
+  {
+    "MeanderingProgrammer/markdown.nvim",
+    name = "render-markdown",
+    lazy = true,
+    ft = "markdown",
+    dependencies = { "nvim-treesitter/nvim-treesitter", "echasnovski/mini.icons" }, -- if you use standalone mini plugins
+    config = function()
+      require("render-markdown").setup({})
+    end,
   },
 }

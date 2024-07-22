@@ -35,4 +35,9 @@ return {
       transparent_background = true,
     },
   },
+  {
+    "scottmckendry/cyberdream.nvim",
+    lazy = false,
+    priority = 1000,
+  },
 }

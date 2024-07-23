@@ -42,23 +42,22 @@ return {
     },
   },
   {
-    "mikavilpas/yazi.nvim",
-    event = "VeryLazy",
+    "stevearc/oil.nvim",
     keys = {
-      -- 👇 in this section, choose your own keymappings!
-      {
-        "-",
-        function()
-          require("yazi").yazi(nil, vim.fn.expand("%:h:p"))
-        end,
-        desc = "Open the file manager",
+      -- stylua: ignore
+      { "-", function() require("oil").toggle_float(vim.fn.expand("%:h:p")) end, desc = "[O]il float current file directory", },
+    },
+    opts = {
+      float = {
+        border = "single",
+        padding = 4,
+        max_width = 75,
+      },
+      keymaps = {
+        ["q"] = "actions.close",
       },
     },
-    ---@type YaziConfig
-    opts = {
-      -- if you want to open yazi instead of netrw, see below for more info
-      open_for_directories = true,
-    },
+    event = "VeryLazy",
   },
   {
     "nvim-treesitter/nvim-treesitter",

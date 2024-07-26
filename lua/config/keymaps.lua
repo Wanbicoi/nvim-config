@@ -18,4 +18,11 @@ end
 
 vim.api.nvim_set_keymap("x", "p", 'p:let @+=@0<CR>:let @"=@0<CR>', { silent = true })
 
--- vim.api.nvim_set_keymap("n", "<leader>e", "<cmd>NvimTreeToggle<cr>", { silent = true })
+-- Add border to term
+vim.keymap.del("n", "<C-_>")
+vim.keymap.del("n", "<C-/>")
+local lazyterm = function()
+  LazyVim.terminal(nil, { cwd = LazyVim.root(), border = "rounded" })
+end
+vim.keymap.set("n", "<C-_>", lazyterm, { desc = "Term with border" })
+vim.keymap.set("n", "<C-/>", lazyterm, { desc = "Term with border" })

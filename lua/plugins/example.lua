@@ -122,4 +122,11 @@ return {
       }
     end,
   },
+  {
+    "LunarVim/bigfile.nvim",
+    lazy = false,
+    opts = {
+      filesize = 0.1,
+    },
+  },
 }

@@ -23,7 +23,11 @@ return {
     "stevearc/oil.nvim",
     ---@module 'oil'
     ---@type oil.SetupOpts
-    opts = {},
+    opts = {
+      keymaps = {
+        ["q"] = { "actions.close", mode = "n" },
+      }
+    },
     dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if you prefer nvim-web-devicons
     keys = {
       { "-", "<cmd>Oil<cr>", desc = "Oil current file" }
@@ -58,7 +62,7 @@ return {
   },
   {
     "ludovicchabant/vim-gutentags",
-    event = "BufEnter"
+    event = "VeryLazy"
   },
   {
     "Darazaki/indent-o-matic",
@@ -81,13 +85,18 @@ return {
   {
     'crusj/bookmarks.nvim',
     keys = {
-      { "<tab><tab>", mode = { "n" } },
+      { "\\b", mode = { "n" } },
     },
     branch = 'main',
     dependencies = { 'nvim-web-devicons' },
     config = function()
       require("bookmarks").setup()
       require("telescope").load_extension("bookmarks")
-    end
+    end,
+    opts = {
+      keymap = {
+        toggle = "\\b"
+      }
+    }
   }
 }

@@ -6,7 +6,7 @@
 local M = {}
 
 M.base46 = {
-  theme = "default-dark",
+  theme = "aquarium",
 }
 M.nvdash = { load_on_startup = false }
 M.term = {

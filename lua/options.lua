@@ -2,8 +2,9 @@ require "nvchad.options"
 
 -- add yours here!
 
-vim.o.cursorlineopt = "both" -- to enable cursorline!
-vim.o.shell = "powershell"   -- to enable cursorline!
+vim.o.cursorlineopt = "both"
+vim.o.shell = "powershell"
+vim.o.swapfile = false
 vim.g.gutentags_file_list_command = "rg --files"
 
 vim.o.relativenumber = true

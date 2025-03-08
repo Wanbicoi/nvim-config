@@ -1,5 +1,32 @@
 return {
   {
+    "hrsh7th/nvim-cmp",
+    dependencies = "hrsh7th/cmp-cmdline",
+    init = function()
+      local cmp = require 'cmp'
+      cmp.setup.cmdline({ '/', '?' }, {
+        completion = { completeopt = "menu,menuone,noselect,preview" },
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = {
+          { name = 'buffer' }
+        }
+      })
+
+      cmp.setup.cmdline(':', {
+        completion = { completeopt = "menu,menuone,noselect,preview" },
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = cmp.config.sources(
+          {
+            { name = 'path' }
+          },
+          {
+            { name = 'cmdline' }
+          }
+        )
+      })
+    end
+  },
+  {
     "nvim-tree/nvim-tree.lua",
     enabled = false
   },
@@ -46,6 +73,8 @@ return {
     "ahmedkhalf/project.nvim",
     config = function()
       require("project_nvim").setup {
+        detection_methods = { "pattern", "lsp" },
+        patterns = { ".git" },
       }
     end,
     init = function()
@@ -55,7 +84,10 @@ return {
   },
   {
     "nvim-treesitter/nvim-treesitter",
-    dependencies = "nvim-treesitter/nvim-treesitter-refactor",
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter-refactor",
+      "nvim-treesitter/nvim-treesitter-textobjects"
+    },
     opts = {
       ensure_installed = "all",
       incremental_selection = {
@@ -83,7 +115,43 @@ return {
           },
         },
       },
+      textobjects = {
+        select = {
+          enable = true,
+          lookahead = true,
+        },
+        move = {
+          enable = true,
+          set_jumps = true,
+          goto_next_start = {
+            ["]m"] = "@function.outer",
+            ["]]"] = "@class.outer",
+          },
+          goto_next_end = {
+            ["]M"] = "@function.outer",
+            ["]["] = "@class.outer",
+          },
+          goto_previous_start = {
+            ["[m"] = "@function.outer",
+            ["[["] = "@class.outer",
+          },
+          goto_previous_end = {
+            ["[M"] = "@function.outer",
+            ["[]"] = "@class.outer",
+          },
+        },
+      },
     },
+  },
+  {
+    "nvim-treesitter/nvim-treesitter-context",
+    dependencies = "nvim-treesitter/nvim-treesitter",
+    event = "BufEnter",
+    opts = {
+      line_numbers = false,
+      max_lines = 5,
+      separator = '─',
+    }
   },
   {
     "ludovicchabant/vim-gutentags",
@@ -138,22 +206,13 @@ return {
         max_width         = { 35, 0.25 },
         min_width         = 20,
       },
-      close_automatic_events = { "unfocus", "switch_buffer" },
+      -- close_automatic_events = { "unfocus", "switch_buffer" },
     },
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
       "nvim-tree/nvim-web-devicons"
     },
     cmd = "AerialToggle"
-  },
-  {
-    "nvim-treesitter/nvim-treesitter-context",
-    event = "BufEnter",
-    opts = {
-      line_numbers = false,
-      max_lines = 3,
-      separator = ''
-    }
   },
   {
     'echasnovski/mini.surround',
@@ -172,17 +231,23 @@ return {
         suffix_last = 'l',      -- Suffix to search with "prev" method
         suffix_next = 'n',      -- Suffix to search with "next" method
       },
+      n_lines = 1000,
     }
   },
   {
     "olimorris/codecompanion.nvim",
     opts = {
+      display = {
+        chat = {
+          show_settings = true
+        }
+      },
       adapters = {
         gemini = function()
           return require("codecompanion.adapters").extend("gemini", {
             schema = {
               model = {
-                default = "gemini-2.0-flash",
+                default = "gemini-2.0-flash-thinking-exp-01-21",
               },
             },
           })
@@ -225,9 +290,45 @@ return {
   },
   {
     'rmagatti/auto-session',
-    lazy = false,
     opts = {
-      auto_restore_last_session = true,
+      -- auto_restore_last_session = true,
+    },
+    keys = {
+      { "<leader>fs", "<cmd>SessionSearch<cr>", desc = "Oil current file" }
+    },
+    cmd = {
+      "SessionSearch"
     }
+  },
+  {
+    'kristijanhusak/vim-dadbod-ui',
+    dependencies = {
+      { 'tpope/vim-dadbod' },
+      -- { 'kristijanhusak/vim-dadbod-completion', ft = { 'sql', 'mysql', 'plsql' }, lazy = true }, -- Optional
+    },
+    cmd = {
+      'DBUI',
+      'DBUIToggle',
+      'DBUIAddConnection',
+      'DBUIFindBuffer',
+    },
+    init = function()
+      -- Your DBUI configuration
+      vim.g.db_ui_use_nerd_fonts = 1
+    end,
+  },
+  {
+    "folke/flash.nvim",
+    event = "VeryLazy",
+    opts = {
+      modes = {
+        search = { enabled = true },
+        char = { enabled = false }
+      }
+    },
+    keys = {
+      { "<leader>st",     mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
+      { "<c-s>", mode = { "c" },           function() require("flash").toggle() end,     desc = "Toggle Flash Search" },
+    },
   }
 }

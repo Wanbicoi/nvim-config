@@ -7,6 +7,7 @@ nomap("n", "<tab>")
 nomap("n", "<s-tab>")
 nomap("n", "<leader>h")
 nomap("n", "<leader>v")
+nomap("n", "<leader>n")
 
 -- add yours here
 
@@ -18,8 +19,6 @@ map("n", "L",
 map("n", "H",
   function() require("nvchad.tabufline").prev() end, { desc = "buffer goto prev" })
 
-map({ "n", "i", "v" }, "<C-s>", "<cmd> w <cr>")
--- map({ "n" }, "-", "<cmd>Oil <cr>")
 map({ "n" }, "<leader>fp", "<cmd>Telescope projects<cr>")
 map({ "n" }, "<leader><leader>", "<cmd>Telescope find_files<cr>")
 map({ "n" }, "<leader>fw", "<cmd>Telescope grep_string<cr>", { desc = "find word under cursor" })
@@ -28,8 +27,19 @@ map({ "n" }, "<leader>ds", "<cmd>lua vim.diagnostic.open_float()<cr>", { desc = 
 
 -- Bookmarks
 map({ "n" }, "<leader>fB", "<cmd>BookmarksLists<cr>")
+map({ "n" }, "<leader>B", "<cmd>BookmarksMark<cr>")
 map({ "n" }, "]b", "<cmd>BookmarksGotoNextInList<cr>")
 map({ "n" }, "[b", "<cmd>BookmarksGotoPrevInList<cr>")
+
+-- Buffer managers
+map({ "n" }, "<leader>X", function() require("nvchad.tabufline").closeAllBufs(false) end,
+  { desc = "buffer close others" })
+
+-- Resize window
+vim.keymap.set('n', '<C-Up>', '<C-w>5+')
+vim.keymap.set('n', '<C-Down>', '<C-w>5-')
+vim.keymap.set('n', '<C-Left>', '<C-w>20<')
+vim.keymap.set('n', '<C-Right>', '<C-w>20>')
 
 vim.keymap.set('n', '<leader>cP', function()
   vim.cmd('let @+ = expand("%:p")')
@@ -51,7 +61,7 @@ map({ "n", "t" }, "<a-l>",
   { desc = "Toggle floating LazyGit window" })
 
 map({ "n", "t" }, "<a-a>",
-  function() require("nvchad.term").toggle { pos = "sp", id = "aider", cmd = "aider", } end,
+  function() require("nvchad.term").toggle { pos = "vsp", id = "aider", cmd = "aider", } end,
   { desc = "Aider✨" })
 
 map("n", "[n",

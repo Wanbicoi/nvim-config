@@ -1,5 +1,6 @@
 require "nvchad.options"
 
+vim.o.incsearch = false
 vim.o.relativenumber = true
 vim.o.wrap = false
 vim.o.cursorlineopt = "both"
@@ -11,6 +12,14 @@ vim.o.foldenable = false
 vim.cmd([[set sessionoptions-=blank,help,terminal]])
 vim.o.winwidth = 40
 vim.o.winminwidth = 20
+
+vim.api.nvim_create_autocmd({ "FileType" }, {
+  pattern = { "markdown", "txt" },
+  callback = function()
+    vim.opt_local.wrap = true
+    vim.opt_local.linebreak = true
+  end,
+})
 
 vim.cmd [[
   let &shell = executable('pwsh') ? 'pwsh' : 'powershell'
@@ -48,3 +57,13 @@ vim.api.nvim_create_autocmd("TermClose", {
     vim.api.nvim_input("<CR>")
   end,
 })
+
+if vim.g.neovide then
+  vim.o.guifont = "CodeNewRoman Nerd Font Propo:h12" -- text below applies for VimScript
+  -- vim.g.neovide_cursor_vfx_mode = "railgun"
+  vim.g.neovide_cursor_vfx_mode = "sonicboom"
+  vim.g.neovide_floating_shadow = false
+  vim.g.neovide_text_contrast = 1
+end
+
+vim.g.db_ui_execute_on_save = false

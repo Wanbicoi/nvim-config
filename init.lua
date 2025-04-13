@@ -93,6 +93,8 @@ vim.g.maplocalleader = ' '
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
+vim.o.tabstop = 2
+vim.o.shiftwidth = 2
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.mouse = 'a'
@@ -236,6 +238,7 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 -- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
 -- or just use <C-\><C-n> to exit terminal mode
 vim.keymap.set('t', '<c-x>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
+vim.keymap.set('n', '<c-s>', '<cmd>:w<cr>', { desc = 'Save all files' })
 
 -- TIP: Disable arrow keys in normal mode
 -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
@@ -452,13 +455,19 @@ require('lazy').setup({
 
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
-      vim.keymap.set('n', '<leader><leader>', builtin.find_files, { desc = '[S]earch [F]iles' })
-      vim.keymap.set('n', '<leader>fs', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
-      vim.keymap.set('n', '<leader>fw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
-      vim.keymap.set('n', '<leader>/', builtin.live_grep, { desc = '[S]earch by [G]rep' })
-      vim.keymap.set('n', '<leader>fr', builtin.resume, { desc = '[S]earch [R]esume' })
-      vim.keymap.set('n', '<leader>fo', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
-      vim.keymap.set('n', '_', builtin.buffers, { desc = '[ ] Find existing buffers' })
+      vim.keymap.set('n', '<leader><leader>', function()
+        builtin.git_files { show_untracked = true }
+      end, { desc = '[F]ind [G]it Files' })
+      vim.keymap.set('n', '<leader>fa', function()
+        builtin.find_files { no_ignore = true }
+      end, { desc = '[F]ind [A]ll' })
+      vim.keymap.set('n', '<leader>ff', builtin.fd, { desc = '[F]ind [F]iles' })
+      vim.keymap.set('n', '<leader>ft', builtin.builtin, { desc = '[F]ind [T]elescope' })
+      vim.keymap.set('n', '<leader>fw', builtin.grep_string, { desc = '[F]ind current [W]ord' })
+      vim.keymap.set('n', '<leader>/', builtin.live_grep, { desc = '[F]ind by [G]rep' })
+      vim.keymap.set('n', '<leader>fr', builtin.resume, { desc = '[F]ind [R]esume' })
+      vim.keymap.set('n', '<leader>fo', builtin.oldfiles, { desc = '[F]ind Recent Files ("." for repeat)' })
+      vim.keymap.set('n', '_', builtin.buffers, { desc = '[_] Find existing buffers' })
 
       -- Shortcut for searching your Neovim configuration files
       vim.keymap.set('n', '<leader>fn', function()
@@ -488,8 +497,8 @@ require('lazy').setup({
       -- Mason must be loaded before its dependents so we need to set it up here.
       -- NOTE: `opts = {}` is the same as calling `require('mason').setup({})`
       { 'williamboman/mason.nvim', opts = {} },
-      'williamboman/mason-lspconfig.nvim',
-      'WhoIsSethDaniel/mason-tool-installer.nvim',
+      { 'williamboman/mason-lspconfig.nvim' },
+      -- 'WhoIsSethDaniel/mason-tool-installer.nvim',
 
       -- Useful status updates for LSP.
       { 'j-hui/fidget.nvim', opts = {} },
@@ -544,14 +553,14 @@ require('lazy').setup({
           -- Jump to the definition of the word under your cursor.
           --  This is where a variable was first declared, or where a function is defined, etc.
           --  To jump back, press <C-t>.
-          map('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
+          map('gd', vim.lsp.buf.definition, '[G]oto [D]efinition')
 
           -- Find references for the word under your cursor.
           map('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
 
           -- Jump to the implementation of the word under your cursor.
           --  Useful when your language has ways of declaring types without an actual implementation.
-          map('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
+          map('gI', vim.lsp.buf.implementation, '[G]oto [I]mplementation')
 
           -- Jump to the type of the word under your cursor.
           --  Useful when you're not sure what type a variable is and you want to see
@@ -732,7 +741,7 @@ require('lazy').setup({
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
       })
-      require('mason-tool-installer').setup { ensure_installed = ensure_installed }
+      -- require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
       require('mason-lspconfig').setup {
         ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
@@ -753,7 +762,11 @@ require('lazy').setup({
   {
     'pmizio/typescript-tools.nvim',
     dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
-    opts = {},
+    opts = {
+      settings = {
+        expose_as_code_action = 'all',
+      },
+    },
     ft = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'json' },
   },
   { -- Autoformat
@@ -825,12 +838,12 @@ require('lazy').setup({
           -- `friendly-snippets` contains a variety of premade snippets.
           --    See the README about individual language/framework/plugin snippets:
           --    https://github.com/rafamadriz/friendly-snippets
-          -- {
-          --   'rafamadriz/friendly-snippets',
-          --   config = function()
-          --     require('luasnip.loaders.from_vscode').lazy_load()
-          --   end,
-          -- },
+          {
+            'rafamadriz/friendly-snippets',
+            config = function()
+              require('luasnip.loaders.from_vscode').lazy_load()
+            end,
+          },
         },
       },
       'saadparwaiz1/cmp_luasnip',
@@ -873,18 +886,17 @@ require('lazy').setup({
           -- Accept ([y]es) the completion.
           --  This will auto-import if your LSP supports it.
           --  This will expand snippets if the LSP sent a snippet.
-          -- ['<C-y>'] = cmp.mapping.confirm { select = true },
+          ['<C-y>'] = cmp.mapping.confirm { select = true },
 
           -- If you prefer more traditional completion keymaps,
           -- you can uncomment the following lines
-          ['<Tab>'] = cmp.mapping.confirm { select = true },
           -- ['<Tab>'] = cmp.mapping.select_next_item(),
           -- ['<S-Tab>'] = cmp.mapping.select_prev_item(),
 
           -- Manually trigger a completion from nvim-cmp.
           --  Generally you don't need this, because nvim-cmp will display
           --  completions whenever it has completion options available.
-          ['<C-Space>'] = cmp.mapping.complete {},
+          ['<c-c>'] = cmp.mapping.complete {},
 
           -- Think of <c-l> as moving to the right of your snippet expansion.
           --  So if you have a snippet that's like:
@@ -979,6 +991,8 @@ require('lazy').setup({
         },
         n_lines = 1000,
       }
+      require('mini.bufremove').setup()
+      vim.keymap.set('n', '<leader>x', MiniBufremove.delete, { desc = '[X] Close current buffer' })
 
       -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,
@@ -1021,6 +1035,7 @@ require('lazy').setup({
     end,
     init = function()
       require('telescope').load_extension 'projects'
+      vim.keymap.set('n', '<leader>fp', '<cmd>Telescope projects<cr>', { desc = '[F]ind [P]rojects' })
     end,
     lazy = false,
   },
@@ -1099,6 +1114,18 @@ require('lazy').setup({
     },
   },
   {
+    'JoosepAlviste/nvim-ts-context-commentstring',
+    init = function()
+      require('ts_context_commentstring').setup {
+        enable_autocmd = false,
+      }
+      local get_option = vim.filetype.get_option
+      vim.filetype.get_option = function(filetype, option)
+        return option == 'commentstring' and require('ts_context_commentstring.internal').calculate_commentstring() or get_option(filetype, option)
+      end
+    end,
+  },
+  {
     'nvim-treesitter/nvim-treesitter-context',
     dependencies = 'nvim-treesitter/nvim-treesitter',
     event = 'BufEnter',
@@ -1156,7 +1183,7 @@ require('lazy').setup({
     'MeanderingProgrammer/render-markdown.nvim',
     dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' },
     opts = {},
-    ft = { 'markdown', 'codecompanion' },
+    ft = { 'markdown', 'codecompanion', 'Avante' },
   },
   {
     'AckslD/swenv.nvim',
@@ -1168,7 +1195,7 @@ require('lazy').setup({
       -- auto_restore_last_session = true,
     },
     keys = {
-      { '<leader>fs', '<cmd>SessionSearch<cr>', desc = 'Oil current file' },
+      { '<leader>fs', '<cmd>SessionSearch<cr>', desc = '[F]ind [S]ession' },
     },
     cmd = {
       'SessionSearch',
@@ -1245,6 +1272,13 @@ require('lazy').setup({
     config = function()
       require('toggleterm').setup {
         open_mapping = [[<c-\>]],
+        size = function(term)
+          if term.direction == 'horizontal' then
+            return 15
+          elseif term.direction == 'vertical' then
+            return vim.o.columns * 0.4
+          end
+        end,
       }
       local Terminal = require('toggleterm.terminal').Terminal
       local lazygit = Terminal:new {
@@ -1274,46 +1308,50 @@ require('lazy').setup({
       vim.keymap.set({ 'n', 't' }, '<a-a>', aider_toggle, { noremap = true, silent = true })
     end,
   },
+  -- {
+  --   'ThePrimeagen/harpoon',
+  --   branch = 'harpoon2',
+  --   event = 'VeryLazy',
+  --   dependencies = { 'nvim-lua/plenary.nvim' },
+  --   config = function()
+  --     local harpoon = require 'harpoon'
+  --     harpoon:setup()
+  --
+  --     vim.keymap.set('n', '<leader>a', function()
+  --       harpoon:list():add()
+  --     end, { desc = '[A]dd to harpoon' })
+  --     vim.keymap.set('n', '<C-e>', function()
+  --       harpoon.ui:toggle_quick_menu(harpoon:list())
+  --     end)
+  --
+  --     vim.keymap.set('n', '<a-1>', function()
+  --       harpoon:list():select(1)
+  --     end)
+  --     vim.keymap.set('n', '<a-2>', function()
+  --       harpoon:list():select(2)
+  --     end)
+  --     vim.keymap.set('n', '<a-3>', function()
+  --       harpoon:list():select(3)
+  --     end)
+  --     vim.keymap.set('n', '<a-4>', function()
+  --       harpoon:list():select(4)
+  --     end)
+  --
+  --     vim.keymap.set('n', '[h', function()
+  --       harpoon:list():prev()
+  --     end)
+  --     vim.keymap.set('n', ']h', function()
+  --       harpoon:list():next()
+  --     end)
+  --   end,
+  -- },
   {
-    'ThePrimeagen/harpoon',
-    branch = 'harpoon2',
-    event = "VeryLazy",
-    dependencies = { 'nvim-lua/plenary.nvim' },
-    config = function()
-      local harpoon = require 'harpoon'
-      harpoon:setup()
-
-      vim.keymap.set('n', '<leader>a', function()
-        harpoon:list():add()
-      end, { desc = '[A]dd to harpoon' })
-      vim.keymap.set('n', '<C-e>', function()
-        harpoon.ui:toggle_quick_menu(harpoon:list())
-      end)
-
-      vim.keymap.set('n', '<a-1>', function()
-        harpoon:list():select(1)
-      end)
-      vim.keymap.set('n', '<a-2>', function()
-        harpoon:list():select(2)
-      end)
-      vim.keymap.set('n', '<a-3>', function()
-        harpoon:list():select(3)
-      end)
-      vim.keymap.set('n', '<a-4>', function()
-        harpoon:list():select(4)
-      end)
-
-      vim.keymap.set('n', '[h', function()
-        harpoon:list():prev()
-      end)
-      vim.keymap.set('n', ']h', function()
-        harpoon:list():next()
-      end)
-    end,
+    'ludovicchabant/vim-gutentags',
+    event = 'VeryLazy',
   },
   {
-    "ludovicchabant/vim-gutentags",
-    event = "VeryLazy"
+    'tpope/vim-fugitive',
+    event = 'VeryLazy',
   },
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
@@ -1329,6 +1367,8 @@ require('lazy').setup({
   require 'kickstart.plugins.lint',
   require 'kickstart.plugins.autopairs',
   require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
+  require 'kickstart.plugins.indent_line',
+  require 'kickstart.plugins.avante',
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.

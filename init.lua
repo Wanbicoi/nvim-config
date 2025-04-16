@@ -556,7 +556,7 @@ require('lazy').setup({
           map('gd', vim.lsp.buf.definition, '[G]oto [D]efinition')
 
           -- Find references for the word under your cursor.
-          map('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
+          map('gR', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
 
           -- Jump to the implementation of the word under your cursor.
           --  Useful when your language has ways of declaring types without an actual implementation.
@@ -574,14 +574,6 @@ require('lazy').setup({
           -- Fuzzy find all the symbols in your current workspace.
           --  Similar to document symbols, except searches over your entire project.
           map('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
-
-          -- Rename the variable under your cursor.
-          --  Most Language Servers support renaming across files, etc.
-          map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
-
-          -- Execute a code action, usually your cursor needs to be on top of an error
-          -- or a suggestion from your LSP for this to activate.
-          map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction', { 'n', 'x' })
 
           -- WARN: This is not Goto Definition, this is Goto Declaration.
           --  For example, in C this would take you to the header.
@@ -886,7 +878,7 @@ require('lazy').setup({
           -- Accept ([y]es) the completion.
           --  This will auto-import if your LSP supports it.
           --  This will expand snippets if the LSP sent a snippet.
-          ['<C-y>'] = cmp.mapping.confirm { select = true },
+          ['<Tab>'] = cmp.mapping.confirm { select = true },
 
           -- If you prefer more traditional completion keymaps,
           -- you can uncomment the following lines
@@ -1135,41 +1127,41 @@ require('lazy').setup({
       separator = '─',
     },
   },
-  {
-    'olimorris/codecompanion.nvim',
-    opts = {
-      display = {
-        chat = {
-          show_settings = true,
-        },
-      },
-      adapters = {
-        gemini = function()
-          return require('codecompanion.adapters').extend('gemini', {
-            schema = {
-              model = {
-                default = 'gemini-2.0-flash-thinking-exp-01-21',
-              },
-            },
-          })
-        end,
-      },
-      strategies = {
-        chat = { adapter = 'gemini' },
-        inline = { adapter = 'gemini' },
-      },
-    },
-    cmd = {
-      'CodeCompanion',
-      'CodeCompanionChat',
-      'CodeCompanionCmd',
-      'CodeCompanionActions',
-    },
-    dependencies = {
-      'nvim-lua/plenary.nvim',
-      'nvim-treesitter/nvim-treesitter',
-    },
-  },
+  -- {
+  --   'olimorris/codecompanion.nvim',
+  --   opts = {
+  --     display = {
+  --       chat = {
+  --         show_settings = true,
+  --       },
+  --     },
+  --     adapters = {
+  --       gemini = function()
+  --         return require('codecompanion.adapters').extend('gemini', {
+  --           schema = {
+  --             model = {
+  --               default = 'gemini-2.0-flash-thinking-exp-01-21',
+  --             },
+  --           },
+  --         })
+  --       end,
+  --     },
+  --     strategies = {
+  --       chat = { adapter = 'gemini' },
+  --       inline = { adapter = 'gemini' },
+  --     },
+  --   },
+  --   cmd = {
+  --     'CodeCompanion',
+  --     'CodeCompanionChat',
+  --     'CodeCompanionCmd',
+  --     'CodeCompanionActions',
+  --   },
+  --   dependencies = {
+  --     'nvim-lua/plenary.nvim',
+  --     'nvim-treesitter/nvim-treesitter',
+  --   },
+  -- },
   {
     'iamcco/markdown-preview.nvim',
     cmd = { 'MarkdownPreviewToggle', 'MarkdownPreview', 'MarkdownPreviewStop' },
@@ -1182,7 +1174,9 @@ require('lazy').setup({
   {
     'MeanderingProgrammer/render-markdown.nvim',
     dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' },
-    opts = {},
+    opts = {
+      file_types = { 'markdown', 'codecompanion', 'Avante' },
+    },
     ft = { 'markdown', 'codecompanion', 'Avante' },
   },
   {

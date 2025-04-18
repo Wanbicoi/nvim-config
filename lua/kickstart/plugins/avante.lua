@@ -1,7 +1,7 @@
 return {
   'yetone/avante.nvim',
-  event = 'VeryLazy',
   version = false, -- Never set this value to "*"! Never!
+  cmd = { 'AvanteToggle' },
   opts = {
     provider = 'gemini',
     cursor_applying_provider = 'gemini',

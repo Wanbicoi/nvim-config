@@ -797,14 +797,13 @@ require('lazy').setup({
         -- python = { "isort", "black" },
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
-        javascript = { 'prettierd', 'prettier', stop_after_first = true },
         python = { 'ruff_format' },
         json = { 'biome' },
         yaml = { 'prettierd' },
-        -- javascript = { "biome" },
-        -- javascriptreact = { "biome" },
-        -- typescript = { "biome" },
-        -- typescriptreact = { "biome" },
+        javascript = { 'prettierd', 'prettier', stop_after_first = true },
+        javascriptreact = { 'prettierd', 'prettier', stop_after_first = true },
+        typescript = { 'prettierd', 'prettier', stop_after_first = true },
+        typescriptreact = { 'prettierd', 'prettier', stop_after_first = true },
         sql = { 'sleek' }, --sql_formatter
       },
     },
@@ -1034,7 +1033,6 @@ require('lazy').setup({
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     dependencies = {
-      'nvim-treesitter/nvim-treesitter-refactor',
       'nvim-treesitter/nvim-treesitter-textobjects',
     },
     build = ':TSUpdate',
@@ -1061,22 +1059,22 @@ require('lazy').setup({
           node_decremental = '<bs>',
         },
       },
-      refactor = {
-        highlight_definitions = {
-          enable = true,
-          clear_on_cursor_move = true,
-        },
-        navigation = {
-          enable = true,
-          keymaps = {
-            goto_definition = 'gnd',
-            list_definitions = 'gnD',
-            list_definitions_toc = false,
-            goto_next_usage = '<a-*>',
-            goto_previous_usage = '<a-#>',
-          },
-        },
-      },
+      -- refactor = {
+      --   highlight_definitions = {
+      --     enable = true,
+      --     clear_on_cursor_move = true,
+      --   },
+      --   navigation = {
+      --     enable = true,
+      --     keymaps = {
+      --       goto_definition = 'gnd',
+      --       list_definitions = 'gnD',
+      --       list_definitions_toc = false,
+      --       goto_next_usage = '<a-*>',
+      --       goto_previous_usage = '<a-#>',
+      --     },
+      --   },
+      -- },
       textobjects = {
         select = {
           enable = true,

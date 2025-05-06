@@ -1126,6 +1126,11 @@ require('lazy').setup({
       max_lines = 5,
       separator = '─',
     },
+    config = function()
+      vim.keymap.set('n', '[n', function()
+        require('treesitter-context').go_to_context(vim.v.count1)
+      end, { silent = true, desc = 'Go to co[n]text' })
+    end,
   },
   -- {
   --   'olimorris/codecompanion.nvim',

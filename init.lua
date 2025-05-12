@@ -196,6 +196,13 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 -- vim.keymap.set("n", "<C-S-j>", "<C-w>J", { desc = "Move window to the lower" })
 -- vim.keymap.set("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
 
+vim.keymap.set('n', ']e', function()
+  vim.diagnostic.jump { severity = vim.diagnostic.severity.ERROR, count = 1 }
+end)
+vim.keymap.set('n', '[e', function()
+  vim.diagnostic.jump { severity = vim.diagnostic.severity.ERROR, count = -1 }
+end)
+
 vim.keymap.set('n', '<C-Up>', '<C-w>5+')
 vim.keymap.set('n', '<C-Down>', '<C-w>5-')
 vim.keymap.set('n', '<C-Left>', '<C-w>20<')
@@ -406,6 +413,9 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>fo', builtin.oldfiles, { desc = '[F]ind Recent Files ("." for repeat)' })
       vim.keymap.set('n', '_', builtin.buffers, { desc = '[_] Find existing buffers' })
 
+      vim.keymap.set('n', '<leader>gs', builtin.git_status, { desc = 'Find [G]it [S]tatus' })
+      vim.keymap.set('n', '<leader>gb', builtin.git_branches, { desc = 'Find [G]it [B]ranches' })
+
       -- Shortcut for searching your Neovim configuration files
       vim.keymap.set('n', '<leader>fn', function()
         builtin.find_files { cwd = vim.fn.stdpath 'config' }
@@ -509,6 +519,9 @@ require('lazy').setup({
       -- Diagnostic Config
       -- See :help vim.diagnostic.Opts
       vim.diagnostic.config {
+        jump = {
+          float = true,
+        },
         severity_sort = true,
         float = { border = 'rounded', source = 'if_many' },
         underline = { severity = vim.diagnostic.severity.ERROR },
@@ -623,6 +636,10 @@ require('lazy').setup({
         },
       }
     end,
+  },
+  {
+    'hinell/lsp-timeout.nvim',
+    dependencies = { 'neovim/nvim-lspconfig' },
   },
   {
     'pmizio/typescript-tools.nvim',
@@ -798,28 +815,39 @@ require('lazy').setup({
       }
     end,
   },
-
-  { -- You can easily change to a different colorscheme.
-    -- Change the name of the colorscheme plugin below, and then
-    -- change the command in the config to whatever the name of that colorscheme is.
-    --
-    -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'folke/tokyonight.nvim',
-    priority = 1000, -- Make sure to load this before all the other start plugins.
+  {
+    'catppuccin/nvim',
+    name = 'catppuccin',
+    priority = 1000,
     config = function()
-      ---@diagnostic disable-next-line: missing-fields
-      require('tokyonight').setup {
-        styles = {
-          comments = { italic = false }, -- Disable italics in comments
-        },
+      require('catppuccin').setup {
+        transparent_background = true,
       }
-
-      -- Load the colorscheme here.
-      -- Like many other themes, this one has different styles, and you could load
-      -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-day'
+      vim.cmd.colorscheme 'catppuccin-latte'
     end,
   },
+  -- { -- You can easily change to a different colorscheme.
+  --   -- Change the name of the colorscheme plugin below, and then
+  --   -- change the command in the config to whatever the name of that colorscheme is.
+  --   --
+  --   -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
+  --   'folke/tokyonight.nvim',
+  --   priority = 1000, -- Make sure to load this before all the other start plugins.
+  --   config = function()
+  --     ---@diagnostic disable-next-line: missing-fields
+  --     require('tokyonight').setup {
+  --       styles = {
+  --         -- comments = { italic = false }, -- Disable italics in comments
+  --       },
+  --       transparent = true, -- Enable this to disable setting the background color
+  --     }
+  --
+  --     -- Load the colorscheme here.
+  --     -- Like many other themes, this one has different styles, and you could load
+  --     -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
+  --     vim.cmd.colorscheme 'tokyonight-day'
+  --   end,
+  -- },
 
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
@@ -1128,10 +1156,11 @@ require('lazy').setup({
       backends = { 'lsp', 'treesitter', 'markdown', 'asciidoc', 'man' },
       layout = {
         default_direction = 'left',
+        placement = 'edge',
         max_width = { 35, 0.25 },
         min_width = 20,
       },
-      -- close_automatic_events = { "unfocus", "switch_buffer" },
+      attach_mode = 'global',
     },
     dependencies = {
       'nvim-treesitter/nvim-treesitter',

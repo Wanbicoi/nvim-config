@@ -441,7 +441,9 @@ require('lazy').setup({
     'neovim/nvim-lspconfig',
     dependencies = {
       { 'williamboman/mason.nvim', opts = {} },
-      { 'williamboman/mason-lspconfig.nvim' },
+      { 'williamboman/mason-lspconfig.nvim', opts = {
+        automatic_enable = false,
+      } },
       -- 'WhoIsSethDaniel/mason-tool-installer.nvim',
 
       -- Useful status updates for LSP.

@@ -1168,6 +1168,7 @@ require('lazy').setup({
         end,
       }
       local Terminal = require('toggleterm.terminal').Terminal
+      -- Lazygit
       local lazygit = Terminal:new {
         cmd = 'lazygit',
         hidden = true,
@@ -1183,6 +1184,7 @@ require('lazy').setup({
         lazygit:toggle()
       end
       vim.keymap.set({ 'n', 't' }, '<a-l>', lazygit_toggle, { noremap = true, silent = true })
+      -- Aider
       local aider = Terminal:new {
         cmd = 'aider',
         hidden = true,
@@ -1193,6 +1195,17 @@ require('lazy').setup({
         aider:toggle()
       end
       vim.keymap.set({ 'n', 't' }, '<a-a>', aider_toggle, { noremap = true, silent = true })
+
+      -- Float
+      local floating_term = Terminal:new {
+        hidden = true,
+        direction = 'float',
+      }
+
+      function floating_term_toggle()
+        floating_term:toggle()
+      end
+      vim.keymap.set({ 'n', 't' }, '<a-f>', floating_term_toggle, { noremap = true, silent = true })
     end,
   },
   -- {

@@ -423,10 +423,6 @@ require('lazy').setup({
       end, { desc = '[S]earch [N]eovim files' })
     end,
   },
-  {
-    'stevearc/dressing.nvim',
-    opts = {},
-  },
   -- LSP Plugins
   {
     -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
@@ -460,11 +456,12 @@ require('lazy').setup({
             mode = mode or 'n'
             vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
           end
+          local builtin = require 'telescope.builtin'
 
           map('gh', vim.diagnostic.open_float, '[D]iagno[s]tic open float')
-          map('gd', vim.lsp.buf.definition, '[G]oto [D]efinition')
-          map('gR', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
-          map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+          map('gd', builtin.lsp_definitions, '[G]oto [D]efinitions')
+          map('gR', builtin.lsp_references, '[G]oto [R]eferences')
+          map('gD', builtin.lsp_type_definitions, '[G]oto [D]eclaration')
 
           -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
           ---@param client vim.lsp.Client
@@ -625,10 +622,10 @@ require('lazy').setup({
       }
     end,
   },
-  {
-    'hinell/lsp-timeout.nvim',
-    dependencies = { 'neovim/nvim-lspconfig' },
-  },
+  -- {
+  --   'hinell/lsp-timeout.nvim',
+  --   dependencies = { 'neovim/nvim-lspconfig' },
+  -- },
   {
     'pmizio/typescript-tools.nvim',
     dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
@@ -638,6 +635,15 @@ require('lazy').setup({
       },
     },
     ft = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'json' },
+  },
+  {
+    'rmagatti/goto-preview',
+    dependencies = { 'rmagatti/logger.nvim' },
+    event = 'BufEnter',
+    config = true,
+    init = function()
+      vim.keymap.set('n', 'gp', "<cmd>lua require('goto-preview').goto_preview_definition()<CR>", { noremap = true, desc = '[G]oto [P]review Definitions' })
+    end,
   },
   { -- Autoformat
     'stevearc/conform.nvim',

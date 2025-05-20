@@ -574,17 +574,6 @@ require('lazy').setup({
         -- "ts_ls",
         gopls = {},
         biome = {},
-        -- clangd = {},
-        -- gopls = {},
-        -- pyright = {},
-        -- rust_analyzer = {},
-        -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
-        --
-        -- Some languages (like typescript) have entire language plugins that can be useful:
-        --    https://github.com/pmizio/typescript-tools.nvim
-        --
-        -- But for many setups, the LSP (`ts_ls`) will work just fine
-        -- ts_ls = {},
         lua_ls = {},
       }
 
@@ -682,17 +671,18 @@ require('lazy').setup({
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
         python = { 'ruff_format' },
-        json = { 'biome' },
+        json = { 'prettierd' },
         yaml = { 'prettierd' },
         javascript = { 'prettierd', 'prettier', stop_after_first = true },
         javascriptreact = { 'prettierd', 'prettier', stop_after_first = true },
         typescript = { 'prettierd', 'prettier', stop_after_first = true },
         typescriptreact = { 'prettierd', 'prettier', stop_after_first = true },
         sql = { 'sleek' }, --sql_formatter
+        bash = { 'beautysh' },
+        zsh = { 'beautysh' },
       },
     },
   },
-
   { -- Autocompletion
     'hrsh7th/nvim-cmp',
     event = 'InsertEnter',
@@ -849,25 +839,6 @@ require('lazy').setup({
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
     config = function()
-      -- Better Around/Inside textobjects
-      --
-      -- Examples:
-      --  - va)  - [V]isually select [A]round [)]paren
-      --  - yinq - [Y]ank [I]nside [N]ext [Q]uote
-      --  - ci'  - [C]hange [I]nside [']quote
-      require('mini.ai').setup {
-        n_lines = 500,
-        mappings = {
-          goto_left = '',
-          goto_right = '',
-        },
-      }
-
-      -- Add/delete/replace surroundings (brackets, quotes, etc.)
-      --
-      -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
-      -- - sd'   - [S]urround [D]elete [']quotes
-      -- - sr)'  - [S]urround [R]eplace [)] [']
       require('mini.surround').setup {
         mappings = {
           add = 'gsa',
@@ -881,26 +852,14 @@ require('lazy').setup({
         n_lines = 1000,
       }
       require('mini.bufremove').setup()
-      vim.keymap.set('n', '<leader>x', MiniBufremove.delete, { desc = '[X] Close current buffer' })
-
-      -- Simple and easy statusline.
-      --  You could remove this setup call if you don't like it,
-      --  and try some other statusline plugin
-      local statusline = require 'mini.statusline'
-      -- set use_icons to true if you have a Nerd Font
-      statusline.setup { use_icons = vim.g.have_nerd_font }
-
-      -- You can configure sections in the statusline by overriding their
-      -- default behavior. For example, here we set the section for
-      -- cursor location to LINE:COLUMN
-      ---@diagnostic disable-next-line: duplicate-set-field
-      statusline.section_location = function()
-        return '%2l:%-2v'
-      end
-
-      -- ... and there is more!
-      --  Check out: https://github.com/echasnovski/mini.nvim
+      vim.keymap.set('n', '<leader>x', MiniBufremove.unshow, { desc = '[X] Unshow current buffer' })
+      vim.keymap.set('n', '<leader>X', MiniBufremove.delete, { desc = '[X] Delete current buffer' })
     end,
+  },
+  {
+    'nvim-lualine/lualine.nvim',
+    opts = {},
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
   },
   {
     'stevearc/oil.nvim',
@@ -909,7 +868,7 @@ require('lazy').setup({
         ['q'] = { 'actions.close', mode = 'n' },
       },
     },
-    dependencies = { 'nvim-tree/nvim-web-devicons' }, -- use if you prefer nvim-web-devicons
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
     keys = {
       { '-', '<cmd>Oil<cr>', desc = 'Oil current file' },
     },
@@ -1064,6 +1023,10 @@ require('lazy').setup({
   --   },
   -- },
   {
+    'stevearc/dressing.nvim',
+    opts = {},
+  },
+  {
     'iamcco/markdown-preview.nvim',
     cmd = { 'MarkdownPreviewToggle', 'MarkdownPreview', 'MarkdownPreviewStop' },
     build = 'cd app; yarn install',
@@ -1086,14 +1049,12 @@ require('lazy').setup({
   },
   {
     'rmagatti/auto-session',
+    event = 'VeryLazy',
     opts = {
       -- auto_restore_last_session = true,
     },
     keys = {
       { '<leader>fs', '<cmd>SessionSearch<cr>', desc = '[F]ind [S]ession' },
-    },
-    cmd = {
-      'SessionSearch',
     },
   },
   {
@@ -1121,10 +1082,11 @@ require('lazy').setup({
       { 'nvim-telescope/telescope.nvim' },
     },
     config = function()
-      vim.keymap.set({ 'n' }, '<leader>fB', '<cmd>BookmarksLists<cr>')
-      vim.keymap.set({ 'n' }, '<leader>B', '<cmd>BookmarksMark<cr>')
-      vim.keymap.set({ 'n' }, ']b', '<cmd>BookmarksGotoNextInList<cr>')
-      vim.keymap.set({ 'n' }, '[b', '<cmd>BookmarksGotoPrevInList<cr>')
+      vim.keymap.set({ 'n' }, '<leader>fB', '<cmd>BookmarksLists<cr>', { desc = '[F]ind [B]ookmarks' })
+      vim.keymap.set({ 'n' }, '<leader>b', '<cmd>BookmarksTree<cr>', { desc = 'Bookmarks Tree' })
+      vim.keymap.set({ 'n' }, '<leader>B', '<cmd>BookmarksMark<cr>', { desc = 'New Bookmarks' })
+      vim.keymap.set({ 'n' }, ']b', '<cmd>BookmarksGotoNextInList<cr>', { desc = 'Next Bookmarks' })
+      vim.keymap.set({ 'n' }, '[b', '<cmd>BookmarksGotoPrevInList<cr>', { desc = 'Previous Bookmarks' })
       local opts = {
         signs = {
           mark = {
@@ -1160,7 +1122,28 @@ require('lazy').setup({
       'nvim-treesitter/nvim-treesitter',
       'nvim-tree/nvim-web-devicons',
     },
-    cmd = 'AerialToggle',
+    cmd = {
+      'AerialToggle',
+      'AerialOpen',
+    },
+    keys = {
+      {
+        '<leader>af',
+        function()
+          require('aerial').focus()
+        end,
+        mode = '',
+        desc = '[A]erial [F]ocus',
+      },
+      {
+        '<leader>at',
+        function()
+          require('aerial').toggle()
+        end,
+        mode = '',
+        desc = '[A]erial [T]oggle',
+      },
+    },
   },
   {
     'akinsho/toggleterm.nvim',
@@ -1217,43 +1200,73 @@ require('lazy').setup({
       vim.keymap.set({ 'n', 't' }, '<a-f>', floating_term_toggle, { noremap = true, silent = true })
     end,
   },
-  -- {
-  --   'ThePrimeagen/harpoon',
-  --   branch = 'harpoon2',
-  --   event = 'VeryLazy',
-  --   dependencies = { 'nvim-lua/plenary.nvim' },
-  --   config = function()
-  --     local harpoon = require 'harpoon'
-  --     harpoon:setup()
-  --
-  --     vim.keymap.set('n', '<leader>a', function()
-  --       harpoon:list():add()
-  --     end, { desc = '[A]dd to harpoon' })
-  --     vim.keymap.set('n', '<C-e>', function()
-  --       harpoon.ui:toggle_quick_menu(harpoon:list())
-  --     end)
-  --
-  --     vim.keymap.set('n', '<a-1>', function()
-  --       harpoon:list():select(1)
-  --     end)
-  --     vim.keymap.set('n', '<a-2>', function()
-  --       harpoon:list():select(2)
-  --     end)
-  --     vim.keymap.set('n', '<a-3>', function()
-  --       harpoon:list():select(3)
-  --     end)
-  --     vim.keymap.set('n', '<a-4>', function()
-  --       harpoon:list():select(4)
-  --     end)
-  --
-  --     vim.keymap.set('n', '[h', function()
-  --       harpoon:list():prev()
-  --     end)
-  --     vim.keymap.set('n', ']h', function()
-  --       harpoon:list():next()
-  --     end)
-  --   end,
-  -- },
+  {
+    'folke/edgy.nvim',
+    event = 'VeryLazy',
+    init = function()
+      vim.opt.laststatus = 3
+      vim.opt.splitkeep = 'screen'
+      vim.keymap.set({ 'n' }, '<leader>e', function()
+        require('edgy').toggle()
+      end, { noremap = true, silent = true, desc = '[E]dgy Toggle' })
+    end,
+    opts = {
+      animate = {
+        enabled = false,
+      },
+      bottom = {
+        { ft = 'qf', title = 'QuickFix' },
+        {
+          ft = 'help',
+          size = { height = 20 },
+          -- only show help buffers
+          filter = function(buf)
+            return vim.bo[buf].buftype == 'help'
+          end,
+        },
+      },
+      left = {
+        -- Neo-tree filesystem always takes half the screen height
+        {
+          title = 'Symbol Outline',
+          ft = 'aerial',
+          size = { height = 0.5 },
+          pinned = true,
+          open = 'AerialOpen',
+        },
+        {
+          title = 'Bookmarks',
+          ft = 'BookmarksTree',
+          pinned = true,
+          open = 'BookmarksTree',
+        },
+        {
+          ft = 'lazyterm',
+          title = 'LazyTerm',
+          size = { height = 0.4 },
+          filter = function(buf)
+            return not vim.b[buf].lazyterm_cmd
+          end,
+        },
+      },
+    },
+  },
+  {
+    'LunarVim/bigfile.nvim',
+    opts = {
+      filesize = 2, -- size of the file in MiB, the plugin round file sizes to the closest MiB
+      pattern = { '*' }, -- autocmd pattern or function see <### Overriding the detection of big files>
+      features = { -- features to disable
+        'indent_blankline',
+        'lsp',
+        'treesitter',
+        'syntax',
+        'matchparen',
+        'vimopts',
+        'filetype',
+      },
+    },
+  },
   {
     'ludovicchabant/vim-gutentags',
     event = 'VeryLazy',
@@ -1324,10 +1337,6 @@ require('lazy').setup({
       }
     end,
   },
-  {
-    'tpope/vim-fugitive',
-    event = 'VeryLazy',
-  },
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
@@ -1343,7 +1352,7 @@ require('lazy').setup({
   require 'kickstart.plugins.autopairs',
   require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
   require 'kickstart.plugins.indent_line',
-  require 'kickstart.plugins.avante',
+  -- require 'kickstart.plugins.avante',
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.

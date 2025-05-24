@@ -142,15 +142,14 @@ vim.cmd [[set sessionoptions-=blank,help,terminal]]
 vim.o.winwidth = 40
 vim.o.winminwidth = 20
 
--- if executable 'pwsh' and executable 'pwsh' then
---   vim.cmd [[
---     let &shell = executable('pwsh') ? 'pwsh' : 'powershell'
---     let &shellcmdflag = '-NoLogo -ExecutionPolicy RemoteSigned -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.UTF8Encoding]::new();$PSDefaultParameterValues[''Out-File:Encoding'']=''utf8'';Remove-Alias -Force -ErrorAction SilentlyContinue tee;'
---     let &shellredir = '2>&1 | %%{ "$_" } | Out-File %s; exit $LastExitCode'
---     let &shellpipe  = '2>&1 | %%{ "$_" } | tee %s; exit $LastExitCode'
---     set shellquote= shellxquote=
---   ]]
--- end
+if vim.g.neovide then
+  vim.o.guifont = 'CodeNewRoman Nerd Font Propo:h12' -- text below applies for VimScript
+  -- vim.g.neovide_cursor_vfx_mode = "railgun"
+  vim.g.neovide_cursor_vfx_mode = 'sonicboom'
+  vim.g.neovide_floating_shadow = false
+  vim.g.neovide_text_contrast = 1
+  vim.g.neovide_cursor_animation_length = 0.02
+end
 
 -- 🆙 Support ascx filetype
 vim.filetype.add { extension = { ascx = 'html' } }
@@ -378,18 +377,8 @@ require('lazy').setup({
       -- [[ Configure Telescope ]]
       -- See `:help telescope` and `:help telescope.setup()`
       require('telescope').setup {
-        -- You can put your default mappings / updates / etc. in here
-        --  All the info you're looking for is in `:help telescope.setup()`
-        --
-        defaults = {
+        defaults = require('telescope.themes').get_dropdown {
           path_display = { 'truncate' },
-        },
-        -- pickers = {}
-        --
-        extensions = {
-          ['ui-select'] = {
-            require('telescope.themes').get_dropdown(),
-          },
         },
       }
 
@@ -413,6 +402,7 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>fr', builtin.resume, { desc = '[F]ind [R]esume' })
       vim.keymap.set('n', '<leader>fo', builtin.oldfiles, { desc = '[F]ind Recent Files ("." for repeat)' })
       vim.keymap.set('n', '_', builtin.buffers, { desc = '[_] Find existing buffers' })
+      vim.keymap.set('n', '<leader>v', builtin.registers, { desc = '[v] Find Registers' })
 
       vim.keymap.set('n', '<leader>gs', builtin.git_status, { desc = 'Find [G]it [S]tatus' })
       vim.keymap.set('n', '<leader>gb', builtin.git_branches, { desc = 'Find [G]it [B]ranches' })
@@ -420,7 +410,7 @@ require('lazy').setup({
       -- Shortcut for searching your Neovim configuration files
       vim.keymap.set('n', '<leader>fn', function()
         builtin.find_files { cwd = vim.fn.stdpath 'config' }
-      end, { desc = '[S]earch [N]eovim files' })
+      end, { desc = '[F]ind [N]eovim files' })
     end,
   },
   -- LSP Plugins
@@ -944,7 +934,7 @@ require('lazy').setup({
     },
     dependencies = { 'nvim-tree/nvim-web-devicons' },
     keys = {
-      { '-', '<cmd>Oil<cr>', desc = 'Oil current file' },
+      { '-', require('oil').toggle_float, desc = 'Oil current file' },
     },
   },
   {
@@ -1110,12 +1100,22 @@ require('lazy').setup({
     ft = { 'markdown', 'codecompanion' },
   },
   {
-    'MeanderingProgrammer/render-markdown.nvim',
-    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' },
-    opts = {
-      file_types = { 'markdown', 'codecompanion', 'Avante' },
+    'OXY2DEV/markview.nvim',
+    lazy = false,
+    dependencies = {
+      'saghen/blink.cmp',
     },
     ft = { 'markdown', 'codecompanion', 'Avante' },
+  },
+  {
+    'folke/zen-mode.nvim',
+    opts = {},
+    keys = {
+      { '<leader>z', '<cmd>ZenMode<cr>', desc = '[Z]en Mode' },
+    },
+    cmd = {
+      'ZenMode',
+    },
   },
   {
     'AckslD/swenv.nvim',
@@ -1185,10 +1185,8 @@ require('lazy').setup({
     opts = {
       backends = { 'lsp', 'treesitter', 'markdown', 'asciidoc', 'man' },
       layout = {
-        default_direction = 'left',
-        placement = 'edge',
         max_width = { 35, 0.25 },
-        min_width = 20,
+        min_width = 35,
       },
       attach_mode = 'global',
     },
@@ -1198,24 +1196,15 @@ require('lazy').setup({
     },
     cmd = {
       'AerialToggle',
-      'AerialOpen',
     },
     keys = {
       {
-        '<leader>af',
+        '<leader>a',
         function()
-          require('aerial').focus()
+          require('aerial').toggle { direction = 'float' }
         end,
         mode = '',
-        desc = '[A]erial [F]ocus',
-      },
-      {
-        '<leader>at',
-        function()
-          require('aerial').toggle()
-        end,
-        mode = '',
-        desc = '[A]erial [T]oggle',
+        desc = '[A]erial [T]oggle Float',
       },
     },
   },
@@ -1273,57 +1262,6 @@ require('lazy').setup({
       end
       vim.keymap.set({ 'n', 't' }, '<a-f>', floating_term_toggle, { noremap = true, silent = true })
     end,
-  },
-  {
-    'folke/edgy.nvim',
-    event = 'VeryLazy',
-    init = function()
-      vim.opt.laststatus = 3
-      vim.opt.splitkeep = 'screen'
-      vim.keymap.set({ 'n' }, '<leader>e', function()
-        require('edgy').toggle()
-      end, { noremap = true, silent = true, desc = '[E]dgy Toggle' })
-    end,
-    opts = {
-      animate = {
-        enabled = false,
-      },
-      bottom = {
-        { ft = 'qf', title = 'QuickFix' },
-        {
-          ft = 'help',
-          size = { height = 20 },
-          -- only show help buffers
-          filter = function(buf)
-            return vim.bo[buf].buftype == 'help'
-          end,
-        },
-      },
-      left = {
-        -- Neo-tree filesystem always takes half the screen height
-        {
-          title = 'Symbol Outline',
-          ft = 'aerial',
-          size = { height = 0.5 },
-          pinned = true,
-          open = 'AerialOpen',
-        },
-        {
-          title = 'Bookmarks',
-          ft = 'BookmarksTree',
-          pinned = true,
-          open = 'BookmarksTree',
-        },
-        {
-          ft = 'lazyterm',
-          title = 'LazyTerm',
-          size = { height = 0.4 },
-          filter = function(buf)
-            return not vim.b[buf].lazyterm_cmd
-          end,
-        },
-      },
-    },
   },
   {
     'LunarVim/bigfile.nvim',

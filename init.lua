@@ -792,7 +792,7 @@ require('lazy').setup({
   {
     'saghen/blink.cmp',
     -- optional: provides snippets for the snippet source
-    dependencies = { 'rafamadriz/friendly-snippets' },
+    dependencies = { 'rafamadriz/friendly-snippets', 'onsails/lspkind.nvim', 'nvim-tree/nvim-web-devicons' },
 
     -- use a release tag to download pre-built binaries
     version = '1.*',
@@ -829,7 +829,44 @@ require('lazy').setup({
       completion = {
         documentation = { window = { border = 'single' } },
         ghost_text = { enabled = true },
-        menu = { border = 'single' },
+        menu = {
+          border = 'single',
+          draw = {
+            components = {
+              kind_icon = {
+                text = function(ctx)
+                  local icon = ctx.kind_icon
+                  if vim.tbl_contains({ 'Path' }, ctx.source_name) then
+                    local dev_icon, _ = require('nvim-web-devicons').get_icon(ctx.label)
+                    if dev_icon then
+                      icon = dev_icon
+                    end
+                  else
+                    icon = require('lspkind').symbolic(ctx.kind, {
+                      mode = 'symbol',
+                    })
+                  end
+
+                  return icon .. ctx.icon_gap
+                end,
+
+                -- Optionally, use the highlight groups from nvim-web-devicons
+                -- You can also add the same function for `kind.highlight` if you want to
+                -- keep the highlight groups in sync with the icons.
+                highlight = function(ctx)
+                  local hl = ctx.kind_hl
+                  if vim.tbl_contains({ 'Path' }, ctx.source_name) then
+                    local dev_icon, dev_hl = require('nvim-web-devicons').get_icon(ctx.label)
+                    if dev_icon then
+                      hl = dev_hl
+                    end
+                  end
+                  return hl
+                end,
+              },
+            },
+          },
+        },
       },
       signature = { window = { border = 'single' }, enabled = true },
       sources = {
@@ -931,10 +968,14 @@ require('lazy').setup({
       keymaps = {
         ['q'] = { 'actions.close', mode = 'n' },
       },
+      float = {
+        padding = 4,
+        max_width = 80,
+      },
     },
     dependencies = { 'nvim-tree/nvim-web-devicons' },
     keys = {
-      { '-', require('oil').toggle_float, desc = 'Oil current file' },
+      { '-', '<CMD>Oil --float<CR>', desc = 'Open parent directory' },
     },
   },
   {
@@ -1108,6 +1149,13 @@ require('lazy').setup({
     ft = { 'markdown', 'codecompanion', 'Avante' },
   },
   {
+    'norcalli/nvim-colorizer.lua',
+    config = function()
+      require('colorizer').setup()
+    end,
+    event = 'VeryLazy',
+  },
+  {
     'folke/zen-mode.nvim',
     opts = {},
     keys = {
@@ -1279,76 +1327,6 @@ require('lazy').setup({
       },
     },
   },
-  {
-    'ludovicchabant/vim-gutentags',
-    event = 'VeryLazy',
-    config = function()
-      vim.g.gutentags_file_list_command = 'rg --files'
-      vim.g.gutentags_cache_dir = vim.fn.stdpath 'cache' .. '/vim-gutentags'
-      --vim.g.gutentags_trace = true
-      vim.g.gutentags_ctags_exclude = {
-        '.git',
-        '.hg',
-        '.svn',
-        '.pijul',
-        '_darcs',
-        'node_modules',
-        'vendor',
-        'venv',
-        '__pypackages__',
-        'packages',
-        'Pods',
-        'target',
-        'build',
-        'dist',
-        'libs',
-        'out',
-        'bin',
-        'obj',
-        '*.o',
-        '*.exe',
-        '*.dll',
-        '*.so',
-        '*.dylib',
-        '*.pyc',
-        '__pycache__',
-        '*.class',
-        '*.jar',
-        '*.war',
-        '*.ear',
-        '.next',
-        'coverage',
-        '*.log',
-        '*.min.js',
-        '*.min.css',
-        '*.map',
-        '*.lock',
-        '*.json',
-        '*.xml',
-        '*.pdf',
-        '*.doc',
-        '*.docx',
-        '*.svg',
-        '*.png',
-        '*.jpg',
-        '*.jpeg',
-        '*.gif',
-        '*.ico',
-        '*.swp',
-        '*.swo',
-        '*.bak',
-        '*.tmp',
-        '*.cache',
-        '.DS_Store',
-        '*.db',
-        '*.yaml',
-        '*.yml',
-        '*.suo',
-        '*.user',
-        '*.sln',
-      }
-    end,
-  },
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
@@ -1364,6 +1342,7 @@ require('lazy').setup({
   require 'kickstart.plugins.autopairs',
   require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
   require 'kickstart.plugins.indent_line',
+  require 'kickstart.plugins.ctags',
   -- require 'kickstart.plugins.avante',
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`

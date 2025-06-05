@@ -130,6 +130,39 @@ end, { desc = '[C]opy relative current file path' })
 
 vim.keymap.set('n', 'q', '<cmd>q<CR>', { noremap = true })
 
+vim.opt.wildignore:append {
+  'blue.vim',
+  'darkblue.vim',
+  'delek.vim',
+  'desert.vim',
+  'elflord.vim',
+  'evening.vim',
+  'industry.vim',
+  'habamax.vim',
+  'koehler.vim',
+  'lunaperche.vim',
+  'morning.vim',
+  'murphy.vim',
+  'pablo.vim',
+  'peachpuff.vim',
+  'quiet.vim',
+  'ron.vim',
+  'shine.vim',
+  'slate.vim',
+  'sorbet.vim',
+  'retrobox.vim',
+  'torte.vim',
+  'wildcharm.vim',
+  'zaibatsu.vim',
+  'vim.lua',
+  'unokai.vim',
+  'randomhue.lua',
+  'minischeme.lua',
+  'default.vim',
+  'minicyan.lua',
+  'zellner.vim',
+}
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -231,12 +264,12 @@ require('lazy').setup({
           return vim.fn.executable 'make' == 1
         end,
       },
-      -- { 'nvim-telescope/telescope-ui-select.nvim' },
       { 'nvim-telescope/telescope-frecency.nvim' },
-      { 'echasnovski/mini.icons', opts = {} },
+      { 'nvim-tree/nvim-web-devicons', opts = {} },
     },
     config = function()
       require('telescope').setup {
+
         defaults = require('telescope.themes').get_dropdown {
           path_display = { 'truncate' },
         },
@@ -406,16 +439,6 @@ require('lazy').setup({
           },
         },
         automatic_installation = false,
-        handlers = {
-          function(server_name)
-            local server = servers[server_name] or {}
-            -- This handles overriding only values explicitly passed
-            -- by the server configuration above. Useful when disabling
-            -- certain features of an LSP (for example, turning off formatting for ts_ls)
-            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-            require('lspconfig')[server_name].setup(server)
-          end,
-        },
       }
     end,
   },
@@ -490,7 +513,7 @@ require('lazy').setup({
   {
     'saghen/blink.cmp',
     -- optional: provides snippets for the snippet source
-    dependencies = { 'rafamadriz/friendly-snippets', { 'echasnovski/mini.icons', opts = {} } },
+    dependencies = { 'rafamadriz/friendly-snippets', 'xzbdmw/colorful-menu.nvim' },
 
     -- use a release tag to download pre-built binaries
     version = '1.*',
@@ -502,18 +525,6 @@ require('lazy').setup({
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config
     opts = {
-      -- 'default' (recommended) for mappings similar to built-in completions (C-y to accept)
-      -- 'super-tab' for mappings similar to vscode (tab to accept)
-      -- 'enter' for enter to accept
-      -- 'none' for no mappings
-      --
-      -- All presets have the following mappings:
-      -- C-space: Open menu or open docs if already open
-      -- C-n/C-p or Up/Down: Select next/previous item
-      -- C-e: Hide menu
-      -- C-k: Toggle signature help (if signature.enabled = true)
-      --
-      -- See :h blink-cmp-config-keymap for defining your own keymap
       keymap = {
         preset = 'default',
         ['<c-c>'] = { 'show', 'show_documentation', 'hide_documentation' },
@@ -525,28 +536,21 @@ require('lazy').setup({
       },
       cmdline = { enabled = true },
       completion = {
-        documentation = { window = { border = 'single' } },
+        documentation = { window = { border = 'single' }, auto_show = true },
         ghost_text = { enabled = true },
         menu = {
           border = 'single',
           draw = {
+            -- We don't need label_description now because label and label_description are already
+            -- combined together in label by colorful-menu.nvim.
+            columns = { { 'kind_icon' }, { 'label', gap = 1 } },
             components = {
-              kind_icon = {
+              label = {
                 text = function(ctx)
-                  local kind_icon, _, _ = require('mini.icons').get('lsp', ctx.kind)
-                  return kind_icon
+                  return require('colorful-menu').blink_components_text(ctx)
                 end,
-                -- (optional) use highlights from mini.icons
                 highlight = function(ctx)
-                  local _, hl, _ = require('mini.icons').get('lsp', ctx.kind)
-                  return hl
-                end,
-              },
-              kind = {
-                -- (optional) use highlights from mini.icons
-                highlight = function(ctx)
-                  local _, hl, _ = require('mini.icons').get('lsp', ctx.kind)
-                  return hl
+                  return require('colorful-menu').blink_components_highlight(ctx)
                 end,
               },
             },
@@ -587,6 +591,7 @@ require('lazy').setup({
       vim.cmd.colorscheme 'catppuccin-latte'
     end,
   },
+  { 'ellisonleao/gruvbox.nvim', priority = 1000, config = true },
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 
@@ -634,7 +639,7 @@ require('lazy').setup({
         max_width = 80,
       },
     },
-    dependencies = { { 'echasnovski/mini.icons', opts = {} } },
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
     keys = {
       { '-', '<CMD>Oil --float<CR>', desc = 'Open parent directory' },
     },

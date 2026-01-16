@@ -930,7 +930,7 @@ require('lazy').setup({
     },
     keys = {
       {
-        '<leader>a',
+        '<leader>A',
         function()
           require('aerial').toggle { direction = 'float' }
         end,
@@ -1001,7 +1001,15 @@ require('lazy').setup({
   },
   {
     'sindrets/diffview.nvim',
-    cmd = { 'DiffviewOpen', 'DiffviewFileHistory' },
+    cmd = { 'DiffviewOpen', 'DiffviewFileHistory', 'DiffviewClose', 'DiffviewToggleFiles', 'DiffviewFocusFiles', 'DiffviewRefresh' },
+    keys = {
+      { '<leader>do', '<cmd>DiffviewOpen<cr>', desc = 'Diffview Open' },
+      { '<leader>dc', '<cmd>DiffviewClose<cr>', desc = 'Diffview Close' },
+      { '<leader>dh', '<cmd>DiffviewFileHistory<cr>', desc = 'Diffview File History' },
+      { '<leader>dt', '<cmd>DiffviewToggleFiles<cr>', desc = 'Diffview Toggle Files' },
+      { '<leader>df', '<cmd>DiffviewFocusFiles<cr>', desc = 'Diffview Focus Files' },
+      { '<leader>dr', '<cmd>DiffviewRefresh<cr>', desc = 'Diffview Refresh' },
+    },
   },
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and

@@ -4,6 +4,7 @@ vim.g.maplocalleader = ' '
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
+vim.o.exrc = true
 vim.o.tabstop = 2
 vim.o.shiftwidth = 2
 vim.opt.number = true
@@ -37,6 +38,7 @@ vim.opt.inccommand = 'split'
 
 vim.opt.cursorline = true
 vim.opt.scrolloff = 10
+vim.opt.autoread = true
 
 -- if performing an operation that would fail due to unsaved changes in the buffer (like `:q`),
 -- instead raise a dialog asking if you wish to save the current file(s)
@@ -52,6 +54,16 @@ vim.o.foldenable = false
 vim.cmd [[set sessionoptions-=blank,help,terminal]]
 vim.o.winwidth = 40
 vim.o.winminwidth = 20
+
+if vim.fn.has 'win32' == 1 then
+  vim.opt.shell = 'pwsh'
+  vim.opt.shellcmdflag =
+    '-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;'
+  vim.opt.shellredir = '2>&1 | Out-File -Encoding UTF8 %s'
+  vim.opt.shellpipe = '2>&1 | Out-File -Encoding UTF8 %s'
+  vim.opt.shellquote = ''
+  vim.opt.shellxquote = ''
+end
 
 if vim.g.neovide then
   vim.o.guifont = 'CodeNewRoman Nerd Font Propo:h12' -- text below applies for VimScript
@@ -82,7 +94,7 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 --
 -- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
 -- or just use <C-\><C-n> to exit terminal mode
-vim.keymap.set('t', '<c-x>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
+vim.keymap.set('t', '<c-q>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 vim.keymap.set('n', '<c-s>', '<cmd>:w<cr>', { desc = 'Save all files' })
 
 -- TIP: Disable arrow keys in normal mode
@@ -190,7 +202,13 @@ end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup({
-  'tpope/vim-sleuth',
+  {
+    'nmac427/guess-indent.nvim',
+    event = 'VeryLazy',
+    config = function()
+      require('guess-indent').setup {}
+    end,
+  },
   {
     'lewis6991/gitsigns.nvim',
     opts = {},
@@ -248,6 +266,7 @@ require('lazy').setup({
         { '<leader>w', group = '[W]orkspace' },
         { '<leader>t', group = '[T]oggle' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+        { '<leader>o', group = '[O]verseer' },
       },
     },
   },
@@ -267,19 +286,104 @@ require('lazy').setup({
       { 'nvim-tree/nvim-web-devicons', opts = {} },
     },
     keys = {
-      { '<leader><leader>', function() require('telescope.builtin').git_files { show_untracked = true } end, desc = '[F]ind [G]it Files' },
-      { '<leader>fa', function() require('telescope.builtin').find_files { no_ignore = true } end, desc = '[F]ind [A]ll' },
-      { '<leader>ff', function() require('telescope.builtin').find_files() end, desc = '[F]ind [F]iles' },
-      { '<leader>ft', function() require('telescope.builtin').builtin() end, desc = '[F]ind [T]elescope' },
-      { '<leader>fw', function() require('telescope.builtin').grep_string() end, desc = '[F]ind current [W]ord' },
-      { '<leader>/', function() require('telescope.builtin').live_grep() end, desc = '[F]ind by [G]rep' },
-      { '<leader>fr', function() require('telescope.builtin').resume() end, desc = '[F]ind [R]esume' },
-      { '<leader>fo', function() require('telescope.builtin').oldfiles() end, desc = '[F]ind Recent Files ("." for repeat)' },
-      { '_', function() require('telescope.builtin').buffers() end, desc = '[_] Find existing buffers' },
-      { '<leader>v', function() require('telescope.builtin').registers() end, desc = '[v] Find Registers' },
-      { '<leader>gs', function() require('telescope.builtin').git_status() end, desc = 'Find [G]it [S]tatus' },
-      { '<leader>gb', function() require('telescope.builtin').git_branches() end, desc = 'Find [G]it [B]ranches' },
-      { '<leader>fn', function() require('telescope.builtin').find_files { cwd = vim.fn.stdpath 'config' } end, desc = '[F]ind [N]eovim files' },
+      {
+        '<leader><leader>',
+        function()
+          require('telescope.builtin').git_files { show_untracked = true }
+        end,
+        desc = '[F]ind [G]it Files',
+      },
+      {
+        '<leader>fa',
+        function()
+          require('telescope.builtin').find_files { no_ignore = true }
+        end,
+        desc = '[F]ind [A]ll',
+      },
+      {
+        '<leader>ff',
+        function()
+          require('telescope.builtin').find_files()
+        end,
+        desc = '[F]ind [F]iles',
+      },
+      {
+        '<leader>ft',
+        function()
+          require('telescope.builtin').builtin()
+        end,
+        desc = '[F]ind [T]elescope',
+      },
+      {
+        '<leader>fw',
+        function()
+          require('telescope.builtin').grep_string()
+        end,
+        desc = '[F]ind current [W]ord',
+      },
+      {
+        '<leader>/',
+        function()
+          require('telescope.builtin').live_grep()
+        end,
+        desc = '[F]ind by [G]rep',
+      },
+      {
+        '<leader>fr',
+        function()
+          require('telescope.builtin').resume()
+        end,
+        desc = '[F]ind [R]esume',
+      },
+      {
+        '<leader>fo',
+        function()
+          require('telescope.builtin').oldfiles()
+        end,
+        desc = '[F]ind Recent Files ("." for repeat)',
+      },
+      {
+        '_',
+        function()
+          require('telescope.builtin').buffers()
+        end,
+        desc = '[_] Find existing buffers',
+      },
+      {
+        '<leader>v',
+        function()
+          require('telescope.builtin').registers()
+        end,
+        desc = '[v] Find Registers',
+      },
+      {
+        '<leader>gs',
+        function()
+          require('telescope.builtin').git_status()
+        end,
+        desc = 'Find [G]it [S]tatus',
+      },
+      {
+        '<leader>gb',
+        function()
+          require('telescope.builtin').git_branches()
+        end,
+        desc = 'Find [G]it [B]ranches',
+      },
+      {
+        '<leader>fc',
+        function()
+          require('telescope.builtin').commands()
+        end,
+        desc = '[F]ind [C]ommands',
+      },
+      {
+        '<leader>fn',
+        function()
+          require('telescope.builtin').find_files { cwd = vim.fn.stdpath 'config' }
+        end,
+        desc = '[F]ind [N]eovim files',
+      },
     },
     config = function()
       require('telescope').setup {
@@ -305,141 +409,142 @@ require('lazy').setup({
       },
     },
   },
-  -- {
-  --   -- Main LSP Configuration
-  --   'neovim/nvim-lspconfig',
-  --   dependencies = {
-  --     { 'williamboman/mason.nvim', opts = {} },
-  --     { 'williamboman/mason-lspconfig.nvim' },
-  --     -- 'WhoIsSethDaniel/mason-tool-installer.nvim',
-  --
-  --     -- Useful status updates for LSP.
-  --     { 'j-hui/fidget.nvim', opts = {} },
-  --     -- 'hrsh7th/cmp-nvim-lsp',
-  --   },
-  --   config = function()
-  --     vim.api.nvim_create_autocmd('LspAttach', {
-  --       group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
-  --       callback = function(event)
-  --         local map = function(keys, func, desc, mode)
-  --           mode = mode or 'n'
-  --           vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
-  --         end
-  --         local builtin = require 'telescope.builtin'
-  --
-  --         map('gh', vim.diagnostic.open_float, '[D]iagno[s]tic open float')
-  --         map('gd', builtin.lsp_definitions, '[G]oto [D]efinitions')
-  --         map('gR', builtin.lsp_references, '[G]oto [R]eferences')
-  --         map('gD', builtin.lsp_type_definitions, '[G]oto [D]eclaration')
-  --
-  --         -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
-  --         ---@param client vim.lsp.Client
-  --         ---@param method vim.lsp.protocol.Method
-  --         ---@param bufnr? integer some lsp support methods only in specific files
-  --         ---@return boolean
-  --         local function client_supports_method(client, method, bufnr)
-  --           if vim.fn.has 'nvim-0.11' == 1 then
-  --             return client:supports_method(method, bufnr)
-  --           else
-  --             return client.supports_method(method, { bufnr = bufnr })
-  --           end
-  --         end
-  --
-  --         local client = vim.lsp.get_client_by_id(event.data.client_id)
-  --         if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf) then
-  --           local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
-  --           vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
-  --             buffer = event.buf,
-  --             group = highlight_augroup,
-  --             callback = vim.lsp.buf.document_highlight,
-  --           })
-  --
-  --           vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
-  --             buffer = event.buf,
-  --             group = highlight_augroup,
-  --             callback = vim.lsp.buf.clear_references,
-  --           })
-  --
-  --           vim.api.nvim_create_autocmd('LspDetach', {
-  --             group = vim.api.nvim_create_augroup('kickstart-lsp-detach', { clear = true }),
-  --             callback = function(event2)
-  --               vim.lsp.buf.clear_references()
-  --               vim.api.nvim_clear_autocmds { group = 'kickstart-lsp-highlight', buffer = event2.buf }
-  --             end,
-  --           })
-  --         end
-  --
-  --         if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf) then
-  --           map('<leader>th', function()
-  --             vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
-  --           end, '[T]oggle Inlay [H]ints')
-  --         end
-  --       end,
-  --     })
-  --
-  --     -- Diagnostic Config
-  --     -- See :help vim.diagnostic.Opts
-  --     vim.diagnostic.config {
-  --       jump = {
-  --         float = true,
-  --       },
-  --       severity_sort = true,
-  --       float = { border = 'rounded', source = 'if_many' },
-  --       underline = { severity = vim.diagnostic.severity.ERROR },
-  --       signs = vim.g.have_nerd_font and {
-  --         text = {
-  --           [vim.diagnostic.severity.ERROR] = '󰅚 ',
-  --           [vim.diagnostic.severity.WARN] = '󰀪 ',
-  --           [vim.diagnostic.severity.INFO] = '󰋽 ',
-  --           [vim.diagnostic.severity.HINT] = '󰌶 ',
-  --         },
-  --       } or {},
-  --       virtual_text = {
-  --         source = 'if_many',
-  --         spacing = 2,
-  --         format = function(diagnostic)
-  --           local diagnostic_message = {
-  --             [vim.diagnostic.severity.ERROR] = diagnostic.message,
-  --             [vim.diagnostic.severity.WARN] = diagnostic.message,
-  --             [vim.diagnostic.severity.INFO] = diagnostic.message,
-  --             [vim.diagnostic.severity.HINT] = diagnostic.message,
-  --           }
-  --           return diagnostic_message[diagnostic.severity]
-  --         end,
-  --       },
-  --     }
-  --     local servers = {
-  --       cssls = {},
-  --       pyright = {},
-  --       jsonls = {},
-  --       yamlls = {},
-  --       -- tailwindcss = {},
-  --       -- "ts_ls",
-  --       gopls = {},
-  --       biome = {},
-  --       lua_ls = {},
-  --     }
-  --     require('mason-lspconfig').setup {
-  --       ensure_installed = vim.tbl_keys(servers),
-  --       automatic_enable = {
-  --         exclude = {
-  --           'ts_ls',
-  --         },
-  --       },
-  --       automatic_installation = false,
-  --     }
-  --   end,
-  -- },
-  -- {
-  --   'pmizio/typescript-tools.nvim',
-  --   dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
-  --   opts = {
-  --     settings = {
-  --       expose_as_code_action = 'all',
-  --     },
-  --   },
-  --   ft = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'json' },
-  -- },
+  -- { 'Hoffs/omnisharp-extended-lsp.nvim' },
+  {
+    -- Main LSP Configuration
+    'neovim/nvim-lspconfig',
+    event = 'VeryLazy',
+    dependencies = {
+      { 'mason-org/mason.nvim', opts = {} },
+      { 'mason-org/mason-lspconfig.nvim' },
+      -- Useful status updates for LSP.
+      { 'j-hui/fidget.nvim', opts = {} },
+    },
+    config = function()
+      vim.api.nvim_create_autocmd('LspAttach', {
+        group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
+        callback = function(event)
+          local map = function(keys, func, desc, mode)
+            mode = mode or 'n'
+            vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
+          end
+          local builtin = require('telescope.builtin')
+          map('gh', vim.diagnostic.open_float, '[D]iagno[s]tic open float')
+          map('gd', builtin.lsp_definitions, '[G]oto [D]efinitions')
+          map('gR', builtin.lsp_references, '[G]oto [R]eferences')
+          map('gi', builtin.lsp_implementations, '[G]oto [R]eferences')
+
+          -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
+          ---@param client vim.lsp.Client
+          ---@param method vim.lsp.protocol.Method
+          ---@param bufnr? integer some lsp support methods only in specific files
+          ---@return boolean
+          local function client_supports_method(client, method, bufnr)
+            if vim.fn.has 'nvim-0.11' == 1 then
+              return client:supports_method(method, bufnr)
+            else
+              return client.supports_method(method, { bufnr = bufnr })
+            end
+          end
+
+          local client = vim.lsp.get_client_by_id(event.data.client_id)
+          if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf) then
+            local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
+            vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
+              buffer = event.buf,
+              group = highlight_augroup,
+              callback = vim.lsp.buf.document_highlight,
+            })
+
+            vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
+              buffer = event.buf,
+              group = highlight_augroup,
+              callback = vim.lsp.buf.clear_references,
+            })
+
+            vim.api.nvim_create_autocmd('LspDetach', {
+              group = vim.api.nvim_create_augroup('kickstart-lsp-detach', { clear = true }),
+              callback = function(event2)
+                vim.lsp.buf.clear_references()
+                vim.api.nvim_clear_autocmds { group = 'kickstart-lsp-highlight', buffer = event2.buf }
+              end,
+            })
+          end
+
+          if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf) then
+            map('<leader>th', function()
+              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
+            end, '[T]oggle Inlay [H]ints')
+          end
+        end,
+      })
+
+      -- Diagnostic Config
+      -- See :help vim.diagnostic.Opts
+      vim.diagnostic.config {
+        jump = {
+          float = true,
+        },
+        severity_sort = true,
+        float = { border = 'rounded', source = 'if_many' },
+        underline = { severity = vim.diagnostic.severity.ERROR },
+        signs = vim.g.have_nerd_font and {
+          text = {
+            [vim.diagnostic.severity.ERROR] = '󰅚 ',
+            [vim.diagnostic.severity.WARN] = '󰀪 ',
+            [vim.diagnostic.severity.INFO] = '󰋽 ',
+            [vim.diagnostic.severity.HINT] = '󰌶 ',
+          },
+        } or {},
+        virtual_text = {
+          source = 'if_many',
+          spacing = 2,
+          format = function(diagnostic)
+            local diagnostic_message = {
+              [vim.diagnostic.severity.ERROR] = diagnostic.message,
+              [vim.diagnostic.severity.WARN] = diagnostic.message,
+              [vim.diagnostic.severity.INFO] = diagnostic.message,
+              [vim.diagnostic.severity.HINT] = diagnostic.message,
+            }
+            return diagnostic_message[diagnostic.severity]
+          end,
+        },
+      }
+      local servers = {
+        cssls = {},
+        pyright = {},
+        jsonls = {},
+        yamlls = {},
+        -- tailwindcss = {},
+        -- "ts_ls",
+        gopls = {},
+        -- biome = {},
+        lua_ls = {},
+        csharp_ls = {},
+      }
+
+      require('mason').setup()
+      require('mason-lspconfig').setup {
+        ensure_installed = vim.tbl_keys(servers or {}),
+        automatic_enable = false,
+      }
+
+      for server_name, server in pairs(servers) do
+        server.capabilities = require('blink.cmp').get_lsp_capabilities(server.capabilities)
+        require('lspconfig')[server_name].setup(server)
+      end
+    end,
+  },
+  {
+    'pmizio/typescript-tools.nvim',
+    dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
+    opts = {
+      settings = {
+        expose_as_code_action = 'all',
+      },
+    },
+    ft = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'json' },
+  },
   -- {
   --   'rmagatti/goto-preview',
   --   dependencies = { 'rmagatti/logger.nvim' },
@@ -519,7 +624,14 @@ require('lazy').setup({
         ['<c-c>'] = { 'show', 'show_documentation', 'hide_documentation' },
         ['<c-l>'] = { 'snippet_forward', 'fallback' },
         ['<c-h>'] = { 'snippet_backward', 'fallback' },
-        ['<Tab>'] = { 'select_and_accept', 'snippet_forward', function() return require('sidekick').nes_jump_or_apply() end, 'fallback' },
+        ['<Tab>'] = {
+          'select_and_accept',
+          'snippet_forward',
+          function()
+            return require('sidekick').nes_jump_or_apply()
+          end,
+          'fallback',
+        },
         ['<c-u>'] = { 'scroll_documentation_up', 'fallback' },
         ['<c-d>'] = { 'scroll_documentation_down', 'fallback' },
       },
@@ -576,23 +688,79 @@ require('lazy').setup({
     opts = {
       picker = 'telescope',
       cli = {
-        tools = {
-          opencode = {
-            cmd = { 'opencode' },
-            env = { OPENCODE_THEME = 'system' },
+        win = {
+          layout = 'float',
+          float = {
+            width = 0.9,
+            height = 0.8,
+          },
+          keys = {
+            prompt = false,
           },
         },
       },
     },
     keys = {
-      { '<leader>aa', function() require('sidekick.cli').toggle() end, desc = 'Sidekick Toggle CLI' },
-      { '<leader>as', function() require('sidekick.cli').select() end, desc = 'Select CLI' },
-      { '<leader>ad', function() require('sidekick.cli').close() end, desc = 'Detach a CLI Session' },
-      { '<leader>at', function() require('sidekick.cli').send({ msg = '{this}' }) end, mode = { 'x', 'n' }, desc = 'Send This' },
-      { '<leader>af', function() require('sidekick.cli').send({ msg = '{file}' }) end, desc = 'Send File' },
-      { '<leader>av', function() require('sidekick.cli').send({ msg = '{selection}' }) end, mode = { 'x' }, desc = 'Send Visual Selection' },
-      { '<leader>ap', function() require('sidekick.cli').prompt() end, mode = { 'n', 'x' }, desc = 'Sidekick Select Prompt' },
-      { '<tab>', function() require('sidekick').nes_jump_or_apply() end, mode = 'n', desc = 'Goto/Apply Next Edit Suggestion' },
+      {
+        '<a-a>',
+        function()
+          require('sidekick.cli').toggle()
+        end,
+        desc = 'Sidekick Toggle CLI',
+      },
+      {
+        '<leader>as',
+        function()
+          require('sidekick.cli').select()
+        end,
+        desc = 'Select CLI',
+      },
+      {
+        '<leader>ad',
+        function()
+          require('sidekick.cli').close()
+        end,
+        desc = 'Detach a CLI Session',
+      },
+      {
+        '<leader>at',
+        function()
+          require('sidekick.cli').send { msg = '{this}' }
+        end,
+        mode = { 'x', 'n' },
+        desc = 'Send This',
+      },
+      {
+        '<leader>af',
+        function()
+          require('sidekick.cli').send { msg = '{file}' }
+        end,
+        desc = 'Send File',
+      },
+      {
+        '<leader>av',
+        function()
+          require('sidekick.cli').send { msg = '{selection}' }
+        end,
+        mode = { 'x' },
+        desc = 'Send Visual Selection',
+      },
+      {
+        '<leader>ap',
+        function()
+          require('sidekick.cli').prompt()
+        end,
+        mode = { 'n', 'x' },
+        desc = 'Sidekick Select Prompt',
+      },
+      {
+        '<tab>',
+        function()
+          require('sidekick').nes_jump_or_apply()
+        end,
+        mode = 'n',
+        desc = 'Goto/Apply Next Edit Suggestion',
+      },
     },
   },
   {
@@ -652,6 +820,7 @@ require('lazy').setup({
       float = {
         padding = 4,
         max_width = 80,
+        border = 'rounded',
       },
     },
     dependencies = { 'nvim-tree/nvim-web-devicons' },
@@ -683,7 +852,7 @@ require('lazy').setup({
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
+      ensure_installed = { 'bash', 'c', 'c_sharp', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -859,7 +1028,9 @@ require('lazy').setup({
       -- auto_restore_last_session = true,
     },
     keys = {
-      { '<leader>fs', '<cmd>SessionSearch<cr>', desc = '[F]ind [S]ession' },
+      { '<leader>wr', '<cmd>AutoSession search<CR>', desc = 'Session search' },
+      { '<leader>ws', '<cmd>AutoSession save<CR>', desc = 'Save session' },
+      { '<leader>wa', '<cmd>AutoSession toggle<CR>', desc = 'Toggle autosave' },
     },
   },
   -- {
@@ -937,6 +1108,17 @@ require('lazy').setup({
         mode = '',
         desc = '[A]erial [T]oggle Float',
       },
+    },
+  },
+  {
+    'stevearc/overseer.nvim',
+    opts = {},
+    keys = {
+      { '<leader>oo', '<cmd>OverseerToggle<cr>', desc = '[O]verseer [T]oggle' },
+      { '<leader>or', '<cmd>OverseerRun<cr>', desc = '[O]verseer [R]un' },
+      { '<leader>oa', '<cmd>OverseerTaskAction<cr>', desc = '[O]verseer [A]ction' },
+      { '<leader>ob', '<cmd>OverseerBuild<cr>', desc = '[O]verseer [B]uild' },
+      { '<leader>os', '<cmd>OverseerShell<cr>', desc = '[O]verseer [S]hell' },
     },
   },
   {

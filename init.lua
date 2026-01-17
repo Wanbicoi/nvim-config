@@ -389,6 +389,9 @@ require('lazy').setup({
       require('telescope').setup {
         defaults = require('telescope.themes').get_dropdown {
           path_display = { 'truncate' },
+          layout_config = {
+            width = 0.8,
+          },
         },
       }
 
@@ -428,7 +431,7 @@ require('lazy').setup({
             mode = mode or 'n'
             vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
           end
-          local builtin = require('telescope.builtin')
+          local builtin = require 'telescope.builtin'
           map('gh', vim.diagnostic.open_float, '[D]iagno[s]tic open float')
           map('gd', builtin.lsp_definitions, '[G]oto [D]efinitions')
           map('gR', builtin.lsp_references, '[G]oto [R]eferences')
@@ -486,7 +489,7 @@ require('lazy').setup({
           float = true,
         },
         severity_sort = true,
-        float = { border = 'rounded', source = 'if_many' },
+        float = { border = 'single', source = 'if_many' },
         underline = { severity = vim.diagnostic.severity.ERROR },
         signs = vim.g.have_nerd_font and {
           text = {
@@ -520,7 +523,16 @@ require('lazy').setup({
         gopls = {},
         -- biome = {},
         lua_ls = {},
-        csharp_ls = {},
+        csharp_ls = {
+          handlers = {
+            ['window/logMessage'] = function(err, result, ctx, config)
+              if result and result.message and result.message:match 'change to .csproj detected' then
+                return
+              end
+              vim.lsp.handlers['window/logMessage'](err, result, ctx, config)
+            end,
+          },
+        },
       }
 
       require('mason').setup()
@@ -693,8 +705,10 @@ require('lazy').setup({
           float = {
             width = 0.9,
             height = 0.8,
+            border = 'single',
           },
           keys = {
+            hide_alt_a = { '<a-a>', 'hide', mode = 'nt', desc = 'hide the terminal window' },
             prompt = false,
           },
         },
@@ -770,6 +784,10 @@ require('lazy').setup({
     config = function()
       require('catppuccin').setup {
         transparent_background = true,
+        float = {
+            transparent = true, -- enable transparent floating windows
+            solid = false, -- use solid styling for floating windows, see |winborder|
+        },
       }
       vim.cmd.colorscheme 'catppuccin-latte'
     end,
@@ -820,7 +838,7 @@ require('lazy').setup({
       float = {
         padding = 4,
         max_width = 80,
-        border = 'rounded',
+        border = 'single',
       },
     },
     dependencies = { 'nvim-tree/nvim-web-devicons' },
@@ -1134,6 +1152,7 @@ require('lazy').setup({
             return vim.o.columns * 0.4
           end
         end,
+        direction = 'float',
       }
       local Terminal = require('toggleterm.terminal').Terminal
       -- Lazygit
@@ -1153,16 +1172,8 @@ require('lazy').setup({
       end
       vim.keymap.set({ 'n', 't' }, '<a-l>', lazygit_toggle, { noremap = true, silent = true })
 
-      -- Float
-      local floating_term = Terminal:new {
-        hidden = true,
-        direction = 'float',
-      }
-
-      function floating_term_toggle()
-        floating_term:toggle()
-      end
-      vim.keymap.set({ 'n', 't' }, '<a-f>', floating_term_toggle, { noremap = true, silent = true })
+      vim.keymap.set('n', '<leader>ts', '<cmd>TermSelect<cr>', { desc = '[T]erminal [S]elect' })
+      vim.keymap.set('n', '<leader>tn', '<cmd>TermSetName<cr>', { desc = '[T]erminal [N]ame' })
     end,
   },
   {

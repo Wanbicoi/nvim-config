@@ -767,14 +767,14 @@ require('lazy').setup({
         mode = { 'n', 'x' },
         desc = 'Sidekick Select Prompt',
       },
-      {
-        '<tab>',
-        function()
-          require('sidekick').nes_jump_or_apply()
-        end,
-        mode = 'n',
-        desc = 'Goto/Apply Next Edit Suggestion',
-      },
+      -- {
+      --   '<tab>',
+      --   function()
+      --     require('sidekick').nes_jump_or_apply()
+      --   end,
+      --   mode = 'n',
+      --   desc = 'Goto/Apply Next Edit Suggestion',
+      -- },
     },
   },
   {

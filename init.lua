@@ -66,12 +66,21 @@ if vim.fn.has 'win32' == 1 then
 end
 
 if vim.g.neovide then
-  vim.o.guifont = 'CodeNewRoman Nerd Font Propo:h12' -- text below applies for VimScript
-  -- vim.g.neovide_cursor_vfx_mode = "railgun"
-  vim.g.neovide_cursor_vfx_mode = 'sonicboom'
+  vim.o.guifont = 'CodeNewRoman Nerd Font Propo:h11' -- text below applies for VimScript
+  vim.g.neovide_cursor_vfx_mode = 'pixiedust'
+  -- vim.g.neovide_cursor_vfx_mode = 'sonicboom'
   vim.g.neovide_floating_shadow = false
   vim.g.neovide_text_contrast = 1
+  vim.g.neovide_text_gamma = 1
   vim.g.neovide_cursor_animation_length = 0.02
+
+  vim.g.neovide_title_background_color = 'white'
+  vim.g.neovide_title_text_color = 'black'
+
+  vim.g.neovide_progress_bar_enabled = true
+  vim.g.neovide_progress_bar_height = 5.0
+  vim.g.neovide_progress_bar_animation_speed = 200.0
+  vim.g.neovide_progress_bar_hide_delay = 0.2
 end
 
 -- 🆙 Support ascx filetype
@@ -416,26 +425,98 @@ require('lazy').setup({
   {
     -- Main LSP Configuration
     'neovim/nvim-lspconfig',
-    event = 'VeryLazy',
     dependencies = {
+      -- Automatically install LSPs and related tools to stdpath for Neovim
+      -- Mason must be loaded before its dependents so we need to set it up here.
+      -- NOTE: `opts = {}` is the same as calling `require('mason').setup({})`
       { 'mason-org/mason.nvim', opts = {} },
-      { 'mason-org/mason-lspconfig.nvim' },
+      'mason-org/mason-lspconfig.nvim',
+
       -- Useful status updates for LSP.
       { 'j-hui/fidget.nvim', opts = {} },
+
+      -- Allows extra capabilities provided by blink.cmp
+      'saghen/blink.cmp',
     },
     config = function()
+      -- Brief aside: **What is LSP?**
+      --
+      -- LSP is an initialism you've probably heard, but might not understand what it is.
+      --
+      -- LSP stands for Language Server Protocol. It's a protocol that helps editors
+      -- and language tooling communicate in a standardized fashion.
+      --
+      -- In general, you have a "server" which is some tool built to understand a particular
+      -- language (such as `gopls`, `lua_ls`, `rust_analyzer`, etc.). These Language Servers
+      -- (sometimes called LSP servers, but that's kind of like ATM Machine) are standalone
+      -- processes that communicate with some "client" - in this case, Neovim!
+      --
+      -- LSP provides Neovim with features like:
+      --  - Go to definition
+      --  - Find references
+      --  - Autocompletion
+      --  - Symbol Search
+      --  - and more!
+      --
+      -- Thus, Language Servers are external tools that must be installed separately from
+      -- Neovim. This is where `mason` and related plugins come into play.
+      --
+      -- If you're wondering about lsp vs treesitter, you can check out the wonderfully
+      -- and elegantly composed help section, `:help lsp-vs-treesitter`
+
+      --  This function gets run when an LSP attaches to a particular buffer.
+      --    That is to say, every time a new file is opened that is associated with
+      --    an lsp (for example, opening `main.rs` is associated with `rust_analyzer`) this
+      --    function will be executed to configure the current buffer
       vim.api.nvim_create_autocmd('LspAttach', {
         group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
         callback = function(event)
+          -- NOTE: Remember that Lua is a real programming language, and as such it is possible
+          -- to define small helper and utility functions so you don't have to repeat yourself.
+          --
+          -- In this case, we create a function that lets us more easily define mappings specific
+          -- for LSP related items. It sets the mode, buffer and description for us each time.
           local map = function(keys, func, desc, mode)
             mode = mode or 'n'
             vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
           end
-          local builtin = require 'telescope.builtin'
-          map('gh', vim.diagnostic.open_float, '[D]iagno[s]tic open float')
-          map('gd', builtin.lsp_definitions, '[G]oto [D]efinitions')
-          map('gR', builtin.lsp_references, '[G]oto [R]eferences')
-          map('gi', builtin.lsp_implementations, '[G]oto [R]eferences')
+
+          -- Rename the variable under your cursor.
+          --  Most Language Servers support renaming across files, etc.
+          map('grn', vim.lsp.buf.rename, '[R]e[n]ame')
+
+          -- Execute a code action, usually your cursor needs to be on top of an error
+          -- or a suggestion from your LSP for this to activate.
+          map('gra', vim.lsp.buf.code_action, '[G]oto Code [A]ction', { 'n', 'x' })
+
+          -- Find references for the word under your cursor.
+          map('grr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
+
+          -- Jump to the implementation of the word under your cursor.
+          --  Useful when your language has ways of declaring types without an actual implementation.
+          map('gri', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
+
+          -- Jump to the definition of the word under your cursor.
+          --  This is where a variable was first declared, or where a function is defined, etc.
+          --  To jump back, press <C-t>.
+          map('grd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
+
+          -- WARN: This is not Goto Definition, this is Goto Declaration.
+          --  For example, in C this would take you to the header.
+          map('grD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+
+          -- Fuzzy find all the symbols in your current document.
+          --  Symbols are things like variables, functions, types, etc.
+          map('gO', require('telescope.builtin').lsp_document_symbols, 'Open Document Symbols')
+
+          -- Fuzzy find all the symbols in your current workspace.
+          --  Similar to document symbols, except searches over your entire project.
+          map('gW', require('telescope.builtin').lsp_dynamic_workspace_symbols, 'Open Workspace Symbols')
+
+          -- Jump to the type of the word under your cursor.
+          --  Useful when you're not sure what type a variable is and you want to see
+          --  the definition of its *type*, not where it was *defined*.
+          map('grt', require('telescope.builtin').lsp_type_definitions, '[G]oto [T]ype Definition')
 
           -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
           ---@param client vim.lsp.Client
@@ -450,6 +531,11 @@ require('lazy').setup({
             end
           end
 
+          -- The following two autocommands are used to highlight references of the
+          -- word under your cursor when your cursor rests there for a little while.
+          --    See `:help CursorHold` for information about when this is executed
+          --
+          -- When you move your cursor, the highlights will be cleared (the second autocommand).
           local client = vim.lsp.get_client_by_id(event.data.client_id)
           if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf) then
             local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
@@ -474,6 +560,10 @@ require('lazy').setup({
             })
           end
 
+          -- The following code creates a keymap to toggle inlay hints in your
+          -- code, if the language server you are using supports them
+          --
+          -- This may be unwanted, since they displace some of your code
           if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf) then
             map('<leader>th', function()
               vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
@@ -485,11 +575,8 @@ require('lazy').setup({
       -- Diagnostic Config
       -- See :help vim.diagnostic.Opts
       vim.diagnostic.config {
-        jump = {
-          float = true,
-        },
         severity_sort = true,
-        float = { border = 'single', source = 'if_many' },
+        float = { border = 'rounded', source = 'if_many' },
         underline = { severity = vim.diagnostic.severity.ERROR },
         signs = vim.g.have_nerd_font and {
           text = {
@@ -513,38 +600,33 @@ require('lazy').setup({
           end,
         },
       }
+
+      local capabilities = require('blink.cmp').get_lsp_capabilities()
       local servers = {
+        copilot = {},
         cssls = {},
         pyright = {},
         jsonls = {},
         yamlls = {},
         -- tailwindcss = {},
-        -- "ts_ls",
         gopls = {},
         -- biome = {},
         lua_ls = {},
-        csharp_ls = {
-          handlers = {
-            ['window/logMessage'] = function(err, result, ctx, config)
-              if result and result.message and result.message:match 'change to .csproj detected' then
-                return
-              end
-              vim.lsp.handlers['window/logMessage'](err, result, ctx, config)
-            end,
-          },
+        csharp_ls = {},
+      }
+      require('mason-lspconfig').setup {
+        ensure_installed = vim.tbl_keys(servers),
+        automatic_installation = false,
+        automatic_enable = {
+          exclude = { 'rust_analyzer', 'ts_ls' },
+        },
+        handlers = {
+          function(server_name)
+            local server = servers[server_name] or {}
+            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+          end,
         },
       }
-
-      require('mason').setup()
-      require('mason-lspconfig').setup {
-        ensure_installed = vim.tbl_keys(servers or {}),
-        automatic_enable = false,
-      }
-
-      for server_name, server in pairs(servers) do
-        server.capabilities = require('blink.cmp').get_lsp_capabilities(server.capabilities)
-        require('lspconfig')[server_name].setup(server)
-      end
     end,
   },
   {
@@ -647,7 +729,18 @@ require('lazy').setup({
         ['<c-u>'] = { 'scroll_documentation_up', 'fallback' },
         ['<c-d>'] = { 'scroll_documentation_down', 'fallback' },
       },
-      cmdline = { enabled = true },
+      cmdline = {
+        enabled = true,
+        keymap = {
+          ['<Tab>'] = { 'show', 'accept', 'fallback' },
+          ['<S-Tab>'] = { 'show', 'select_prev', 'fallback' },
+          ['<C-n>'] = { 'select_next', 'fallback' },
+          ['<C-p>'] = { 'select_prev', 'fallback' },
+        },
+        completion = {
+          menu = { auto_show = true },
+        },
+      },
       completion = {
         documentation = { window = { border = 'single' }, auto_show = true },
         ghost_text = { enabled = true },
@@ -683,7 +776,6 @@ require('lazy').setup({
           },
         },
       },
-
       -- (Default) Rust fuzzy matcher for typo resistance and significantly better performance
       -- You may use a lua implementation instead by using `implementation = "lua"` or fallback to the lua implementation,
       -- when the Rust fuzzy matcher is not available, by using `implementation = "prefer_rust"`
@@ -785,14 +877,24 @@ require('lazy').setup({
       require('catppuccin').setup {
         transparent_background = true,
         float = {
-            transparent = true, -- enable transparent floating windows
-            solid = false, -- use solid styling for floating windows, see |winborder|
+          transparent = true, -- enable transparent floating windows
+          solid = false, -- use solid styling for floating windows, see |winborder|
         },
       }
-      vim.cmd.colorscheme 'catppuccin-latte'
+      -- vim.cmd.colorscheme 'catppuccin-latte'
     end,
   },
-  { 'ellisonleao/gruvbox.nvim', priority = 1000, config = true },
+  {
+    'ellisonleao/gruvbox.nvim',
+    priority = 1000,
+    config = function()
+      require('gruvbox').setup {
+        transparent_mode = false,
+      }
+      vim.o.background = 'light'
+      vim.cmd 'colorscheme gruvbox'
+    end,
+  },
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 

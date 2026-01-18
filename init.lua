@@ -344,7 +344,17 @@ require('lazy').setup({
         function()
           require('telescope.builtin').live_grep()
         end,
-        desc = '[F]ind by [G]rep',
+        desc = '[G]rep',
+      },
+      {
+        '<leader>?',
+        function()
+          local text = vim.fn.getreg '"' -- get default register (yanked/copied)
+          require('telescope.builtin').live_grep {
+            default_text = text,
+          }
+        end,
+        desc = '[G]rep with copied text',
       },
       {
         '<leader>fr',
@@ -1242,12 +1252,10 @@ require('lazy').setup({
     config = function()
       require('toggleterm').setup {
         open_mapping = [[<c-\>]],
-        size = function(term)
-          if term.direction == 'horizontal' then
-            return 15
-          elseif term.direction == 'vertical' then
-            return vim.o.columns * 0.4
-          end
+        hide_numbers = false,
+        on_open = function(term)
+          vim.opt_local.number = true
+          vim.opt_local.relativenumber = false -- Set to true if you prefer relative
         end,
         direction = 'float',
       }

@@ -854,7 +854,7 @@ require('lazy').setup({
         desc = 'Sidekick Select Prompt',
       },
       {
-        '<c-n>',
+        '<c-a>',
         function()
           require('sidekick').nes_jump_or_apply()
         end,
@@ -1201,10 +1201,11 @@ require('lazy').setup({
     opts = {
       backends = { 'lsp', 'treesitter', 'markdown', 'asciidoc', 'man' },
       layout = {
-        max_width = { 35, 0.25 },
-        min_width = 35,
+        max_width = { 0.5 },
+        min_width = 40,
       },
       attach_mode = 'global',
+      default_direction = 'float',
     },
     dependencies = {
       'nvim-treesitter/nvim-treesitter',
@@ -1217,10 +1218,10 @@ require('lazy').setup({
       {
         '<leader>A',
         function()
-          require('aerial').toggle { direction = 'float' }
+          require('aerial').toggle()
         end,
         mode = '',
-        desc = '[A]erial [T]oggle Float',
+        desc = '[A]erial toggle float',
       },
     },
   },

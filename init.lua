@@ -81,6 +81,15 @@ if vim.g.neovide then
   vim.g.neovide_progress_bar_height = 5.0
   vim.g.neovide_progress_bar_animation_speed = 200.0
   vim.g.neovide_progress_bar_hide_delay = 0.2
+
+  vim.keymap.set('n', '<c-v>', '"+P') -- Paste normal mode
+  vim.keymap.set('v', '<C-v>', '"+P')
+  vim.keymap.set('c', '<c-v>', '<C-R>+') -- Paste command mode
+  vim.keymap.set('i', '<c-v>', '<ESC>"+pa') -- Paste insert mode
+  vim.keymap.set('t', '<C-v>', function()
+    local text = vim.fn.getreg '+'
+    vim.api.nvim_chan_send(vim.b.terminal_job_id, text)
+  end, { desc = 'Paste clipboard into terminal' })
 end
 
 -- 🆙 Support ascx filetype
@@ -481,41 +490,14 @@ require('lazy').setup({
             vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
           end
 
-          -- Rename the variable under your cursor.
-          --  Most Language Servers support renaming across files, etc.
           map('grn', vim.lsp.buf.rename, '[R]e[n]ame')
-
-          -- Execute a code action, usually your cursor needs to be on top of an error
-          -- or a suggestion from your LSP for this to activate.
           map('gra', vim.lsp.buf.code_action, '[G]oto Code [A]ction', { 'n', 'x' })
-
-          -- Find references for the word under your cursor.
           map('grr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
-
-          -- Jump to the implementation of the word under your cursor.
-          --  Useful when your language has ways of declaring types without an actual implementation.
           map('gri', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
-
-          -- Jump to the definition of the word under your cursor.
-          --  This is where a variable was first declared, or where a function is defined, etc.
-          --  To jump back, press <C-t>.
           map('grd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
-
-          -- WARN: This is not Goto Definition, this is Goto Declaration.
-          --  For example, in C this would take you to the header.
           map('grD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-
-          -- Fuzzy find all the symbols in your current document.
-          --  Symbols are things like variables, functions, types, etc.
           map('gO', require('telescope.builtin').lsp_document_symbols, 'Open Document Symbols')
-
-          -- Fuzzy find all the symbols in your current workspace.
-          --  Similar to document symbols, except searches over your entire project.
           map('gW', require('telescope.builtin').lsp_dynamic_workspace_symbols, 'Open Workspace Symbols')
-
-          -- Jump to the type of the word under your cursor.
-          --  Useful when you're not sure what type a variable is and you want to see
-          --  the definition of its *type*, not where it was *defined*.
           map('grt', require('telescope.builtin').lsp_type_definitions, '[G]oto [T]ype Definition')
 
           -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
@@ -568,6 +550,14 @@ require('lazy').setup({
             map('<leader>th', function()
               vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
             end, '[T]oggle Inlay [H]ints')
+          end
+
+          if vim.fn.has 'nvim-0.12' == 1 then
+            if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_inlineCompletion, event.buf) then
+              vim.lsp.inline_completion.enable(true, { bufnr = event.buf })
+              vim.keymap.set('i', '<c-f>', vim.lsp.inline_completion.get, { desc = 'LSP: accept inline completion', buffer = event.buf })
+              vim.keymap.set('i', '<c-g>', vim.lsp.inline_completion.select, { desc = 'LSP: switch inline completion', buffer = event.buf })
+            end
           end
         end,
       })
@@ -721,13 +711,17 @@ require('lazy').setup({
         ['<Tab>'] = {
           'select_and_accept',
           'snippet_forward',
-          function()
-            return require('sidekick').nes_jump_or_apply()
-          end,
           'fallback',
         },
         ['<c-u>'] = { 'scroll_documentation_up', 'fallback' },
         ['<c-d>'] = { 'scroll_documentation_down', 'fallback' },
+        ['<c-a>'] = {
+          function()
+            if require('sidekick.nes').update() then
+              return -- jumped or applied
+            end
+          end,
+        },
       },
       cmdline = {
         enabled = true,
@@ -859,14 +853,14 @@ require('lazy').setup({
         mode = { 'n', 'x' },
         desc = 'Sidekick Select Prompt',
       },
-      -- {
-      --   '<tab>',
-      --   function()
-      --     require('sidekick').nes_jump_or_apply()
-      --   end,
-      --   mode = 'n',
-      --   desc = 'Goto/Apply Next Edit Suggestion',
-      -- },
+      {
+        '<c-n>',
+        function()
+          require('sidekick').nes_jump_or_apply()
+        end,
+        mode = 'n',
+        desc = 'Goto/Apply Next Edit Suggestion',
+      },
     },
   },
   {

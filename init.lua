@@ -280,7 +280,7 @@ require('lazy').setup({
         { '<leader>c', group = '[C]ode', mode = { 'n', 'x' } },
         { '<leader>d', group = '[D]iff' },
         { '<leader>w', group = '[W]orkspace' },
-        { '<leader>t', group = '[T]oggle' },
+        { '<leader>t', group = '[T]est / [T]oggle' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
         { '<leader>o', group = '[O]verseer' },
       },
@@ -817,6 +817,13 @@ require('lazy').setup({
         desc = 'Sidekick Toggle CLI',
       },
       {
+        '<leader>aa',
+        function()
+          require('sidekick.cli').toggle()
+        end,
+        desc = 'Sidekick Toggle CLI',
+      },
+      {
         '<leader>as',
         function()
           require('sidekick.cli').select()
@@ -974,7 +981,7 @@ require('lazy').setup({
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'bash', 'c', 'c_sharp', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
+      ensure_installed = { 'bash', 'c', 'c_sharp', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'javascript', 'typescript', 'tsx' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -1304,6 +1311,31 @@ require('lazy').setup({
       { '<leader>dr', '<cmd>DiffviewRefresh<cr>', desc = 'Diffview Refresh' },
     },
   },
+  {
+    'HakonHarnes/img-clip.nvim',
+    event = 'VeryLazy',
+    opts = {},
+    keys = {
+      {
+        '<C-S-v>',
+        function()
+          require('img-clip').paste_image()
+        end,
+        mode = { 'n', 'i', 'v' },
+        desc = 'Paste image from clipboard',
+      },
+      {
+        '<C-S-v>',
+        function()
+          vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-\\><C-N>', true, false, true), 'n', false)
+          require('img-clip').paste_image()
+          vim.api.nvim_feedkeys('i', 'n', false)
+        end,
+        mode = 't',
+        desc = 'Paste image from clipboard (terminal mode)',
+      },
+    },
+  },
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
@@ -1319,6 +1351,7 @@ require('lazy').setup({
   require 'kickstart.plugins.autopairs',
   require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
   require 'kickstart.plugins.indent_line',
+  require 'kickstart.plugins.neotest',
   -- require 'kickstart.plugins.ctags',
   -- require 'kickstart.plugins.avante',
 

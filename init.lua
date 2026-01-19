@@ -424,7 +424,6 @@ require('lazy').setup({
       -- Enable Telescope extensions if they are installed
       pcall(require('telescope').load_extension, 'fzf')
       pcall(require('telescope').load_extension, 'frecency')
-      -- pcall(require('telescope').load_extension, 'ui-select')
     end,
   },
   -- LSP Plugins
@@ -438,7 +437,6 @@ require('lazy').setup({
       },
     },
   },
-  -- { 'Hoffs/omnisharp-extended-lsp.nvim' },
   {
     -- Main LSP Configuration
     'neovim/nvim-lspconfig',
@@ -1258,7 +1256,7 @@ require('lazy').setup({
       require('toggleterm').setup {
         open_mapping = [[<c-\>]],
         hide_numbers = false,
-        on_open = function(term)
+        on_open = function()
           vim.opt_local.number = true
           vim.opt_local.relativenumber = false -- Set to true if you prefer relative
         end,
@@ -1346,7 +1344,6 @@ require('lazy').setup({
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
   -- require 'kickstart.plugins.debug',
-  -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
   require 'kickstart.plugins.autopairs',
   require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps

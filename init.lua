@@ -278,9 +278,7 @@ require('lazy').setup({
       -- Document existing key chains
       spec = {
         { '<leader>c', group = '[C]ode', mode = { 'n', 'x' } },
-        { '<leader>d', group = '[D]ocument' },
-        { '<leader>r', group = '[R]ename' },
-        { '<leader>s', group = '[S]earch' },
+        { '<leader>d', group = '[D]iff' },
         { '<leader>w', group = '[W]orkspace' },
         { '<leader>t', group = '[T]oggle' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
@@ -1276,9 +1274,6 @@ require('lazy').setup({
         lazygit:toggle()
       end
       vim.keymap.set({ 'n', 't' }, '<a-l>', lazygit_toggle, { noremap = true, silent = true })
-
-      vim.keymap.set('n', '<leader>ts', '<cmd>TermSelect<cr>', { desc = '[T]erminal [S]elect' })
-      vim.keymap.set('n', '<leader>tn', '<cmd>TermSetName<cr>', { desc = '[T]erminal [N]ame' })
     end,
   },
   {

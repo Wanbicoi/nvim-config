@@ -1270,10 +1270,8 @@ require('lazy').setup({
       backends = { 'lsp', 'treesitter', 'markdown', 'asciidoc', 'man' },
       layout = {
         max_width = { 0.5 },
-        min_width = 40,
+        min_width = 0.5,
       },
-      attach_mode = 'global',
-      default_direction = 'float',
     },
     dependencies = {
       'nvim-treesitter/nvim-treesitter',
@@ -1286,7 +1284,7 @@ require('lazy').setup({
       {
         '<leader>A',
         function()
-          require('aerial').toggle()
+          require('aerial').toggle { direction = 'float' }
         end,
         mode = '',
         desc = '[A]erial toggle float',

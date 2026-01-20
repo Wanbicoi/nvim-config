@@ -93,7 +93,7 @@ if vim.g.neovide then
 end
 
 -- 🆙 Support ascx filetype
-vim.filetype.add { extension = { ascx = 'html' } }
+vim.filetype.add { extension = { ascx = 'html', json = 'jsonc' } }
 vim.treesitter.language.register('html', 'ascx')
 
 -- [[ Basic Keymaps ]]
@@ -331,6 +331,25 @@ require('lazy').setup({
         desc = '[F]ind [T]elescope',
       },
       {
+        '<leader>fW',
+        function()
+          local word = vim.fn.expand('<cword>')
+          local pickers = require('telescope.builtin')
+          local find_cmd
+          if vim.fn.executable('fd') == 1 then
+            find_cmd = { 'fd', '--hidden', '--type', 'f', word }
+          elseif vim.fn.executable('rg') == 1 then
+            find_cmd = { 'rg', '--hidden', '--files', '-g', '*' .. word .. '*' }
+          else
+            -- Fallback: open find_files and prefill prompt with the word
+            pickers.find_files({ prompt_title = 'Find files matching: ' .. word, hidden = true, no_ignore = true })
+            return
+          end
+          pickers.find_files({ find_command = find_cmd, prompt_title = 'Files: ' .. word })
+        end,
+        desc = '[F]ind file of the current [W]ord',
+      },
+      {
         '<leader>fw',
         function()
           require('telescope.builtin').grep_string()
@@ -347,7 +366,7 @@ require('lazy').setup({
       {
         '<leader>?',
         function()
-          local text = vim.fn.getreg '"' -- get default register (yanked/copied)
+          local text = vim.fn.getreg '+' -- get default register (yanked/copied)
           require('telescope.builtin').live_grep {
             default_text = text,
           }
@@ -979,7 +998,23 @@ require('lazy').setup({
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'bash', 'c', 'c_sharp', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'javascript', 'typescript', 'tsx' },
+      ensure_installed = {
+        'bash',
+        'c',
+        'c_sharp',
+        'diff',
+        'html',
+        'lua',
+        'luadoc',
+        'markdown',
+        'markdown_inline',
+        'query',
+        'vim',
+        'vimdoc',
+        'javascript',
+        'typescript',
+        'tsx',
+      },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -1251,6 +1286,7 @@ require('lazy').setup({
   },
   {
     'akinsho/toggleterm.nvim',
+    event = 'VeryLazy',
     version = '*',
     config = function()
       require('toggleterm').setup {
@@ -1268,6 +1304,7 @@ require('lazy').setup({
         cmd = 'lazygit',
         hidden = true,
         direction = 'float',
+        name = 'lazygit',
         on_open = function()
           vim.cmd 'startinsert!'
         end,
@@ -1279,10 +1316,35 @@ require('lazy').setup({
         lazygit:toggle()
       end
       vim.keymap.set({ 'n', 't' }, '<a-l>', lazygit_toggle, { noremap = true, silent = true })
+
+      -- Create 9 floating terminals
+      local terms = {}
+      for i = 1, 9 do
+        terms[i] = Terminal:new {
+          direction = 'float',
+          count = i,
+        }
+      end
+
+      -- Helper to toggle terminal by index
+      local function toggle_term(i)
+        return function()
+          terms[i]:toggle()
+        end
+      end
+
+      -- Map <A-1> .. <A-9> in NORMAL + TERMINAL mode
+      for i = 1, 9 do
+        local key = '<A-' .. i .. '>'
+        vim.keymap.set({ 'n', 't' }, key, toggle_term(i), {
+          desc = 'Toggle floating terminal ' .. i,
+        })
+      end
     end,
   },
   {
     'LunarVim/bigfile.nvim',
+    event = 'VeryLazy',
     opts = {
       filesize = 2, -- size of the file in MiB, the plugin round file sizes to the closest MiB
       pattern = { '*' }, -- autocmd pattern or function see <### Overriding the detection of big files>
@@ -1308,32 +1370,60 @@ require('lazy').setup({
       { '<leader>df', '<cmd>DiffviewFocusFiles<cr>', desc = 'Diffview Focus Files' },
       { '<leader>dr', '<cmd>DiffviewRefresh<cr>', desc = 'Diffview Refresh' },
     },
+    config = function()
+      local actions = require 'diffview.actions'
+      require('diffview').setup {
+        -- Turn on wrapping for diff buffers when they are read
+        hooks = {
+          diff_buf_read = function(bufnr)
+            -- Set wrap for the diff buffer only
+            vim.api.nvim_set_option_value('wrap', true, { buf = bufnr })
+          end,
+        },
+
+        -- Map page scroll in preview/view/file panels to <C-j>/<C-k>
+        keymaps = {
+          view = {
+            ['<C-j>'] = actions.scroll_view(0.25),
+            ['<C-k>'] = actions.scroll_view(-0.25),
+          },
+          file_panel = {
+            ['<C-j>'] = actions.scroll_view(0.25),
+            ['<C-k>'] = actions.scroll_view(-0.25),
+          },
+          file_history_panel = {
+            ['<C-j>'] = actions.scroll_view(0.25),
+            ['<C-k>'] = actions.scroll_view(-0.25),
+          },
+        },
+      }
+    end,
   },
-  {
-    'HakonHarnes/img-clip.nvim',
-    event = 'VeryLazy',
-    opts = {},
-    keys = {
-      {
-        '<C-S-v>',
-        function()
-          require('img-clip').paste_image()
-        end,
-        mode = { 'n', 'i', 'v' },
-        desc = 'Paste image from clipboard',
-      },
-      {
-        '<C-S-v>',
-        function()
-          vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-\\><C-N>', true, false, true), 'n', false)
-          require('img-clip').paste_image()
-          vim.api.nvim_feedkeys('i', 'n', false)
-        end,
-        mode = 't',
-        desc = 'Paste image from clipboard (terminal mode)',
-      },
-    },
-  },
+  -- {
+  --   'HakonHarnes/img-clip.nvim',
+  --   event = 'VeryLazy',
+  --   opts = {},
+  --   keys = {
+  --     {
+  --       '<C-S-v>',
+  --       function()
+  --         require('img-clip').paste_image()
+  --       end,
+  --       mode = { 'n', 'i', 'v' },
+  --       desc = 'Paste image from clipboard',
+  --     },
+  --     {
+  --       '<C-S-v>',
+  --       function()
+  --         vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-\\><C-N>', true, false, true), 'n', false)
+  --         require('img-clip').paste_image()
+  --         vim.api.nvim_feedkeys('i', 'n', false)
+  --       end,
+  --       mode = 't',
+  --       desc = 'Paste image from clipboard (terminal mode)',
+  --     },
+  --   },
+  -- },
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.

@@ -188,6 +188,10 @@ vim.opt.wildignore:append {
   'unokai.vim',
   'randomhue.lua',
   'minischeme.lua',
+  'miniautumn.lua',
+  'minispring.lua',
+  'miniwinter.lua',
+  'minisummer.lua',
   'default.vim',
   'minicyan.lua',
   'zellner.vim',
@@ -333,19 +337,19 @@ require('lazy').setup({
       {
         '<leader>fW',
         function()
-          local word = vim.fn.expand('<cword>')
-          local pickers = require('telescope.builtin')
+          local word = vim.fn.expand '<cword>'
+          local pickers = require 'telescope.builtin'
           local find_cmd
-          if vim.fn.executable('fd') == 1 then
+          if vim.fn.executable 'fd' == 1 then
             find_cmd = { 'fd', '--hidden', '--type', 'f', word }
-          elseif vim.fn.executable('rg') == 1 then
+          elseif vim.fn.executable 'rg' == 1 then
             find_cmd = { 'rg', '--hidden', '--files', '-g', '*' .. word .. '*' }
           else
             -- Fallback: open find_files and prefill prompt with the word
-            pickers.find_files({ prompt_title = 'Find files matching: ' .. word, hidden = true, no_ignore = true })
+            pickers.find_files { prompt_title = 'Find files matching: ' .. word, hidden = true, no_ignore = true }
             return
           end
-          pickers.find_files({ find_command = find_cmd, prompt_title = 'Files: ' .. word })
+          pickers.find_files { find_command = find_cmd, prompt_title = 'Files: ' .. word }
         end,
         desc = '[F]ind file of the current [W]ord',
       },
@@ -918,7 +922,23 @@ require('lazy').setup({
         transparent_mode = false,
       }
       vim.o.background = 'light'
-      vim.cmd 'colorscheme gruvbox'
+      -- vim.cmd 'colorscheme gruvbox'
+    end,
+  },
+  {
+    'projekt0n/github-nvim-theme',
+    name = 'github-theme',
+    lazy = false, -- make sure we load this during startup if it is your main colorscheme
+    priority = 1000, -- make sure to load this before all the other start plugins
+    config = function()
+      require('github-theme').setup {
+        options = {
+          styles = {
+            comments = 'italic',
+          },
+        },
+      }
+      vim.cmd 'colorscheme github_light'
     end,
   },
   -- Highlight todo, notes, etc in comments

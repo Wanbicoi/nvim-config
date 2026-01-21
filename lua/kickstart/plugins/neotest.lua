@@ -4,7 +4,7 @@ return {
     'nvim-neotest/nvim-nio',
     'nvim-lua/plenary.nvim',
     'nvim-treesitter/nvim-treesitter',
-    'thenbe/neotest-playwright',
+    { 'StevanFreeborn/neotest-playwright', branch = 'fork' },
   },
   config = function()
     require('neotest').setup {

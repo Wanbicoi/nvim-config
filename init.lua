@@ -370,7 +370,8 @@ require('lazy').setup({
       {
         '<leader>?',
         function()
-          local text = vim.fn.getreg '+' -- get default register (yanked/copied)
+          local text = vim.fn.getreg '+'
+          text = vim.trim(text:gsub('[\n\r]', ' '))
           require('telescope.builtin').live_grep {
             default_text = text,
           }
@@ -436,12 +437,19 @@ require('lazy').setup({
     },
     config = function()
       require('telescope').setup {
-        defaults = require('telescope.themes').get_dropdown {
-          path_display = { 'truncate' },
+        defaults = {
+          layout_strategy = 'vertical',
           layout_config = {
-            width = 0.8,
+            prompt_position = 'top',
+            height = 0.9,
           },
         },
+        -- defaults = require('telescope.themes').get_ivy {
+        --   path_display = { 'truncate' },
+        --   -- layout_config = {
+        --   --   width = 0.8,
+        --   -- },
+        -- },
       }
 
       -- Enable Telescope extensions if they are installed

@@ -469,6 +469,16 @@ require('lazy').setup({
       pcall(require('telescope').load_extension, 'frecency')
     end,
   },
+  {
+    'folke/lazydev.nvim',
+    ft = 'lua',
+    opts = {
+      library = {
+        -- Load luvit types when the `vim.uv` word is found
+        { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
+      },
+    },
+  },
   -- LSP Plugins
   {
     -- Main LSP Configuration
@@ -487,6 +497,7 @@ require('lazy').setup({
         },
       },
       'mason-org/mason-lspconfig.nvim',
+      'folke/lazydev.nvim',
 
       -- Useful status updates for LSP.
       { 'j-hui/fidget.nvim', opts = {} },
@@ -515,16 +526,6 @@ require('lazy').setup({
             },
           })
         end,
-      },
-      {
-        'folke/lazydev.nvim',
-        ft = 'lua',
-        opts = {
-          library = {
-            -- Load luvit types when the `vim.uv` word is found
-            { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
-          },
-        },
       },
       'saghen/blink.cmp',
     },
@@ -685,7 +686,7 @@ require('lazy').setup({
 
       local capabilities = require('blink.cmp').get_lsp_capabilities()
       local servers = {
-        copilot = {},
+        -- copilot = {},
         cssls = {},
         pyright = {},
         jsonls = {},
@@ -693,7 +694,17 @@ require('lazy').setup({
         -- tailwindcss = {},
         gopls = {},
         -- biome = {},
-        lua_ls = {},
+        lua_ls = {
+          settings = {
+            Lua = {
+              completion = {
+                callSnippet = 'Replace',
+              },
+              -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
+              -- diagnostics = { disable = { 'missing-fields' } },
+            },
+          },
+        },
         -- csharp_ls = {},
       }
       require('mason-lspconfig').setup {
@@ -786,8 +797,7 @@ require('lazy').setup({
     'saghen/blink.cmp',
     event = { 'InsertEnter', 'CmdlineEnter' },
     -- optional: provides snippets for the snippet source
-    dependencies = { 'rafamadriz/friendly-snippets', 'xzbdmw/colorful-menu.nvim' },
-
+    dependencies = { 'rafamadriz/friendly-snippets', 'xzbdmw/colorful-menu.nvim', 'folke/lazydev.nvim' },
     -- use a release tag to download pre-built binaries
     version = '1.*',
     -- AND/OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust

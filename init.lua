@@ -114,10 +114,6 @@ vim.treesitter.language.register('html', 'ascx')
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
--- Clear highlights on search when pressing <Esc> in normal mode
---  See `:help hlsearch`
-vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
-
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
@@ -417,6 +413,13 @@ require('lazy').setup({
           require('telescope.builtin').git_status()
         end,
         desc = 'Find [G]it [S]tatus',
+      },
+      {
+        '<leader>gB',
+        function()
+          require('telescope.builtin').git_bcommits()
+        end,
+        desc = 'Find [G]it [B]uffer commits',
       },
       {
         '<leader>gb',
@@ -974,6 +977,11 @@ require('lazy').setup({
     init = function()
       vim.g.copilot_nes_debounce = 500
       vim.lsp.enable 'copilot_ls'
+      vim.keymap.set('n', '<esc>', function()
+        if not require('copilot-lsp.nes').clear() then
+          vim.cmd 'nohlsearch'
+        end
+      end, { desc = 'Clear Copilot suggestion or fallback' })
       vim.keymap.set('n', '<tab>', function()
         local bufnr = vim.api.nvim_get_current_buf()
         local state = vim.b[bufnr].nes_state

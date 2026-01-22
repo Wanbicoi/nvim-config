@@ -88,11 +88,11 @@ if vim.g.neovide then
   vim.g.neovide_progress_bar_animation_speed = 200.0
   vim.g.neovide_progress_bar_hide_delay = 0.2
 
-  vim.keymap.set('n', '<c-v>', '"+P') -- Paste normal mode
-  vim.keymap.set('v', '<C-v>', '"+P')
-  vim.keymap.set('c', '<c-v>', '<C-R>+') -- Paste command mode
-  vim.keymap.set('i', '<c-v>', '<ESC>"+pa') -- Paste insert mode
-  vim.keymap.set('t', '<C-v>', function()
+  vim.keymap.set('n', '<c-s-v>', '"+P') -- Paste normal mode
+  vim.keymap.set('v', '<c-s-v>', '"+P')
+  vim.keymap.set('c', '<c-s-v>', '<C-R>+') -- Paste command mode
+  vim.keymap.set('i', '<c-s-v>', '<ESC>"+pa') -- Paste insert mode
+  vim.keymap.set('t', '<c-s-v>', function()
     local text = vim.fn.getreg '+'
     vim.api.nvim_chan_send(vim.b.terminal_job_id, text)
   end, { desc = 'Paste clipboard into terminal' })
@@ -490,7 +490,6 @@ require('lazy').setup({
           },
           mappings = {
             i = {
-              ['<c-v>'] = false,
               ['<esc>'] = require('telescope.actions').close,
             },
           },
@@ -1523,14 +1522,6 @@ require('lazy').setup({
     config = function()
       local actions = require 'diffview.actions'
       require('diffview').setup {
-        -- Turn on wrapping for diff buffers when they are read
-        hooks = {
-          diff_buf_read = function(bufnr)
-            -- Set wrap for the diff buffer only
-            vim.api.nvim_set_option_value('wrap', true, { buf = bufnr })
-          end,
-        },
-
         -- Map page scroll in preview/view/file panels to <C-j>/<C-k>
         keymaps = {
           view = {

@@ -4,7 +4,9 @@
 
 return {
   {
+    dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' },
     'lewis6991/gitsigns.nvim',
+    event = 'VeryLazy',
     opts = {
       on_attach = function(bufnr)
         local gitsigns = require 'gitsigns'
@@ -15,12 +17,21 @@ return {
           vim.keymap.set(mode, l, r, opts)
         end
 
+        local ts_repeat_move = require 'nvim-treesitter.textobjects.repeatable_move'
+
+        -- Make gitsigns.nav_hunk repeatable with ; and ,
+        local next_hunk_repeat, prev_hunk_repeat = ts_repeat_move.make_repeatable_move_pair(function()
+          gitsigns.nav_hunk('next', { target = 'all' })
+        end, function()
+          gitsigns.nav_hunk('prev', { target = 'all' })
+        end)
+
         -- Navigation
         map('n', ']c', function()
           if vim.wo.diff then
             vim.cmd.normal { ']c', bang = true }
           else
-            gitsigns.nav_hunk('next', { target = 'all' })
+            next_hunk_repeat()
           end
         end, { desc = 'Jump to next git [c]hange' })
 
@@ -28,7 +39,7 @@ return {
           if vim.wo.diff then
             vim.cmd.normal { '[c', bang = true }
           else
-            gitsigns.nav_hunk('prev', { target = 'all' })
+            prev_hunk_repeat()
           end
         end, { desc = 'Jump to previous git [c]hange' })
 

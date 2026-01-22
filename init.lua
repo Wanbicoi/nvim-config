@@ -75,6 +75,7 @@ if vim.g.neovide then
   vim.g.neovide_floating_blur_amount_x = 0
   vim.g.neovide_floating_blur_amount_y = 0
 
+  vim.g.neovide_scroll_animation_length = 0.2
   vim.g.neovide_text_contrast = 1
   vim.g.neovide_text_gamma = 1
   vim.g.neovide_cursor_animation_length = 0.02
@@ -301,6 +302,7 @@ require('lazy').setup({
         { '<leader>t', group = '[T]est / [T]oggle' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
         { '<leader>o', group = '[O]verseer' },
+        { '<leader>s', group = '[S]wap Textobjects' },
       },
     },
   },
@@ -449,10 +451,10 @@ require('lazy').setup({
           },
           mappings = {
             i = {
-              ["<c-v>"] = false,
-              ["<esc>"] = require('telescope.actions').close,
-            }
-          }
+              ['<c-v>'] = false,
+              ['<esc>'] = require('telescope.actions').close,
+            },
+          },
         },
         -- defaults = require('telescope.themes').get_ivy {
         --   path_display = { 'truncate' },
@@ -468,16 +470,6 @@ require('lazy').setup({
     end,
   },
   -- LSP Plugins
-  {
-    'folke/lazydev.nvim',
-    ft = 'lua',
-    opts = {
-      library = {
-        -- Load luvit types when the `vim.uv` word is found
-        { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
-      },
-    },
-  },
   {
     -- Main LSP Configuration
     'neovim/nvim-lspconfig',
@@ -523,6 +515,16 @@ require('lazy').setup({
             },
           })
         end,
+      },
+      {
+        'folke/lazydev.nvim',
+        ft = 'lua',
+        opts = {
+          library = {
+            -- Load luvit types when the `vim.uv` word is found
+            { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
+          },
+        },
       },
       'saghen/blink.cmp',
     },
@@ -580,15 +582,15 @@ require('lazy').setup({
           map('grt', require('telescope.builtin').lsp_type_definitions, '[G]oto [T]ype Definition')
 
           -- Add LSP functions to the right-click PopUp menu
-          vim.cmd.amenu('10.10 PopUp.LSP\\ Definitions <cmd>lua require("telescope.builtin").lsp_definitions()<CR>')
-          vim.cmd.amenu('10.20 PopUp.LSP\\ References <cmd>lua require("telescope.builtin").lsp_references()<CR>')
-          vim.cmd.amenu('10.30 PopUp.LSP\\ Implementations <cmd>lua require("telescope.builtin").lsp_implementations()<CR>')
-          vim.cmd.amenu('10.40 PopUp.LSP\\ Type\\ Definition <cmd>lua require("telescope.builtin").lsp_type_definitions()<CR>')
-          vim.cmd.amenu('10.50 PopUp.LSP\\ Declaration <cmd>lua vim.lsp.buf.declaration()<CR>')
-          vim.cmd.amenu('10.60 PopUp.LSP\\ Rename <cmd>lua vim.lsp.buf.rename()<CR>')
-          vim.cmd.amenu('10.70 PopUp.LSP\\ Code\\ Action <cmd>lua vim.lsp.buf.code_action()<CR>')
-          vim.cmd.amenu('10.80 PopUp.LSP\\ Document\\ Symbols <cmd>lua require("telescope.builtin").lsp_document_symbols()<CR>')
-          vim.cmd.amenu('10.90 PopUp.LSP\\ Workspace\\ Symbols <cmd>lua require("telescope.builtin").lsp_dynamic_workspace_symbols()<CR>')
+          vim.cmd.amenu '10.10 PopUp.LSP\\ Definitions <cmd>lua require("telescope.builtin").lsp_definitions()<CR>'
+          vim.cmd.amenu '10.20 PopUp.LSP\\ References <cmd>lua require("telescope.builtin").lsp_references()<CR>'
+          vim.cmd.amenu '10.30 PopUp.LSP\\ Implementations <cmd>lua require("telescope.builtin").lsp_implementations()<CR>'
+          vim.cmd.amenu '10.40 PopUp.LSP\\ Type\\ Definition <cmd>lua require("telescope.builtin").lsp_type_definitions()<CR>'
+          vim.cmd.amenu '10.50 PopUp.LSP\\ Declaration <cmd>lua vim.lsp.buf.declaration()<CR>'
+          vim.cmd.amenu '10.60 PopUp.LSP\\ Rename <cmd>lua vim.lsp.buf.rename()<CR>'
+          vim.cmd.amenu '10.70 PopUp.LSP\\ Code\\ Action <cmd>lua vim.lsp.buf.code_action()<CR>'
+          vim.cmd.amenu '10.80 PopUp.LSP\\ Document\\ Symbols <cmd>lua require("telescope.builtin").lsp_document_symbols()<CR>'
+          vim.cmd.amenu '10.90 PopUp.LSP\\ Workspace\\ Symbols <cmd>lua require("telescope.builtin").lsp_dynamic_workspace_symbols()<CR>'
 
           -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
           ---@param client vim.lsp.Client
@@ -773,9 +775,10 @@ require('lazy').setup({
         javascriptreact = { 'prettierd', 'prettier', stop_after_first = true },
         typescript = { 'prettierd', 'prettier', stop_after_first = true },
         typescriptreact = { 'prettierd', 'prettier', stop_after_first = true },
-        sql = { 'sleek' }, --sql_formatter
+        sql = { 'sleek' },
         bash = { 'beautysh' },
         zsh = { 'beautysh' },
+        markdown = { 'prettierd' },
       },
     },
   },
@@ -864,96 +867,118 @@ require('lazy').setup({
     },
     opts_extend = { 'sources.default' },
   },
+  -- {
+  --   'folke/sidekick.nvim',
+  --   event = 'VeryLazy',
+  --   dependencies = { 'nvim-telescope/telescope.nvim' },
+  --   opts = {
+  --     picker = 'telescope',
+  --     cli = {
+  --       win = {
+  --         layout = 'float',
+  --         float = {
+  --           width = 0.9,
+  --           height = 0.8,
+  --           border = 'single',
+  --         },
+  --         keys = {
+  --           hide_alt_a = { '<a-a>', 'hide', mode = 'nt', desc = 'hide the terminal window' },
+  --           prompt = false,
+  --         },
+  --       },
+  --     },
+  --   },
+  --   keys = {
+  --     {
+  --       '<a-a>',
+  --       function()
+  --         require('sidekick.cli').toggle()
+  --       end,
+  --       desc = 'Sidekick Toggle CLI',
+  --     },
+  --     {
+  --       '<leader>aa',
+  --       function()
+  --         require('sidekick.cli').toggle()
+  --       end,
+  --       desc = 'Sidekick Toggle CLI',
+  --     },
+  --     {
+  --       '<leader>as',
+  --       function()
+  --         require('sidekick.cli').select()
+  --       end,
+  --       desc = 'Select CLI',
+  --     },
+  --     {
+  --       '<leader>ad',
+  --       function()
+  --         require('sidekick.cli').close()
+  --       end,
+  --       desc = 'Detach a CLI Session',
+  --     },
+  --     {
+  --       '<leader>at',
+  --       function()
+  --         require('sidekick.cli').send { msg = '{this}' }
+  --       end,
+  --       mode = { 'x', 'n' },
+  --       desc = 'Send This',
+  --     },
+  --     {
+  --       '<leader>af',
+  --       function()
+  --         require('sidekick.cli').send { msg = '{file}' }
+  --       end,
+  --       desc = 'Send File',
+  --     },
+  --     {
+  --       '<leader>av',
+  --       function()
+  --         require('sidekick.cli').send { msg = '{selection}' }
+  --       end,
+  --       mode = { 'x' },
+  --       desc = 'Send Visual Selection',
+  --     },
+  --     {
+  --       '<leader>ap',
+  --       function()
+  --         require('sidekick.cli').prompt()
+  --       end,
+  --       mode = { 'n', 'x' },
+  --       desc = 'Sidekick Select Prompt',
+  --     },
+  --     {
+  --       '<c-n>',
+  --       function()
+  --         require('sidekick').nes_jump_or_apply()
+  --       end,
+  --       mode = 'n',
+  --       desc = 'Goto/Apply Next Edit Suggestion',
+  --     },
+  --   },
+  -- },
   {
-    'folke/sidekick.nvim',
+    'copilotlsp-nvim/copilot-lsp',
     event = 'VeryLazy',
-    dependencies = { 'nvim-telescope/telescope.nvim' },
-    opts = {
-      picker = 'telescope',
-      cli = {
-        win = {
-          layout = 'float',
-          float = {
-            width = 0.9,
-            height = 0.8,
-            border = 'single',
-          },
-          keys = {
-            hide_alt_a = { '<a-a>', 'hide', mode = 'nt', desc = 'hide the terminal window' },
-            prompt = false,
-          },
-        },
-      },
-    },
-    keys = {
-      {
-        '<a-a>',
-        function()
-          require('sidekick.cli').toggle()
-        end,
-        desc = 'Sidekick Toggle CLI',
-      },
-      {
-        '<leader>aa',
-        function()
-          require('sidekick.cli').toggle()
-        end,
-        desc = 'Sidekick Toggle CLI',
-      },
-      {
-        '<leader>as',
-        function()
-          require('sidekick.cli').select()
-        end,
-        desc = 'Select CLI',
-      },
-      {
-        '<leader>ad',
-        function()
-          require('sidekick.cli').close()
-        end,
-        desc = 'Detach a CLI Session',
-      },
-      {
-        '<leader>at',
-        function()
-          require('sidekick.cli').send { msg = '{this}' }
-        end,
-        mode = { 'x', 'n' },
-        desc = 'Send This',
-      },
-      {
-        '<leader>af',
-        function()
-          require('sidekick.cli').send { msg = '{file}' }
-        end,
-        desc = 'Send File',
-      },
-      {
-        '<leader>av',
-        function()
-          require('sidekick.cli').send { msg = '{selection}' }
-        end,
-        mode = { 'x' },
-        desc = 'Send Visual Selection',
-      },
-      {
-        '<leader>ap',
-        function()
-          require('sidekick.cli').prompt()
-        end,
-        mode = { 'n', 'x' },
-        desc = 'Sidekick Select Prompt',
-      },
-      {
-        '<c-n>',
-        function()
-          require('sidekick').nes_jump_or_apply()
-        end,
-        mode = 'n',
-        desc = 'Goto/Apply Next Edit Suggestion',
-      },
-    },
+    init = function()
+      vim.g.copilot_nes_debounce = 500
+      vim.lsp.enable 'copilot_ls'
+      vim.keymap.set('n', '<tab>', function()
+        local bufnr = vim.api.nvim_get_current_buf()
+        local state = vim.b[bufnr].nes_state
+        if state then
+          -- Try to jump to the start of the suggestion edit.
+          -- If already at the start, then apply the pending suggestion and jump to the end of the edit.
+          local _ = require('copilot-lsp.nes').walk_cursor_start_edit()
+            or (require('copilot-lsp.nes').apply_pending_nes() and require('copilot-lsp.nes').walk_cursor_end_edit())
+          return nil
+        else
+          -- Resolving the terminal's inability to distinguish between `TAB` and `<C-i>` in normal mode
+          return '<C-i>'
+        end
+      end, { desc = 'Accept Copilot NES suggestion', expr = true })
+    end,
   },
   {
     'catppuccin/nvim',
@@ -1073,88 +1098,141 @@ require('lazy').setup({
       'nvim-treesitter/nvim-treesitter-textobjects',
     },
     build = ':TSUpdate',
-    main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
-    opts = {
-      ensure_installed = {
-        'bash',
-        'c',
-        'c_sharp',
-        'diff',
-        'html',
-        'lua',
-        'luadoc',
-        'markdown',
-        'markdown_inline',
-        'query',
-        'vim',
-        'vimdoc',
-        'javascript',
-        'typescript',
-        'tsx',
-      },
-      -- Autoinstall languages that are not installed
-      auto_install = true,
-      highlight = {
-        enable = true,
-        -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
-        --  If you are experiencing weird indenting issues, add the language to
-        --  the list of additional_vim_regex_highlighting and disabled languages for indent.
-        additional_vim_regex_highlighting = { 'ruby' },
-      },
-      indent = { enable = true, disable = { 'ruby' } },
-      incremental_selection = {
-        enable = true,
-        keymaps = {
-          init_selection = '<enter>',
-          node_incremental = '<enter>',
-          scope_incremental = false,
-          node_decremental = '<bs>',
+    config = function()
+      -- Setup treesitter with all options
+      require('nvim-treesitter.configs').setup {
+        ensure_installed = {
+          'bash',
+          'c',
+          'c_sharp',
+          'diff',
+          'html',
+          'lua',
+          'luadoc',
+          'markdown',
+          'markdown_inline',
+          'query',
+          'vim',
+          'vimdoc',
+          'javascript',
+          'typescript',
+          'tsx',
         },
-      },
-      -- refactor = {
-      --   highlight_definitions = {
-      --     enable = true,
-      --     clear_on_cursor_move = true,
-      --   },
-      --   navigation = {
-      --     enable = true,
-      --     keymaps = {
-      --       goto_definition = 'gnd',
-      --       list_definitions = 'gnD',
-      --       list_definitions_toc = false,
-      --       goto_next_usage = '<a-*>',
-      --       goto_previous_usage = '<a-#>',
-      --     },
-      --   },
-      -- },
-      -- textobjects = {
-      --   select = {
-      --     enable = true,
-      --     lookahead = true,
-      --   },
-      --   move = {
-      --     enable = true,
-      --     set_jumps = true,
-      --     goto_next_start = {
-      --       [']m'] = '@function.outer',
-      --       [']]'] = '@class.outer',
-      --     },
-      --     goto_next_end = {
-      --       [']M'] = '@function.outer',
-      --       [']['] = '@class.outer',
-      --     },
-      --     goto_previous_start = {
-      --       ['[m'] = '@function.outer',
-      --       ['[['] = '@class.outer',
-      --     },
-      --     goto_previous_end = {
-      --       ['[M'] = '@function.outer',
-      --       ['[]'] = '@class.outer',
-      --     },
-      --   },
-      -- },
-    },
+        -- Autoinstall languages that are not installed
+        auto_install = true,
+        highlight = {
+          enable = true,
+          -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
+          --  If you are experiencing weird indenting issues, add the language to
+          --  the list of additional_vim_regex_highlighting and disabled languages for indent.
+          additional_vim_regex_highlighting = { 'ruby' },
+        },
+        indent = { enable = true, disable = { 'ruby' } },
+        incremental_selection = {
+          enable = true,
+          keymaps = {
+            init_selection = '<enter>',
+            node_incremental = '<enter>',
+            scope_incremental = false,
+            node_decremental = '<bs>',
+          },
+        },
+        textobjects = {
+          select = {
+            enable = true,
+            lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
+            keymaps = {
+              -- You can use the capture groups defined in textobjects.scm
+              ['af'] = '@function.outer',
+              ['if'] = '@function.inner',
+              ['ac'] = '@class.outer',
+              ['ic'] = '@class.inner',
+              ['aa'] = '@parameter.outer',
+              ['ia'] = '@parameter.inner',
+              ['al'] = '@loop.outer',
+              ['il'] = '@loop.inner',
+              ['ai'] = '@conditional.outer',
+              ['ii'] = '@conditional.inner',
+              ['a/'] = '@comment.outer',
+              ['i/'] = '@comment.inner',
+            },
+            -- You can choose the select mode (default is charwise 'v')
+            selection_modes = {
+              ['@parameter.outer'] = 'v', -- charwise
+              ['@function.outer'] = 'V', -- linewise
+              ['@class.outer'] = 'V', -- linewise
+            },
+          },
+          lsp_interop = {
+            enable = true,
+            border = 'single',
+            peek_definition_code = {
+              ['grp'] = '@function.outer',
+            },
+          },
+          move = {
+            enable = true,
+            set_jumps = true, -- whether to set jumps in the jumplist
+            goto_next_start = {
+              [']f'] = '@function.outer',
+              [']a'] = '@parameter.outer',
+              [']l'] = '@loop.outer',
+              [']i'] = '@conditional.outer',
+              [']/'] = '@comment.outer',
+            },
+            goto_next_end = {
+              [']F'] = '@function.outer',
+              [']A'] = '@parameter.outer',
+              [']L'] = '@loop.outer',
+              [']I'] = '@conditional.outer',
+            },
+            goto_previous_start = {
+              ['[f'] = '@function.outer',
+              ['[a'] = '@parameter.outer',
+              ['[l'] = '@loop.outer',
+              ['[i'] = '@conditional.outer',
+              ['[/'] = '@comment.outer',
+            },
+            goto_previous_end = {
+              ['[F'] = '@function.outer',
+              ['[A'] = '@parameter.outer',
+              ['[L'] = '@loop.outer',
+              ['[I'] = '@conditional.outer',
+            },
+          },
+          swap = {
+            enable = true,
+            swap_next = {
+              ['<leader>sa'] = '@parameter.inner', -- swap parameters/argument with next
+              ['<leader>sf'] = '@function.outer', -- swap function with next
+            },
+            swap_previous = {
+              ['<leader>sA'] = '@parameter.inner', -- swap parameters/argument with prev
+              ['<leader>sF'] = '@function.outer', -- swap function with previous
+            },
+          },
+        },
+      }
+
+      -- Setup repeatable move after treesitter config
+      local ts_repeat_move = require 'nvim-treesitter.textobjects.repeatable_move'
+
+      -- Repeat movement with ; and ,
+      -- ensure ; goes forward and , goes backward regardless of the last direction
+      vim.keymap.set({ 'n', 'x', 'o' }, ';', ts_repeat_move.repeat_last_move_next)
+      vim.keymap.set({ 'n', 'x', 'o' }, ',', ts_repeat_move.repeat_last_move_previous)
+
+      -- vim way: ; goes to the direction you were moving.
+      -- vim.keymap.set({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move)
+      -- vim.keymap.set({ "n", "x", "o" }, ",", ts_repeat_move.repeat_last_move_opposite)
+
+      -- Optionally, make builtin f, F, t, T also repeatable with ; and ,
+      vim.keymap.set({ 'n', 'x', 'o' }, 'f', ts_repeat_move.builtin_f_expr, { expr = true })
+      vim.keymap.set({ 'n', 'x', 'o' }, 'F', ts_repeat_move.builtin_F_expr, { expr = true })
+      vim.keymap.set({ 'n', 'x', 'o' }, 't', ts_repeat_move.builtin_t_expr, { expr = true })
+      vim.keymap.set({ 'n', 'x', 'o' }, 'T', ts_repeat_move.builtin_T_expr, { expr = true })
+    end,
   },
   {
     'JoosepAlviste/nvim-ts-context-commentstring',
@@ -1361,64 +1439,6 @@ require('lazy').setup({
     },
   },
   {
-    'akinsho/toggleterm.nvim',
-    event = 'VeryLazy',
-    version = '*',
-    config = function()
-      require('toggleterm').setup {
-        open_mapping = [[<c-\>]],
-        hide_numbers = false,
-        on_open = function()
-          vim.opt_local.number = true
-          vim.opt_local.relativenumber = false -- Set to true if you prefer relative
-        end,
-        direction = 'float',
-      }
-      local Terminal = require('toggleterm.terminal').Terminal
-      -- Lazygit
-      local lazygit = Terminal:new {
-        cmd = 'lazygit',
-        hidden = true,
-        direction = 'float',
-        name = 'lazygit',
-        on_open = function()
-          vim.cmd 'startinsert!'
-        end,
-        on_close = function()
-          vim.cmd 'startinsert!'
-        end,
-      }
-      function lazygit_toggle()
-        lazygit:toggle()
-      end
-      vim.keymap.set({ 'n', 't' }, '<a-l>', lazygit_toggle, { noremap = true, silent = true })
-
-      -- Create 9 floating terminals
-      local terms = {}
-      for i = 1, 9 do
-        terms[i] = Terminal:new {
-          direction = 'float',
-          count = i,
-        }
-      end
-
-      -- Helper to toggle terminal by index
-      local function toggle_term(i)
-        return function()
-          terms[i]:toggle()
-        end
-      end
-
-      -- Map <A-1> .. <A-9> in NORMAL + TERMINAL mode
-      for i = 1, 9 do
-        local key = '<A-' .. i .. '>'
-        vim.keymap.set({ 'n', 't' }, key, toggle_term(i), {
-          desc = 'Toggle floating terminal ' .. i,
-        })
-      end
-    end,
-  },
-  {
     'LunarVim/bigfile.nvim',
     event = 'VeryLazy',
     opts = {
@@ -1475,6 +1495,15 @@ require('lazy').setup({
       }
     end,
   },
+  {
+    'iamcco/markdown-preview.nvim',
+    cmd = { 'MarkdownPreviewToggle', 'MarkdownPreview', 'MarkdownPreviewStop' },
+    build = 'cd app && yarn install',
+    init = function()
+      vim.g.mkdp_filetypes = { 'markdown' }
+    end,
+    ft = { 'markdown' },
+  },
   -- {
   --   'HakonHarnes/img-clip.nvim',
   --   event = 'VeryLazy',
@@ -1515,6 +1544,7 @@ require('lazy').setup({
   require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
   require 'kickstart.plugins.indent_line',
   require 'kickstart.plugins.neotest',
+  require 'kickstart.plugins.toggleterm',
   -- require 'kickstart.plugins.ctags',
   -- require 'kickstart.plugins.avante',
 

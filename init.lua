@@ -330,7 +330,7 @@ require('lazy').setup({
       {
         '<leader>fa',
         function()
-          require('telescope.builtin').find_files { no_ignore = true }
+          require('telescope.builtin').find_files { no_ignore = true, hidden = true }
         end,
         desc = '[F]ind [A]ll',
       },
@@ -447,6 +447,12 @@ require('lazy').setup({
             prompt_position = 'top',
             height = 0.9,
           },
+          mappings = {
+            i = {
+              ["<c-v>"] = false,
+              ["<esc>"] = require('telescope.actions').close,
+            }
+          }
         },
         -- defaults = require('telescope.themes').get_ivy {
         --   path_display = { 'truncate' },

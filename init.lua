@@ -10,6 +10,7 @@ vim.o.shiftwidth = 2
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.mouse = 'a'
+vim.opt.mousemodel = 'popup'
 vim.opt.showmode = false
 vim.schedule(function()
   vim.opt.clipboard = 'unnamedplus'
@@ -69,7 +70,11 @@ if vim.g.neovide then
   vim.o.guifont = 'CodeNewRoman Nerd Font Propo:h11' -- text below applies for VimScript
   vim.g.neovide_cursor_vfx_mode = 'pixiedust'
   -- vim.g.neovide_cursor_vfx_mode = 'sonicboom'
-  vim.g.neovide_floating_shadow = false
+  vim.g.neovide_floating_shadow = true
+  vim.g.neovide_floating_z_height = 10
+  vim.g.neovide_floating_blur_amount_x = 0
+  vim.g.neovide_floating_blur_amount_y = 0
+
   vim.g.neovide_text_contrast = 1
   vim.g.neovide_text_gamma = 1
   vim.g.neovide_cursor_animation_length = 0.02
@@ -87,6 +92,15 @@ if vim.g.neovide then
   vim.keymap.set('c', '<c-v>', '<C-R>+') -- Paste command mode
   vim.keymap.set('i', '<c-v>', '<ESC>"+pa') -- Paste insert mode
   vim.keymap.set('t', '<C-v>', function()
+    local text = vim.fn.getreg '+'
+    vim.api.nvim_chan_send(vim.b.terminal_job_id, text)
+  end, { desc = 'Paste clipboard into terminal' })
+
+  vim.keymap.set('n', '<s-insert>', '"+P') -- Paste normal mode
+  vim.keymap.set('v', '<s-insert>', '"+P')
+  vim.keymap.set('c', '<s-insert>', '<C-R>+') -- Paste command mode
+  vim.keymap.set('i', '<s-insert>', '<ESC>"+pa') -- Paste insert mode
+  vim.keymap.set('t', '<s-insert>', function()
     local text = vim.fn.getreg '+'
     vim.api.nvim_chan_send(vim.b.terminal_job_id, text)
   end, { desc = 'Paste clipboard into terminal' })
@@ -338,18 +352,7 @@ require('lazy').setup({
         '<leader>fW',
         function()
           local word = vim.fn.expand '<cword>'
-          local pickers = require 'telescope.builtin'
-          local find_cmd
-          if vim.fn.executable 'fd' == 1 then
-            find_cmd = { 'fd', '--hidden', '--type', 'f', word }
-          elseif vim.fn.executable 'rg' == 1 then
-            find_cmd = { 'rg', '--hidden', '--files', '-g', '*' .. word .. '*' }
-          else
-            -- Fallback: open find_files and prefill prompt with the word
-            pickers.find_files { prompt_title = 'Find files matching: ' .. word, hidden = true, no_ignore = true }
-            return
-          end
-          pickers.find_files { find_command = find_cmd, prompt_title = 'Files: ' .. word }
+          require('telescope.builtin').find_files { search_file = word, prompt_title = 'Files: ' .. word }
         end,
         desc = '[F]ind file of the current [W]ord',
       },
@@ -439,6 +442,7 @@ require('lazy').setup({
       require('telescope').setup {
         defaults = {
           layout_strategy = 'vertical',
+          sorting_strategy = 'ascending',
           layout_config = {
             prompt_position = 'top',
             height = 0.9,
@@ -475,13 +479,45 @@ require('lazy').setup({
       -- Automatically install LSPs and related tools to stdpath for Neovim
       -- Mason must be loaded before its dependents so we need to set it up here.
       -- NOTE: `opts = {}` is the same as calling `require('mason').setup({})`
-      { 'mason-org/mason.nvim', opts = {} },
+      {
+        'mason-org/mason.nvim',
+        opts = {
+          registries = {
+            'github:mason-org/mason-registry',
+            'github:Crashdummyy/mason-registry',
+          },
+        },
+      },
       'mason-org/mason-lspconfig.nvim',
 
       -- Useful status updates for LSP.
       { 'j-hui/fidget.nvim', opts = {} },
-
       -- Allows extra capabilities provided by blink.cmp
+      {
+        'seblyng/roslyn.nvim',
+        ---@module 'roslyn.config'
+        ---@type RoslynNvimConfig
+        opts = {
+          -- your configuration comes here; leave empty for default settings
+        },
+        ft = { '.cs', '.sln', '.csproj' },
+        config = function()
+          vim.lsp.config('roslyn', {
+            on_attach = function()
+              print 'This will run when the server attaches!'
+            end,
+            settings = {
+              ['csharp|inlay_hints'] = {
+                csharp_enable_inlay_hints_for_implicit_object_creation = true,
+                csharp_enable_inlay_hints_for_implicit_variable_types = true,
+              },
+              ['csharp|code_lens'] = {
+                dotnet_enable_references_code_lens = true,
+              },
+            },
+          })
+        end,
+      },
       'saghen/blink.cmp',
     },
     config = function()
@@ -536,6 +572,17 @@ require('lazy').setup({
           map('gO', require('telescope.builtin').lsp_document_symbols, 'Open Document Symbols')
           map('gW', require('telescope.builtin').lsp_dynamic_workspace_symbols, 'Open Workspace Symbols')
           map('grt', require('telescope.builtin').lsp_type_definitions, '[G]oto [T]ype Definition')
+
+          -- Add LSP functions to the right-click PopUp menu
+          vim.cmd.amenu('10.10 PopUp.LSP\\ Definitions <cmd>lua require("telescope.builtin").lsp_definitions()<CR>')
+          vim.cmd.amenu('10.20 PopUp.LSP\\ References <cmd>lua require("telescope.builtin").lsp_references()<CR>')
+          vim.cmd.amenu('10.30 PopUp.LSP\\ Implementations <cmd>lua require("telescope.builtin").lsp_implementations()<CR>')
+          vim.cmd.amenu('10.40 PopUp.LSP\\ Type\\ Definition <cmd>lua require("telescope.builtin").lsp_type_definitions()<CR>')
+          vim.cmd.amenu('10.50 PopUp.LSP\\ Declaration <cmd>lua vim.lsp.buf.declaration()<CR>')
+          vim.cmd.amenu('10.60 PopUp.LSP\\ Rename <cmd>lua vim.lsp.buf.rename()<CR>')
+          vim.cmd.amenu('10.70 PopUp.LSP\\ Code\\ Action <cmd>lua vim.lsp.buf.code_action()<CR>')
+          vim.cmd.amenu('10.80 PopUp.LSP\\ Document\\ Symbols <cmd>lua require("telescope.builtin").lsp_document_symbols()<CR>')
+          vim.cmd.amenu('10.90 PopUp.LSP\\ Workspace\\ Symbols <cmd>lua require("telescope.builtin").lsp_dynamic_workspace_symbols()<CR>')
 
           -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
           ---@param client vim.lsp.Client
@@ -639,20 +686,22 @@ require('lazy').setup({
         gopls = {},
         -- biome = {},
         lua_ls = {},
-        csharp_ls = {},
+        -- csharp_ls = {},
       }
       require('mason-lspconfig').setup {
         ensure_installed = vim.tbl_keys(servers),
         automatic_installation = false,
         automatic_enable = {
-          exclude = { 'rust_analyzer', 'ts_ls' },
+          exclude = { 'rust_analyzer', 'ts_ls', 'csharp_ls' },
         },
-        handlers = {
-          function(server_name)
-            local server = servers[server_name] or {}
-            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-          end,
-        },
+        -- handlers = {
+        --   function(server_name)
+        --     local server = servers[server_name] or {}
+        --     server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+        --     -- vim.lsp.config(server_name, server)
+        --     -- vim.lsp.enable(server_name)
+        --   end,
+        -- },
       }
     end,
   },
@@ -752,13 +801,6 @@ require('lazy').setup({
         },
         ['<c-u>'] = { 'scroll_documentation_up', 'fallback' },
         ['<c-d>'] = { 'scroll_documentation_down', 'fallback' },
-        ['<c-a>'] = {
-          function()
-            if require('sidekick.nes').update() then
-              return -- jumped or applied
-            end
-          end,
-        },
       },
       cmdline = {
         enabled = true,
@@ -898,7 +940,7 @@ require('lazy').setup({
         desc = 'Sidekick Select Prompt',
       },
       {
-        '<c-a>',
+        '<c-n>',
         function()
           require('sidekick').nes_jump_or_apply()
         end,
@@ -919,7 +961,7 @@ require('lazy').setup({
           solid = false, -- use solid styling for floating windows, see |winborder|
         },
       }
-      -- vim.cmd.colorscheme 'catppuccin-latte'
+      vim.cmd.colorscheme 'catppuccin-latte'
     end,
   },
   {
@@ -946,7 +988,7 @@ require('lazy').setup({
           },
         },
       }
-      vim.cmd 'colorscheme github_light'
+      -- vim.cmd 'colorscheme github_light'
     end,
   },
   -- Highlight todo, notes, etc in comments
@@ -990,6 +1032,8 @@ require('lazy').setup({
     opts = {
       keymaps = {
         ['q'] = { 'actions.close', mode = 'n' },
+        ['gc'] = { 'actions.copy_to_system_clipboard', mode = 'n' },
+        ['c-o'] = { 'actions.open_external', mode = 'n' },
       },
       float = {
         padding = 4,
@@ -1119,21 +1163,21 @@ require('lazy').setup({
       end
     end,
   },
-  -- {
-  --   'nvim-treesitter/nvim-treesitter-context',
-  --   dependencies = 'nvim-treesitter/nvim-treesitter',
-  --   event = 'BufEnter',
-  --   opts = {
-  --     line_numbers = false,
-  --     max_lines = 5,
-  --     separator = '─',
-  --   },
-  --   config = function()
-  --     vim.keymap.set('n', '[n', function()
-  --       require('treesitter-context').go_to_context(vim.v.count1)
-  --     end, { silent = true, desc = 'Go to co[n]text' })
-  --   end,
-  -- },
+  {
+    'nvim-treesitter/nvim-treesitter-context',
+    dependencies = 'nvim-treesitter/nvim-treesitter',
+    event = 'BufEnter',
+    config = function()
+      require('treesitter-context').setup {
+        -- line_numbers = false,
+        max_lines = 5,
+        multiline_threshold = 2,
+      }
+      vim.keymap.set('n', '[n', function()
+        require('treesitter-context').go_to_context(vim.v.count1)
+      end, { silent = true, desc = 'Go to co[n]text' })
+    end,
+  },
   -- {
   --   'olimorris/codecompanion.nvim',
   --   opts = {

@@ -76,7 +76,7 @@ if vim.g.neovide then
   vim.g.neovide_floating_blur_amount_y = 0
 
   vim.g.neovide_scroll_animation_length = 0.2
-  vim.g.neovide_text_contrast = 1
+  vim.g.neovide_text_contrast = 0.6
   vim.g.neovide_text_gamma = 1
   vim.g.neovide_cursor_animation_length = 0.02
 
@@ -219,6 +219,42 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
   callback = function()
     vim.highlight.on_yank()
+  end,
+})
+
+-- Add diffget to right-click menu when in diff mode
+vim.api.nvim_create_autocmd({ 'OptionSet' }, {
+  desc = 'Add diffget to right-click menu in diff mode',
+  group = vim.api.nvim_create_augroup('diff-mode-popup', { clear = true }),
+  pattern = 'diff',
+  callback = function()
+    if vim.wo.diff then
+      -- Add diffget menu item when entering diff mode
+      vim.cmd.amenu '20.10 PopUp.-DiffSep- :'
+      vim.cmd.amenu '20.20 PopUp.Diff\\ Get <cmd>diffget<CR>'
+      vim.cmd.amenu '20.30 PopUp.Diff\\ Put <cmd>diffput<CR>'
+    else
+      -- Remove diff menu items when leaving diff mode
+      pcall(vim.cmd.aunmenu, 'PopUp.-DiffSep-')
+      pcall(vim.cmd.aunmenu, 'PopUp.Diff\\ Get')
+      pcall(vim.cmd.aunmenu, 'PopUp.Diff\\ Put')
+    end
+  end,
+})
+
+-- Also add the menu items when first opening a diff buffer
+vim.api.nvim_create_autocmd({ 'BufEnter' }, {
+  desc = 'Setup diff menu on buffer enter if in diff mode',
+  group = vim.api.nvim_create_augroup('diff-mode-bufenter', { clear = true }),
+  callback = function()
+    if vim.wo.diff then
+      pcall(vim.cmd.aunmenu, 'PopUp.-DiffSep-')
+      pcall(vim.cmd.aunmenu, 'PopUp.Diff\\ Get')
+      pcall(vim.cmd.aunmenu, 'PopUp.Diff\\ Put')
+      vim.cmd.amenu '20.10 PopUp.-DiffSep- :'
+      vim.cmd.amenu '20.20 PopUp.Diff\\ Get <cmd>diffget<CR>'
+      vim.cmd.amenu '20.30 PopUp.Diff\\ Put <cmd>diffput<CR>'
+    end
   end,
 })
 
@@ -474,7 +510,7 @@ require('lazy').setup({
   },
   {
     'folke/lazydev.nvim',
-    ft = 'lua',
+    lazy = false,
     opts = {
       library = {
         -- Load luvit types when the `vim.uv` word is found
@@ -1010,7 +1046,7 @@ require('lazy').setup({
           solid = false, -- use solid styling for floating windows, see |winborder|
         },
       }
-      vim.cmd.colorscheme 'catppuccin-latte'
+      -- vim.cmd.colorscheme 'catppuccin-latte'
     end,
   },
   {
@@ -1037,7 +1073,7 @@ require('lazy').setup({
           },
         },
       }
-      -- vim.cmd 'colorscheme github_light'
+      vim.cmd 'colorscheme github_light'
     end,
   },
   -- Highlight todo, notes, etc in comments

@@ -270,6 +270,42 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
+-- [[ Auto-change CWD to project root ]]
+-- This replicates the behavior of project.nvim
+-- Using built-in vim.fs.root() for Neovim 0.10+
+local root_patterns = { '.git', '.gitignore', 'Cargo.toml', 'package.json', 'go.mod', '.sln', '.csproj' }
+
+local function find_project_root()
+  local path = vim.api.nvim_buf_get_name(0)
+  return vim.fs.root(path, root_patterns)
+end
+
+-- Auto-change directory when opening a file
+vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
+  desc = 'Auto change directory to project root',
+  group = vim.api.nvim_create_augroup('auto-project-root', { clear = true }),
+  callback = function(args)
+    -- Skip special buffers
+    local buftype = vim.bo[args.buf].buftype
+    if buftype ~= '' then
+      return
+    end
+
+    -- Skip if file doesn't exist
+    local filepath = vim.api.nvim_buf_get_name(args.buf)
+    if filepath == '' or vim.fn.filereadable(filepath) == 0 then
+      return
+    end
+
+    local root = find_project_root()
+    if root and root ~= vim.fn.getcwd() then
+      vim.cmd('cd ' .. vim.fn.fnameescape(root))
+      -- Optional: uncomment to get notifications when CWD changes
+      -- vim.notify('Changed directory to: ' .. root, vim.log.levels.INFO)
+    end
+  end,
+})
+
 require('lazy').setup({
   {
     'nmac427/guess-indent.nvim',
@@ -339,68 +375,166 @@ require('lazy').setup({
     },
   },
   { -- Fuzzy Finder (files, lsp, etc)
-    'nvim-telescope/telescope.nvim',
-    branch = '0.1.x',
-    dependencies = {
-      'nvim-lua/plenary.nvim',
-      {
-        'nvim-telescope/telescope-fzf-native.nvim',
-        build = 'make',
-        cond = function()
-          return vim.fn.executable 'make' == 1
-        end,
+    'folke/snacks.nvim',
+    priority = 1000,
+    lazy = false,
+    ---@type snacks.Config
+    opts = {
+      bigfile = { enabled = true },
+      statuscolumn = { enabled = true },
+      words = { enabled = true },
+      gitbrowse = { enabled = true },
+      quickfile = { enabled = true },
+      statuscolumn = { enabled = true },
+      picker = {
+        layout = 'ivy_split',
+        win = {
+          list = {
+            keys = {
+              ['<c-j>'] = { 'preview_scroll_down', mode = { 'i', 'n' } },
+              ['<c-k>'] = { 'preview_scroll_up', mode = { 'i', 'n' } },
+            },
+          },
+          input = {
+            keys = {
+              ['<c-j>'] = { 'preview_scroll_down', mode = { 'i', 'n' } },
+              ['<c-k>'] = { 'preview_scroll_up', mode = { 'i', 'n' } },
+            },
+          },
+        },
+        -- Basic configuration
+        -- focus = 'input',
+        -- show_delay = 5000,
+        -- limit_live = 10000,
+        -- Matcher options
+        -- matcher = {
+        --   fuzzy = true,
+        --   smartcase = true,
+        --   ignorecase = true,
+        --   sort_empty = false,
+        --   filename_bonus = true,
+        --   frecency = true, -- enable frecency scoring
+        -- },
+
+        -- Sort configuration
+        -- sort = {
+        --   fields = { 'score:desc', '#text', 'idx' },
+        -- },
+
+        -- Replace vim.ui.select
+        ui_select = true,
+
+        -- Formatter options
+        -- formatters = {
+        --   file = {
+        --     filename_first = false,
+        --     truncate = 'center',
+        --     min_width = 40,
+        --     filename_only = false,
+        --     git_status_hl = true,
+        --   },
+        -- },
+
+        -- Source-specific configs
+        -- sources = {
+        --   files = {
+        --     hidden = false,
+        --     ignored = false,
+        --     -- Auto-detect project root for files picker
+        --     follow = true, -- follow symlinks
+        --   },
+        --   grep = {
+        --     live = true,
+        --     -- Auto-detect project root for grep
+        --     follow = true,
+        --   },
+        --   projects = {
+        --     -- Root patterns to detect projects (same as your old project.nvim config)
+        --     patterns = { '.git', '.gitignore', 'Cargo.toml', 'package.json', 'go.mod', '.sln', '.csproj' },
+        --
+        --     -- Use frecency for sorting (recent + frequent projects appear first)
+        --     matcher = {
+        --       frecency = true,
+        --       sort_empty = true,
+        --     },
+        --
+        --     -- Include recent file directories as projects
+        --     recent = true,
+        --
+        --     -- Max depth for scanning directories (if you add dev directories below)
+        --     max_depth = 2,
+        --
+        --     -- Optionally: Add your dev/projects directories here
+        --     -- dev = { '~/dev', '~/projects', '~/work' },
+        --   },
+        -- },
       },
-      { 'nvim-telescope/telescope-frecency.nvim' },
-      { 'nvim-tree/nvim-web-devicons', opts = {} },
     },
+    -- init = function()
+    --   -- Helper function to find project root (for Snacks picker when needed)
+    --   -- Using built-in vim.fs.root() for Neovim 0.10+
+    --   _G.get_project_root = function()
+    --     local root_patterns = { '.git', '.gitignore', 'Cargo.toml', 'package.json', 'go.mod', '.sln', '.csproj' }
+    --     local path = vim.api.nvim_buf_get_name(0)
+    --     return vim.fs.root(path, root_patterns)
+    --   end
+    -- end,
     keys = {
+      {
+        '<leader>gB',
+        function()
+          Snacks.gitbrowse()
+        end,
+        desc = 'Git Browse',
+        mode = { 'n', 'v' },
+      },
       {
         '<leader><leader>',
         function()
-          require('telescope.builtin').git_files { show_untracked = true }
+          Snacks.picker.git_files { show_untracked = true }
         end,
         desc = '[F]ind [G]it Files',
       },
       {
         '<leader>fa',
         function()
-          require('telescope.builtin').find_files { no_ignore = true, hidden = true }
+          Snacks.picker.files { hidden = true, ignored = true }
         end,
         desc = '[F]ind [A]ll',
       },
       {
         '<leader>ff',
         function()
-          require('telescope.builtin').find_files()
+          Snacks.picker.files()
         end,
         desc = '[F]ind [F]iles',
       },
       {
         '<leader>ft',
         function()
-          require('telescope.builtin').builtin()
+          Snacks.picker.pickers()
         end,
-        desc = '[F]ind [T]elescope',
+        desc = '[F]ind Picker [T]ypes',
       },
       {
         '<leader>fW',
         function()
           local word = vim.fn.expand '<cword>'
-          require('telescope.builtin').find_files { search_file = word, prompt_title = 'Files: ' .. word }
+          Snacks.picker.files { pattern = word }
         end,
         desc = '[F]ind file of the current [W]ord',
       },
       {
         '<leader>fw',
         function()
-          require('telescope.builtin').grep_string()
+          Snacks.picker.grep_word()
         end,
         desc = '[F]ind current [W]ord',
       },
       {
         '<leader>/',
         function()
-          require('telescope.builtin').live_grep()
+          Snacks.picker.grep()
         end,
         desc = '[G]rep',
       },
@@ -409,8 +543,8 @@ require('lazy').setup({
         function()
           local text = vim.fn.getreg '+'
           text = vim.trim(text:gsub('[\n\r]', ' '))
-          require('telescope.builtin').live_grep {
-            default_text = text,
+          Snacks.picker.grep {
+            search = text,
           }
         end,
         desc = '[G]rep with copied text',
@@ -418,102 +552,122 @@ require('lazy').setup({
       {
         '<leader>fr',
         function()
-          require('telescope.builtin').resume()
+          Snacks.picker.resume()
         end,
         desc = '[F]ind [R]esume',
       },
       {
         '<leader>fo',
         function()
-          require('telescope.builtin').oldfiles()
+          Snacks.picker.recent()
         end,
-        desc = '[F]ind Recent Files ("." for repeat)',
+        desc = '[F]ind Recent Files',
       },
       {
         '_',
         function()
-          require('telescope.builtin').buffers()
+          Snacks.picker.buffers()
         end,
         desc = '[_] Find existing buffers',
       },
       {
-        '<leader>v',
+        '<leader>gb',
         function()
-          require('telescope.builtin').registers()
+          Snacks.picker.git_branches()
         end,
-        desc = '[v] Find Registers',
+        desc = 'Git Branches',
+      },
+      {
+        '<leader>gl',
+        function()
+          Snacks.picker.git_log()
+        end,
+        desc = 'Git Log',
+      },
+      {
+        '<leader>gL',
+        function()
+          Snacks.picker.git_log_line()
+        end,
+        desc = 'Git Log Line',
       },
       {
         '<leader>gs',
         function()
-          require('telescope.builtin').git_status()
+          Snacks.picker.git_status()
         end,
-        desc = 'Find [G]it [S]tatus',
+        desc = 'Git Status',
       },
       {
-        '<leader>gB',
+        '<leader>gS',
         function()
-          require('telescope.builtin').git_bcommits()
+          Snacks.picker.git_stash()
         end,
-        desc = 'Find [G]it [B]uffer commits',
+        desc = 'Git Stash',
       },
       {
-        '<leader>gb',
+        '<leader>gd',
         function()
-          require('telescope.builtin').git_branches()
+          Snacks.picker.git_diff()
         end,
-        desc = 'Find [G]it [B]ranches',
+        desc = 'Git Diff (Hunks)',
+      },
+      {
+        '<leader>gf',
+        function()
+          Snacks.picker.git_log_file()
+        end,
+        desc = 'Git Log File',
       },
       {
         '<leader>fc',
         function()
-          require('telescope.builtin').commands()
+          Snacks.picker.commands()
         end,
         desc = '[F]ind [C]ommands',
       },
       {
         '<leader>fn',
         function()
-          require('telescope.builtin').find_files { cwd = vim.fn.stdpath 'config' }
+          Snacks.picker.files { cwd = vim.fn.stdpath 'config' }
         end,
         desc = '[F]ind [N]eovim files',
       },
-    },
-    config = function()
-      require('telescope').setup {
-        defaults = {
-          layout_strategy = 'vertical',
-          sorting_strategy = 'ascending',
-          layout_config = {
-            prompt_position = 'top',
-            height = 0.9,
-          },
-          mappings = {
-            i = {
-              ['<esc>'] = require('telescope.actions').close,
-            },
-          },
-        },
-        -- defaults = require('telescope.themes').get_ivy {
-        --   path_display = { 'truncate' },
-        --   -- layout_config = {
-        --   --   width = 0.8,
-        --   -- },
-        -- },
-      }
-
-      -- Enable Telescope extensions if they are installed
-      pcall(require('telescope').load_extension, 'fzf')
-      pcall(require('telescope').load_extension, 'frecency')
-    end,
-  },
-  {
-    'folke/lazydev.nvim',
-    lazy = false,
-    opts = {
-      library = {
-        -- Load luvit types when the `vim.uv` word is found
-        { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
+      -- Additional useful pickers
+      {
+        '<leader>fh',
+        function()
+          Snacks.picker.help()
+        end,
+        desc = '[F]ind [H]elp',
+      },
+      {
+        '<leader>fk',
+        function()
+          Snacks.picker.keymaps()
+        end,
+        desc = '[F]ind [K]eymaps',
+      },
+      {
+        '<leader>fd',
+        function()
+          Snacks.picker.diagnostics()
+        end,
+        desc = '[F]ind [D]iagnostics',
+      },
+      {
+        '<leader>sb',
+        function()
+          Snacks.picker.lines()
+        end,
+        desc = '[S]earch [B]uffer lines',
+      },
+      {
+        '<leader>fp',
+        function()
+          Snacks.picker.projects()
+        end,
+        desc = '[F]ind [P]rojects',
       },
     },
   },
@@ -612,24 +766,36 @@ require('lazy').setup({
 
           map('grn', vim.lsp.buf.rename, '[R]e[n]ame')
           map('gra', vim.lsp.buf.code_action, '[G]oto Code [A]ction', { 'n', 'x' })
-          map('grr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
-          map('gri', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
-          map('grd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
+          map('grr', function()
+            Snacks.picker.lsp_references()
+          end, '[G]oto [R]eferences')
+          map('gri', function()
+            Snacks.picker.lsp_implementations()
+          end, '[G]oto [I]mplementation')
+          map('grd', function()
+            Snacks.picker.lsp_definitions()
+          end, '[G]oto [D]efinition')
           map('grD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-          map('gO', require('telescope.builtin').lsp_document_symbols, 'Open Document Symbols')
-          map('gW', require('telescope.builtin').lsp_dynamic_workspace_symbols, 'Open Workspace Symbols')
-          map('grt', require('telescope.builtin').lsp_type_definitions, '[G]oto [T]ype Definition')
+          map('gO', function()
+            Snacks.picker.lsp_symbols()
+          end, 'Open Document Symbols')
+          map('gW', function()
+            Snacks.picker.lsp_workspace_symbols()
+          end, 'Open Workspace Symbols')
+          map('grt', function()
+            Snacks.picker.lsp_type_definitions()
+          end, '[G]oto [T]ype Definition')
 
           -- Add LSP functions to the right-click PopUp menu
-          vim.cmd.amenu '10.10 PopUp.LSP\\ Definitions <cmd>lua require("telescope.builtin").lsp_definitions()<CR>'
-          vim.cmd.amenu '10.20 PopUp.LSP\\ References <cmd>lua require("telescope.builtin").lsp_references()<CR>'
-          vim.cmd.amenu '10.30 PopUp.LSP\\ Implementations <cmd>lua require("telescope.builtin").lsp_implementations()<CR>'
-          vim.cmd.amenu '10.40 PopUp.LSP\\ Type\\ Definition <cmd>lua require("telescope.builtin").lsp_type_definitions()<CR>'
+          vim.cmd.amenu '10.10 PopUp.LSP\\ Definitions <cmd>lua Snacks.picker.lsp_definitions()<CR>'
+          vim.cmd.amenu '10.20 PopUp.LSP\\ References <cmd>lua Snacks.picker.lsp_references()<CR>'
+          vim.cmd.amenu '10.30 PopUp.LSP\\ Implementations <cmd>lua Snacks.picker.lsp_implementations()<CR>'
+          vim.cmd.amenu '10.40 PopUp.LSP\\ Type\\ Definition <cmd>lua Snacks.picker.lsp_type_definitions()<CR>'
           vim.cmd.amenu '10.50 PopUp.LSP\\ Declaration <cmd>lua vim.lsp.buf.declaration()<CR>'
           vim.cmd.amenu '10.60 PopUp.LSP\\ Rename <cmd>lua vim.lsp.buf.rename()<CR>'
           vim.cmd.amenu '10.70 PopUp.LSP\\ Code\\ Action <cmd>lua vim.lsp.buf.code_action()<CR>'
-          vim.cmd.amenu '10.80 PopUp.LSP\\ Document\\ Symbols <cmd>lua require("telescope.builtin").lsp_document_symbols()<CR>'
-          vim.cmd.amenu '10.90 PopUp.LSP\\ Workspace\\ Symbols <cmd>lua require("telescope.builtin").lsp_dynamic_workspace_symbols()<CR>'
+          vim.cmd.amenu '10.80 PopUp.LSP\\ Document\\ Symbols <cmd>lua Snacks.picker.lsp_symbols()<CR>'
+          vim.cmd.amenu '10.90 PopUp.LSP\\ Workspace\\ Symbols <cmd>lua Snacks.picker.lsp_workspace_symbols()<CR>'
 
           -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
           ---@param client vim.lsp.Client
@@ -761,6 +927,16 @@ require('lazy').setup({
         -- },
       }
     end,
+  },
+  {
+    'folke/lazydev.nvim',
+    lazy = false,
+    opts = {
+      library = {
+        -- Load luvit types when the `vim.uv` word is found
+        { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
+      },
+    },
   },
   {
     'pmizio/typescript-tools.nvim',
@@ -1096,6 +1272,7 @@ require('lazy').setup({
       require('mini.bufremove').setup()
       vim.keymap.set('n', '<leader>x', MiniBufremove.delete, { desc = '[X] Delete current buffer' })
       vim.keymap.set('n', '<leader>X', MiniBufremove.wipeout, { desc = '[X] Wipeout current buffer' })
+      vim.g.minisessions_disable = true
     end,
   },
   {
@@ -1130,20 +1307,7 @@ require('lazy').setup({
       { '-', '<CMD>Oil --float<CR>', desc = 'Open parent directory' },
     },
   },
-  {
-    'ahmedkhalf/project.nvim',
-    event = 'VeryLazy',
-    config = function()
-      require('project_nvim').setup {
-        detection_methods = { 'pattern', 'lsp' },
-        patterns = { '.git' },
-      }
-      require('telescope').load_extension 'projects'
-    end,
-    keys = {
-      { '<leader>fp', '<cmd>Telescope projects<cr>', desc = '[F]ind [P]rojects' },
-    },
-  },
+
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     event = { 'BufReadPre', 'BufNewFile' },
@@ -1491,23 +1655,23 @@ require('lazy').setup({
       { '<leader>os', '<cmd>OverseerShell<cr>', desc = '[O]verseer [S]hell' },
     },
   },
-  {
-    'LunarVim/bigfile.nvim',
-    event = 'VeryLazy',
-    opts = {
-      filesize = 2, -- size of the file in MiB, the plugin round file sizes to the closest MiB
-      pattern = { '*' }, -- autocmd pattern or function see <### Overriding the detection of big files>
-      features = { -- features to disable
-        'indent_blankline',
-        'lsp',
-        'treesitter',
-        'syntax',
-        'matchparen',
-        -- 'vimopts',
-        -- 'filetype',
-      },
-    },
-  },
+  -- {
+  --   'LunarVim/bigfile.nvim',
+  --   event = 'VeryLazy',
+  --   opts = {
+  --     filesize = 2, -- size of the file in MiB, the plugin round file sizes to the closest MiB
+  --     pattern = { '*' }, -- autocmd pattern or function see <### Overriding the detection of big files>
+  --     features = { -- features to disable
+  --       'indent_blankline',
+  --       'lsp',
+  --       'treesitter',
+  --       'syntax',
+  --       'matchparen',
+  --       -- 'vimopts',
+  --       -- 'filetype',
+  --     },
+  --   },
+  -- },
   {
     'sindrets/diffview.nvim',
     cmd = { 'DiffviewOpen', 'DiffviewFileHistory', 'DiffviewClose', 'DiffviewToggleFiles', 'DiffviewFocusFiles', 'DiffviewRefresh' },

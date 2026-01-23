@@ -689,7 +689,6 @@ require('lazy').setup({
         },
       },
       'mason-org/mason-lspconfig.nvim',
-      'folke/lazydev.nvim',
 
       -- Useful status updates for LSP.
       { 'j-hui/fidget.nvim', opts = {} },
@@ -888,7 +887,6 @@ require('lazy').setup({
         },
       }
 
-      local capabilities = require('blink.cmp').get_lsp_capabilities()
       local servers = {
         -- copilot = {},
         cssls = {},
@@ -904,8 +902,6 @@ require('lazy').setup({
               completion = {
                 callSnippet = 'Replace',
               },
-              -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-              -- diagnostics = { disable = { 'missing-fields' } },
             },
           },
         },
@@ -915,16 +911,8 @@ require('lazy').setup({
         ensure_installed = vim.tbl_keys(servers),
         automatic_installation = false,
         automatic_enable = {
-          exclude = { 'rust_analyzer', 'ts_ls', 'csharp_ls' },
+          exclude = { 'rust_analyzer', 'ts_ls', 'csharp_ls', 'copilot' },
         },
-        -- handlers = {
-        --   function(server_name)
-        --     local server = servers[server_name] or {}
-        --     server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-        --     -- vim.lsp.config(server_name, server)
-        --     -- vim.lsp.enable(server_name)
-        --   end,
-        -- },
       }
     end,
   },
@@ -1012,7 +1000,7 @@ require('lazy').setup({
     'saghen/blink.cmp',
     event = { 'InsertEnter', 'CmdlineEnter' },
     -- optional: provides snippets for the snippet source
-    dependencies = { 'rafamadriz/friendly-snippets', 'xzbdmw/colorful-menu.nvim', 'folke/lazydev.nvim' },
+    dependencies = { 'rafamadriz/friendly-snippets', 'xzbdmw/colorful-menu.nvim' },
     -- use a release tag to download pre-built binaries
     version = '1.*',
     -- AND/OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust

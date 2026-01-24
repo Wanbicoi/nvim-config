@@ -5,6 +5,7 @@ return {
   version = '*',
   config = function()
     require('toggleterm').setup {
+      autochdir = true,
       open_mapping = [[<c-\>]],
       hide_numbers = false,
       on_open = function()

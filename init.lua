@@ -10,7 +10,7 @@ vim.o.shiftwidth = 2
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.mouse = 'a'
-vim.opt.mousemodel = 'popup'
+vim.opt.mousemodel = 'popup_setpos'
 vim.opt.showmode = false
 vim.schedule(function()
   vim.opt.clipboard = 'unnamedplus'
@@ -136,10 +136,10 @@ vim.keymap.set('n', '<c-s>', '<cmd>:w<cr>', { desc = 'Save all files' })
 --  Use CTRL+<hjkl> to switch between windows
 --
 --  See `:help wincmd` for a list of all window commands
-vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+-- vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
+-- vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
+-- vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
+-- vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
 -- NOTE: Some terminals have coliding keymaps or are not able to send distinct keycodes
 -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
@@ -210,6 +210,8 @@ vim.opt.wildignore:append {
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
+
+require 'autocmds'
 
 -- Highlight when yanking (copying) text
 --  Try it with `yap` in normal mode
@@ -381,7 +383,6 @@ require('lazy').setup({
     ---@type snacks.Config
     opts = {
       bigfile = { enabled = true },
-      statuscolumn = { enabled = true },
       words = { enabled = true },
       gitbrowse = { enabled = true },
       quickfile = { enabled = true },
@@ -505,7 +506,39 @@ require('lazy').setup({
       {
         '<leader>ff',
         function()
-          Snacks.picker.files()
+          Snacks.picker.files {
+            hidden = true,
+            ignore = true,
+            exclude = {
+              -- dependencies
+              'node_modules',
+              'vendor',
+              'target',
+              'dist',
+              'build',
+              'out',
+              -- language-specific
+              'obj',
+              'bin',
+              '.venv',
+              'venv',
+              '.mypy_cache',
+              '.pytest_cache',
+              -- frameworks
+              '.next',
+              '.nuxt',
+              '.svelte-kit',
+              '.angular',
+              '.expo',
+              -- tooling
+              '.git',
+              '.terraform',
+              '.terragrunt-cache',
+              -- editor junk
+              '.DS_Store',
+              'Thumbs.db',
+            },
+          }
         end,
         desc = '[F]ind [F]iles',
       },
@@ -675,6 +708,7 @@ require('lazy').setup({
   {
     -- Main LSP Configuration
     'neovim/nvim-lspconfig',
+    event = 'BufEnter',
     dependencies = {
       -- Automatically install LSPs and related tools to stdpath for Neovim
       -- Mason must be loaded before its dependents so we need to set it up here.
@@ -693,31 +727,34 @@ require('lazy').setup({
       -- Useful status updates for LSP.
       { 'j-hui/fidget.nvim', opts = {} },
       -- Allows extra capabilities provided by blink.cmp
-      {
-        'seblyng/roslyn.nvim',
-        ---@module 'roslyn.config'
-        ---@type RoslynNvimConfig
-        opts = {
-          -- your configuration comes here; leave empty for default settings
-        },
-        ft = { '.cs', '.sln', '.csproj' },
-        config = function()
-          vim.lsp.config('roslyn', {
-            on_attach = function()
-              print 'This will run when the server attaches!'
-            end,
-            settings = {
-              ['csharp|inlay_hints'] = {
-                csharp_enable_inlay_hints_for_implicit_object_creation = true,
-                csharp_enable_inlay_hints_for_implicit_variable_types = true,
-              },
-              ['csharp|code_lens'] = {
-                dotnet_enable_references_code_lens = true,
-              },
-            },
-          })
-        end,
-      },
+      -- {
+      --   'seblyng/roslyn.nvim',
+      --   ---@module 'roslyn.config'
+      --   ---@type RoslynNvimConfig
+      --   opts = {
+      --     -- your configuration comes here; leave empty for default settings
+      --   },
+      --   ft = { 'cs', 'sln', 'csproj' },
+      --   config = function(_, opts)
+      --     require('roslyn').setup(opts)
+      --     vim.lsp.config('roslyn', {
+      --       capabilities = require('blink.cmp').get_lsp_capabilities(),
+      --       on_attach = function(client, bufnr)
+      --         -- Integrated with fidget: show notification on attach
+      --         require('fidget').notify('Roslyn attached to ' .. vim.fn.bufname(bufnr))
+      --       end,
+      --       settings = {
+      --         ['csharp|inlay_hints'] = {
+      --           csharp_enable_inlay_hints_for_implicit_object_creation = true,
+      --           csharp_enable_inlay_hints_for_implicit_variable_types = true,
+      --         },
+      --         ['csharp|code_lens'] = {
+      --           dotnet_enable_references_code_lens = true,
+      --         },
+      --       },
+      --     })
+      --   end,
+      -- },
       'saghen/blink.cmp',
     },
     config = function()
@@ -862,7 +899,7 @@ require('lazy').setup({
       -- See :help vim.diagnostic.Opts
       vim.diagnostic.config {
         severity_sort = true,
-        float = { border = 'rounded', source = 'if_many' },
+        float = { border = 'single', source = 'if_many' },
         underline = { severity = vim.diagnostic.severity.ERROR },
         signs = vim.g.have_nerd_font and {
           text = {
@@ -905,13 +942,13 @@ require('lazy').setup({
             },
           },
         },
-        -- csharp_ls = {},
+        csharp_ls = {},
       }
       require('mason-lspconfig').setup {
         ensure_installed = vim.tbl_keys(servers),
         automatic_installation = false,
         automatic_enable = {
-          exclude = { 'rust_analyzer', 'ts_ls', 'csharp_ls', 'copilot' },
+          exclude = { 'rust_analyzer', 'ts_ls', 'copilot' },
         },
       }
     end,
@@ -1210,7 +1247,7 @@ require('lazy').setup({
           solid = false, -- use solid styling for floating windows, see |winborder|
         },
       }
-      -- vim.cmd.colorscheme 'catppuccin-latte'
+      vim.cmd.colorscheme 'catppuccin-latte'
     end,
   },
   {
@@ -1237,14 +1274,19 @@ require('lazy').setup({
           },
         },
       }
-      vim.cmd 'colorscheme github_light'
+      -- vim.cmd 'colorscheme github_light'
     end,
   },
   -- Highlight todo, notes, etc in comments
-  { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
-
+  {
+    'folke/todo-comments.nvim',
+    event = 'BufEnter',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    opts = {},
+  },
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
+    event = 'BufEnter',
     config = function()
       require('mini.surround').setup {
         mappings = {
@@ -1289,6 +1331,9 @@ require('lazy').setup({
         padding = 4,
         max_width = 80,
         border = 'single',
+      },
+      view_options = {
+        show_hidden = true,
       },
     },
     dependencies = { 'nvim-tree/nvim-web-devicons' },
@@ -1635,7 +1680,12 @@ require('lazy').setup({
   },
   {
     'stevearc/overseer.nvim',
-    opts = {},
+    opts = {
+      keymaps ={
+        ["J"] = "keymap.next_task",
+        ["K"] = "keymap.next_task",
+      }
+    },
     keys = {
       { '<leader>oo', '<cmd>OverseerToggle<cr>', desc = '[O]verseer [T]oggle' },
       { '<leader>or', '<cmd>OverseerRun<cr>', desc = '[O]verseer [R]un' },
@@ -1701,6 +1751,23 @@ require('lazy').setup({
       vim.g.mkdp_filetypes = { 'markdown' }
     end,
     ft = { 'markdown' },
+  },
+  {
+    'danymat/neogen',
+    cmd = { 'Neogen' },
+    dependencies = 'nvim-treesitter/nvim-treesitter',
+    config = function()
+      require('neogen').setup {
+        enabled = true,
+        languages = {
+          cs = {
+            template = {
+              annotation_convention = 'xmldoc',
+            },
+          },
+        },
+      }
+    end,
   },
   -- {
   --   'HakonHarnes/img-clip.nvim',

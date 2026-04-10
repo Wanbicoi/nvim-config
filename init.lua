@@ -1471,18 +1471,18 @@ require('lazy').setup({
 
       -- Repeat movement with ; and ,
       -- ensure ; goes forward and , goes backward regardless of the last direction
-      vim.keymap.set({ 'n', 'x', 'o' }, ';', ts_repeat_move.repeat_last_move_next)
-      vim.keymap.set({ 'n', 'x', 'o' }, ',', ts_repeat_move.repeat_last_move_previous)
+      -- vim.keymap.set({ 'n', 'x', 'o' }, ';', ts_repeat_move.repeat_last_move_next)
+      -- vim.keymap.set({ 'n', 'x', 'o' }, ',', ts_repeat_move.repeat_last_move_previous)
 
       -- vim way: ; goes to the direction you were moving.
-      -- vim.keymap.set({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move)
-      -- vim.keymap.set({ "n", "x", "o" }, ",", ts_repeat_move.repeat_last_move_opposite)
+      vim.keymap.set({ 'n', 'x', 'o' }, ';', ts_repeat_move.repeat_last_move)
+      vim.keymap.set({ 'n', 'x', 'o' }, ',', ts_repeat_move.repeat_last_move_opposite)
 
       -- Optionally, make builtin f, F, t, T also repeatable with ; and ,
-      vim.keymap.set({ 'n', 'x', 'o' }, 'f', ts_repeat_move.builtin_f_expr, { expr = true })
-      vim.keymap.set({ 'n', 'x', 'o' }, 'F', ts_repeat_move.builtin_F_expr, { expr = true })
-      vim.keymap.set({ 'n', 'x', 'o' }, 't', ts_repeat_move.builtin_t_expr, { expr = true })
-      vim.keymap.set({ 'n', 'x', 'o' }, 'T', ts_repeat_move.builtin_T_expr, { expr = true })
+      -- vim.keymap.set({ 'n', 'x', 'o' }, 'f', ts_repeat_move.builtin_f_expr, { expr = true })
+      -- vim.keymap.set({ 'n', 'x', 'o' }, 'F', ts_repeat_move.builtin_F_expr, { expr = true })
+      -- vim.keymap.set({ 'n', 'x', 'o' }, 't', ts_repeat_move.builtin_t_expr, { expr = true })
+      -- vim.keymap.set({ 'n', 'x', 'o' }, 'T', ts_repeat_move.builtin_T_expr, { expr = true })
     end,
   },
   {
@@ -1656,8 +1656,9 @@ require('lazy').setup({
     opts = {
       backends = { 'lsp', 'treesitter', 'markdown', 'asciidoc', 'man' },
       layout = {
-        max_width = { 0.5 },
-        min_width = 0.5,
+        max_width = { 0.3 },
+        min_width = { 48, 0.2 },
+        default_direction = 'prefer_left',
       },
     },
     dependencies = {
@@ -1680,18 +1681,70 @@ require('lazy').setup({
   },
   {
     'stevearc/overseer.nvim',
-    opts = {
-      keymaps ={
-        ["J"] = "keymap.next_task",
-        ["K"] = "keymap.next_task",
+    config = function()
+      require('overseer').setup {
+        task_list {
+          keymaps = {
+            ['J'] = 'keymap.next_task',
+            ['K'] = 'keymap.next_task',
+          },
+        },
       }
-    },
+    end,
     keys = {
       { '<leader>oo', '<cmd>OverseerToggle<cr>', desc = '[O]verseer [T]oggle' },
       { '<leader>or', '<cmd>OverseerRun<cr>', desc = '[O]verseer [R]un' },
       { '<leader>oa', '<cmd>OverseerTaskAction<cr>', desc = '[O]verseer [A]ction' },
       { '<leader>ob', '<cmd>OverseerBuild<cr>', desc = '[O]verseer [B]uild' },
       { '<leader>os', '<cmd>OverseerShell<cr>', desc = '[O]verseer [S]hell' },
+    },
+  },
+  {
+    'folke/flash.nvim',
+    event = 'VeryLazy',
+    ---@type Flash.Config
+    opts = {},
+    keys = {
+      {
+        's',
+        mode = { 'n', 'x', 'o' },
+        function()
+          require('flash').jump()
+        end,
+        desc = 'Flash',
+      },
+      {
+        'S',
+        mode = { 'n', 'x', 'o' },
+        function()
+          require('flash').treesitter()
+        end,
+        desc = 'Flash Treesitter',
+      },
+      {
+        'r',
+        mode = 'o',
+        function()
+          require('flash').remote()
+        end,
+        desc = 'Remote Flash',
+      },
+      {
+        'R',
+        mode = { 'o', 'x' },
+        function()
+          require('flash').treesitter_search()
+        end,
+        desc = 'Treesitter Search',
+      },
+      {
+        '<c-s-s>',
+        mode = { 'c' },
+        function()
+          require('flash').toggle()
+        end,
+        desc = 'Toggle Flash Search',
+      },
     },
   },
   -- {

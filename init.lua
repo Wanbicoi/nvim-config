@@ -931,7 +931,7 @@ require('lazy').setup({
         jsonls = {},
         yamlls = {},
         -- tailwindcss = {},
-        gopls = {},
+        -- gopls = {},
         -- biome = {},
         lua_ls = {
           settings = {
@@ -1352,7 +1352,7 @@ require('lazy').setup({
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     config = function()
       -- Setup treesitter with all options
-      require('nvim-treesitter.configs').setup {
+      require('nvim-treesitter').setup {
         ensure_installed = {
           'bash',
           'c',
@@ -1467,7 +1467,7 @@ require('lazy').setup({
       }
 
       -- Setup repeatable move after treesitter config
-      local ts_repeat_move = require 'nvim-treesitter.textobjects.repeatable_move'
+      local ts_repeat_move = require "nvim-treesitter-textobjects.repeatable_move"
 
       -- Repeat movement with ; and ,
       -- ensure ; goes forward and , goes backward regardless of the last direction

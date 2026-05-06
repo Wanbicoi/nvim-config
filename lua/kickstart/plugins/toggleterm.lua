@@ -60,7 +60,8 @@ return {
 
     -- OpenCode Terminal
     local opencode = Terminal:new {
-      cmd = 'opencode',
+      -- TODO: rename opencode to ai
+      cmd = 'pi',
       hidden = true,
       direction = 'float',
       name = 'opencode',

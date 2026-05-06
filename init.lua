@@ -1,116 +1,5 @@
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
-
--- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = true
-
-vim.o.exrc = true
-vim.o.tabstop = 2
-vim.o.shiftwidth = 2
-vim.opt.number = true
-vim.opt.relativenumber = true
-vim.opt.mouse = 'a'
-vim.opt.mousemodel = 'popup_setpos'
-vim.opt.showmode = false
-vim.schedule(function()
-  vim.opt.clipboard = 'unnamedplus'
-end)
-
--- Enable break indent
-vim.opt.breakindent = true
-
-vim.opt.undofile = true
-vim.opt.ignorecase = true
-vim.opt.smartcase = true
-vim.opt.signcolumn = 'yes'
-vim.opt.updatetime = 250
-vim.opt.timeoutlen = 300
-vim.opt.splitright = true
-vim.opt.splitbelow = true
-
--- Sets how neovim will display certain whitespace characters in the editor.
---  See `:help 'list'`
---  and `:help 'listchars'`
-vim.opt.list = true
-vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
-
--- Preview substitutions live, as you type!
-vim.opt.inccommand = 'split'
-
-vim.opt.cursorline = true
-vim.opt.scrolloff = 10
-vim.opt.autoread = true
-
--- if performing an operation that would fail due to unsaved changes in the buffer (like `:q`),
--- instead raise a dialog asking if you wish to save the current file(s)
--- See `:help 'confirm'`
-vim.opt.confirm = true
--- vim.o.incsearch = false
-vim.o.wrap = false
-vim.o.cursorlineopt = 'both'
-vim.o.swapfile = false
-vim.wo.foldmethod = 'expr'
-vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-vim.o.foldenable = false
-vim.cmd [[set sessionoptions-=blank,help,terminal]]
-vim.o.winwidth = 40
-vim.o.winminwidth = 20
-
-if vim.fn.has 'win32' == 1 then
-  vim.opt.shell = 'pwsh'
-  vim.opt.shellcmdflag =
-    '-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;'
-  vim.opt.shellredir = '2>&1 | Out-File -Encoding UTF8 %s'
-  vim.opt.shellpipe = '2>&1 | Out-File -Encoding UTF8 %s'
-  vim.opt.shellquote = ''
-  vim.opt.shellxquote = ''
-end
-
-if vim.g.neovide then
-  vim.o.guifont = 'CodeNewRoman Nerd Font Propo:h11' -- text below applies for VimScript
-  vim.g.neovide_cursor_vfx_mode = 'pixiedust'
-  -- vim.g.neovide_cursor_vfx_mode = 'sonicboom'
-  vim.g.neovide_floating_shadow = true
-  vim.g.neovide_floating_z_height = 10
-  vim.g.neovide_floating_blur_amount_x = 0
-  vim.g.neovide_floating_blur_amount_y = 0
-
-  vim.g.neovide_scroll_animation_length = 0.2
-  vim.g.neovide_text_contrast = 0.6
-  vim.g.neovide_text_gamma = 1
-  vim.g.neovide_cursor_animation_length = 0.02
-
-  vim.g.neovide_title_background_color = 'white'
-  vim.g.neovide_title_text_color = 'black'
-
-  vim.g.neovide_progress_bar_enabled = true
-  vim.g.neovide_progress_bar_height = 5.0
-  vim.g.neovide_progress_bar_animation_speed = 200.0
-  vim.g.neovide_progress_bar_hide_delay = 0.2
-
-  vim.keymap.set('n', '<c-s-v>', '"+P') -- Paste normal mode
-  vim.keymap.set('v', '<c-s-v>', '"+P')
-  vim.keymap.set('c', '<c-s-v>', '<C-R>+') -- Paste command mode
-  vim.keymap.set('i', '<c-s-v>', '<ESC>"+pa') -- Paste insert mode
-  vim.keymap.set('t', '<c-s-v>', function()
-    local text = vim.fn.getreg '+'
-    vim.api.nvim_chan_send(vim.b.terminal_job_id, text)
-  end, { desc = 'Paste clipboard into terminal' })
-
-  vim.keymap.set('n', '<s-insert>', '"+P') -- Paste normal mode
-  vim.keymap.set('v', '<s-insert>', '"+P')
-  vim.keymap.set('c', '<s-insert>', '<C-R>+') -- Paste command mode
-  vim.keymap.set('i', '<s-insert>', '<ESC>"+pa') -- Paste insert mode
-  vim.keymap.set('t', '<s-insert>', function()
-    local text = vim.fn.getreg '+'
-    vim.api.nvim_chan_send(vim.b.terminal_job_id, text)
-  end, { desc = 'Paste clipboard into terminal' })
-end
-
--- 🆙 Support ascx filetype
-vim.filetype.add { extension = { ascx = 'html', json = 'jsonc' } }
-vim.treesitter.language.register('html', 'ascx')
-
+require 'options'
+require 'autocmds'
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -171,95 +60,6 @@ end, { desc = '[C]opy relative current file path' })
 
 vim.keymap.set('n', 'q', '<cmd>q<CR>', { noremap = true })
 
-vim.opt.wildignore:append {
-  'blue.vim',
-  'darkblue.vim',
-  'delek.vim',
-  'desert.vim',
-  'elflord.vim',
-  'evening.vim',
-  'industry.vim',
-  'habamax.vim',
-  'koehler.vim',
-  'lunaperche.vim',
-  'morning.vim',
-  'murphy.vim',
-  'pablo.vim',
-  'peachpuff.vim',
-  'quiet.vim',
-  'ron.vim',
-  'shine.vim',
-  'slate.vim',
-  'sorbet.vim',
-  'retrobox.vim',
-  'torte.vim',
-  'wildcharm.vim',
-  'zaibatsu.vim',
-  'vim.lua',
-  'unokai.vim',
-  'randomhue.lua',
-  'minischeme.lua',
-  'miniautumn.lua',
-  'minispring.lua',
-  'miniwinter.lua',
-  'minisummer.lua',
-  'default.vim',
-  'minicyan.lua',
-  'zellner.vim',
-}
-
--- [[ Basic Autocommands ]]
---  See `:help lua-guide-autocommands`
-
-require 'autocmds'
-
--- Highlight when yanking (copying) text
---  Try it with `yap` in normal mode
---  See `:help vim.highlight.on_yank()`
-vim.api.nvim_create_autocmd('TextYankPost', {
-  desc = 'Highlight when yanking (copying) text',
-  group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
-  callback = function()
-    vim.highlight.on_yank()
-  end,
-})
-
--- Add diffget to right-click menu when in diff mode
-vim.api.nvim_create_autocmd({ 'OptionSet' }, {
-  desc = 'Add diffget to right-click menu in diff mode',
-  group = vim.api.nvim_create_augroup('diff-mode-popup', { clear = true }),
-  pattern = 'diff',
-  callback = function()
-    if vim.wo.diff then
-      -- Add diffget menu item when entering diff mode
-      vim.cmd.amenu '20.10 PopUp.-DiffSep- :'
-      vim.cmd.amenu '20.20 PopUp.Diff\\ Get <cmd>diffget<CR>'
-      vim.cmd.amenu '20.30 PopUp.Diff\\ Put <cmd>diffput<CR>'
-    else
-      -- Remove diff menu items when leaving diff mode
-      pcall(vim.cmd.aunmenu, 'PopUp.-DiffSep-')
-      pcall(vim.cmd.aunmenu, 'PopUp.Diff\\ Get')
-      pcall(vim.cmd.aunmenu, 'PopUp.Diff\\ Put')
-    end
-  end,
-})
-
--- Also add the menu items when first opening a diff buffer
-vim.api.nvim_create_autocmd({ 'BufEnter' }, {
-  desc = 'Setup diff menu on buffer enter if in diff mode',
-  group = vim.api.nvim_create_augroup('diff-mode-bufenter', { clear = true }),
-  callback = function()
-    if vim.wo.diff then
-      pcall(vim.cmd.aunmenu, 'PopUp.-DiffSep-')
-      pcall(vim.cmd.aunmenu, 'PopUp.Diff\\ Get')
-      pcall(vim.cmd.aunmenu, 'PopUp.Diff\\ Put')
-      vim.cmd.amenu '20.10 PopUp.-DiffSep- :'
-      vim.cmd.amenu '20.20 PopUp.Diff\\ Get <cmd>diffget<CR>'
-      vim.cmd.amenu '20.30 PopUp.Diff\\ Put <cmd>diffput<CR>'
-    end
-  end,
-})
-
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
@@ -272,41 +72,6 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
--- [[ Auto-change CWD to project root ]]
--- This replicates the behavior of project.nvim
--- Using built-in vim.fs.root() for Neovim 0.10+
-local root_patterns = { '.git', '.gitignore', 'Cargo.toml', 'package.json', 'go.mod', '.sln', '.csproj' }
-
-local function find_project_root()
-  local path = vim.api.nvim_buf_get_name(0)
-  return vim.fs.root(path, root_patterns)
-end
-
--- Auto-change directory when opening a file
-vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
-  desc = 'Auto change directory to project root',
-  group = vim.api.nvim_create_augroup('auto-project-root', { clear = true }),
-  callback = function(args)
-    -- Skip special buffers
-    local buftype = vim.bo[args.buf].buftype
-    if buftype ~= '' then
-      return
-    end
-
-    -- Skip if file doesn't exist
-    local filepath = vim.api.nvim_buf_get_name(args.buf)
-    if filepath == '' or vim.fn.filereadable(filepath) == 0 then
-      return
-    end
-
-    local root = find_project_root()
-    if root and root ~= vim.fn.getcwd() then
-      vim.cmd('cd ' .. vim.fn.fnameescape(root))
-      -- Optional: uncomment to get notifications when CWD changes
-      -- vim.notify('Changed directory to: ' .. root, vim.log.levels.INFO)
-    end
-  end,
-})
 
 require('lazy').setup({
   {
@@ -942,7 +707,7 @@ require('lazy').setup({
             },
           },
         },
-        csharp_ls = {},
+        -- csharp_ls = {},
       }
       require('mason-lspconfig').setup {
         ensure_installed = vim.tbl_keys(servers),
@@ -1717,7 +1482,7 @@ require('lazy').setup({
         'S',
         mode = { 'n', 'x', 'o' },
         function()
-          require('flash').treesitter()
+          require('flash').treesitter_search()
         end,
         desc = 'Flash Treesitter',
       },

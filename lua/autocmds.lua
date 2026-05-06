@@ -27,3 +27,85 @@ vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter', 'CursorHold', 'CursorHo
     end
   end,
 })
+
+-- Highlight when yanking (copying) text
+--  Try it with `yap` in normal mode
+--  See `:help vim.highlight.on_yank()`
+vim.api.nvim_create_autocmd('TextYankPost', {
+  desc = 'Highlight when yanking (copying) text',
+  group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
+  callback = function()
+    vim.highlight.on_yank()
+  end,
+})
+
+-- Add diffget to right-click menu when in diff mode
+vim.api.nvim_create_autocmd({ 'OptionSet' }, {
+  desc = 'Add diffget to right-click menu in diff mode',
+  group = vim.api.nvim_create_augroup('diff-mode-popup', { clear = true }),
+  pattern = 'diff',
+  callback = function()
+    if vim.wo.diff then
+      -- Add diffget menu item when entering diff mode
+      vim.cmd.amenu '20.10 PopUp.-DiffSep- :'
+      vim.cmd.amenu '20.20 PopUp.Diff\\ Get <cmd>diffget<CR>'
+      vim.cmd.amenu '20.30 PopUp.Diff\\ Put <cmd>diffput<CR>'
+    else
+      -- Remove diff menu items when leaving diff mode
+      pcall(vim.cmd.aunmenu, 'PopUp.-DiffSep-')
+      pcall(vim.cmd.aunmenu, 'PopUp.Diff\\ Get')
+      pcall(vim.cmd.aunmenu, 'PopUp.Diff\\ Put')
+    end
+  end,
+})
+
+-- Also add the menu items when first opening a diff buffer
+vim.api.nvim_create_autocmd({ 'BufEnter' }, {
+  desc = 'Setup diff menu on buffer enter if in diff mode',
+  group = vim.api.nvim_create_augroup('diff-mode-bufenter', { clear = true }),
+  callback = function()
+    if vim.wo.diff then
+      pcall(vim.cmd.aunmenu, 'PopUp.-DiffSep-')
+      pcall(vim.cmd.aunmenu, 'PopUp.Diff\\ Get')
+      pcall(vim.cmd.aunmenu, 'PopUp.Diff\\ Put')
+      vim.cmd.amenu '20.10 PopUp.-DiffSep- :'
+      vim.cmd.amenu '20.20 PopUp.Diff\\ Get <cmd>diffget<CR>'
+      vim.cmd.amenu '20.30 PopUp.Diff\\ Put <cmd>diffput<CR>'
+    end
+  end,
+})
+
+-- [[ Auto-change CWD to project root ]]
+-- This replicates the behavior of project.nvim
+-- Using built-in vim.fs.root() for Neovim 0.10+
+local root_patterns = { '.git', '.gitignore', 'Cargo.toml', 'package.json', 'go.mod', '.sln', '.csproj' }
+
+local function find_project_root()
+  local path = vim.api.nvim_buf_get_name(0)
+  return vim.fs.root(path, root_patterns)
+end
+-- Auto-change directory when opening a file
+vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
+  desc = 'Auto change directory to project root',
+  group = vim.api.nvim_create_augroup('auto-project-root', { clear = true }),
+  callback = function(args)
+    -- Skip special buffers
+    local buftype = vim.bo[args.buf].buftype
+    if buftype ~= '' then
+      return
+    end
+
+    -- Skip if file doesn't exist
+    local filepath = vim.api.nvim_buf_get_name(args.buf)
+    if filepath == '' or vim.fn.filereadable(filepath) == 0 then
+      return
+    end
+
+    local root = find_project_root()
+    if root and root ~= vim.fn.getcwd() then
+      vim.cmd('cd ' .. vim.fn.fnameescape(root))
+      -- Optional: uncomment to get notifications when CWD changes
+      -- vim.notify('Changed directory to: ' .. root, vim.log.levels.INFO)
+    end
+  end,
+})

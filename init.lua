@@ -13,6 +13,7 @@ local function setup_cds_treesitter_parser()
       url = 'https://github.com/cap-js-community/tree-sitter-cds.git',
       files = { 'src/parser.c', 'src/scanner.c' },
       branch = 'main',
+      queries = 'nvim',
       generate_requires_npm = false,
       requires_generate_from_grammar = false,
     },
@@ -23,6 +24,13 @@ end
 vim.api.nvim_create_autocmd('User', {
   pattern = 'TSUpdate',
   callback = setup_cds_treesitter_parser,
+})
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'cds',
+  callback = function(args)
+    pcall(vim.treesitter.start, args.buf)
+  end,
 })
 
 -- [[ Basic Keymaps ]]

@@ -1,5 +1,30 @@
 require 'options'
 require 'autocmds'
+
+vim.filetype.add {
+  extension = {
+    cds = 'cds',
+  },
+}
+
+local function setup_cds_treesitter_parser()
+  require('nvim-treesitter.parsers').cds = {
+    install_info = {
+      url = 'https://github.com/cap-js-community/tree-sitter-cds.git',
+      files = { 'src/parser.c', 'src/scanner.c' },
+      branch = 'main',
+      generate_requires_npm = false,
+      requires_generate_from_grammar = false,
+    },
+    filetype = 'cds',
+  }
+end
+
+vim.api.nvim_create_autocmd('User', {
+  pattern = 'TSUpdate',
+  callback = setup_cds_treesitter_parser,
+})
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -59,6 +84,7 @@ vim.keymap.set('n', '<leader>cp', function()
 end, { desc = '[C]opy relative current file path' })
 
 vim.keymap.set('n', 'q', '<cmd>q<CR>', { noremap = true })
+vim.keymap.set('n', '<esc>', '<cmd>noh<CR>', { noremap = true })
 
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
@@ -491,35 +517,6 @@ require('lazy').setup({
 
       -- Useful status updates for LSP.
       { 'j-hui/fidget.nvim', opts = {} },
-      -- Allows extra capabilities provided by blink.cmp
-      -- {
-      --   'seblyng/roslyn.nvim',
-      --   ---@module 'roslyn.config'
-      --   ---@type RoslynNvimConfig
-      --   opts = {
-      --     -- your configuration comes here; leave empty for default settings
-      --   },
-      --   ft = { 'cs', 'sln', 'csproj' },
-      --   config = function(_, opts)
-      --     require('roslyn').setup(opts)
-      --     vim.lsp.config('roslyn', {
-      --       capabilities = require('blink.cmp').get_lsp_capabilities(),
-      --       on_attach = function(client, bufnr)
-      --         -- Integrated with fidget: show notification on attach
-      --         require('fidget').notify('Roslyn attached to ' .. vim.fn.bufname(bufnr))
-      --       end,
-      --       settings = {
-      --         ['csharp|inlay_hints'] = {
-      --           csharp_enable_inlay_hints_for_implicit_object_creation = true,
-      --           csharp_enable_inlay_hints_for_implicit_variable_types = true,
-      --         },
-      --         ['csharp|code_lens'] = {
-      --           dotnet_enable_references_code_lens = true,
-      --         },
-      --       },
-      --     })
-      --   end,
-      -- },
       'saghen/blink.cmp',
     },
     config = function()
@@ -698,15 +695,15 @@ require('lazy').setup({
         -- tailwindcss = {},
         -- gopls = {},
         -- biome = {},
-        lua_ls = {
-          settings = {
-            Lua = {
-              completion = {
-                callSnippet = 'Replace',
-              },
-            },
-          },
-        },
+        -- lua_ls = {
+        --   settings = {
+        --     Lua = {
+        --       completion = {
+        --         callSnippet = 'Replace',
+        --       },
+        --     },
+        --   },
+        -- },
         -- csharp_ls = {},
       }
       require('mason-lspconfig').setup {
@@ -716,6 +713,16 @@ require('lazy').setup({
           exclude = { 'rust_analyzer', 'ts_ls', 'copilot' },
         },
       }
+
+      vim.lsp.config('cds_lsp', {
+        capabilities = require('blink.cmp').get_lsp_capabilities(),
+        settings = {
+          cds = {
+            validate = true,
+          },
+        },
+      })
+      vim.lsp.enable 'cds_lsp'
     end,
   },
   {
@@ -1110,12 +1117,15 @@ require('lazy').setup({
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     event = { 'BufReadPre', 'BufNewFile' },
+    cmd = { 'TSInstall', 'TSInstallSync', 'TSUpdate', 'TSUpdateSync', 'TSUninstall', 'TSInstallInfo' },
     dependencies = {
       'nvim-treesitter/nvim-treesitter-textobjects',
     },
     build = ':TSUpdate',
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     config = function()
+      setup_cds_treesitter_parser()
+
       -- Setup treesitter with all options
       require('nvim-treesitter').setup {
         ensure_installed = {
@@ -1134,6 +1144,7 @@ require('lazy').setup({
           'javascript',
           'typescript',
           'tsx',
+          'cds',
         },
         -- Autoinstall languages that are not installed
         auto_install = true,

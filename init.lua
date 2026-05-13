@@ -47,6 +47,7 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 -- or just use <C-\><C-n> to exit terminal mode
 vim.keymap.set('t', '<c-q>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 vim.keymap.set('n', '<c-s>', '<cmd>:w<cr>', { desc = 'Save all files' })
+vim.keymap.set("v", "<leader>r", '"0y:%s/\\V<C-r>0//g<Left><Left>')
 
 -- TIP: Disable arrow keys in normal mode
 -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
@@ -1021,10 +1022,10 @@ require('lazy').setup({
     priority = 1000,
     config = function()
       require('catppuccin').setup {
-        transparent_background = true,
+        -- transparent_background = true,
         float = {
-          transparent = true, -- enable transparent floating windows
-          solid = false, -- use solid styling for floating windows, see |winborder|
+          -- transparent = true, -- enable transparent floating windows
+          -- solid = false, -- use solid styling for floating windows, see |winborder|
         },
       }
       vim.cmd.colorscheme 'catppuccin-latte'

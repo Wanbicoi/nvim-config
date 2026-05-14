@@ -40,11 +40,11 @@ return {
         },
       },
       spec = {
-        { '<leader>c', group = '[C]ode', mode = { 'n', 'x' } },
+        { '<leader>c', group = '[C]ode',            mode = { 'n', 'x' } },
         { '<leader>d', group = '[D]iff' },
         { '<leader>w', group = '[W]orkspace' },
         { '<leader>t', group = '[T]est / [T]oggle' },
-        { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+        { '<leader>h', group = 'Git [H]unk',        mode = { 'n', 'v' } },
         { '<leader>o', group = '[O]verseer' },
         { '<leader>s', group = '[S]wap Textobjects' },
       },
@@ -185,7 +185,7 @@ return {
         end,
         desc = '[F]ind [F]iles (cwd)',
       },
-      { '<leader>ft', function() Snacks.picker.pickers() end, desc = '[F]ind Picker [T]ypes' },
+      { '<leader>ft', function() Snacks.picker.pickers() end,            desc = '[F]ind Picker [T]ypes' },
       {
         '<leader>fW',
         function()
@@ -203,9 +203,9 @@ return {
         desc = '[F]ind file of the current [W]ord (cwd)',
       },
       { '<leader>fw', function() snacks_search.project('grep_word') end, desc = '[F]ind current [W]ord' },
-      { '<leader>Fw', function() snacks_search.pwd('grep_word') end, desc = '[F]ind current [W]ord (cwd)' },
-      { '<leader>/', function() snacks_search.project('grep') end, desc = '[G]rep' },
-      { '<leader>F/', function() snacks_search.pwd('grep') end, desc = '[G]rep (cwd)' },
+      { '<leader>Fw', function() snacks_search.pwd('grep_word') end,     desc = '[F]ind current [W]ord (cwd)' },
+      { '<leader>/',  function() snacks_search.project('grep') end,      desc = '[G]rep' },
+      { '<leader>F/', function() snacks_search.pwd('grep') end,          desc = '[G]rep (cwd)' },
       {
         '<leader>?',
         function()
@@ -224,17 +224,17 @@ return {
         end,
         desc = '[G]rep with copied text (cwd)',
       },
-      { '<leader>fr', function() Snacks.picker.resume() end, desc = '[F]ind [R]esume' },
-      { '<leader>fo', function() Snacks.picker.recent() end, desc = '[F]ind Recent Files' },
-      { '_', function() Snacks.picker.buffers() end, desc = '[_] Find existing buffers' },
+      { '<leader>fr', function() Snacks.picker.resume() end,                desc = '[F]ind [R]esume' },
+      { '<leader>fo', function() Snacks.picker.recent() end,                desc = '[F]ind Recent Files' },
+      { '_',          function() Snacks.picker.buffers() end,               desc = '[_] Find existing buffers' },
       { '<leader>gb', function() snacks_search.project('git_branches') end, desc = 'Git Branches' },
-      { '<leader>gl', function() snacks_search.project('git_log') end, desc = 'Git Log' },
+      { '<leader>gl', function() snacks_search.project('git_log') end,      desc = 'Git Log' },
       { '<leader>gL', function() snacks_search.project('git_log_line') end, desc = 'Git Log Line' },
-      { '<leader>gs', function() snacks_search.project('git_status') end, desc = 'Git Status' },
-      { '<leader>gS', function() snacks_search.project('git_stash') end, desc = 'Git Stash' },
-      { '<leader>gd', function() snacks_search.project('git_diff') end, desc = 'Git Diff (Hunks)' },
+      { '<leader>gs', function() snacks_search.project('git_status') end,   desc = 'Git Status' },
+      { '<leader>gS', function() snacks_search.project('git_stash') end,    desc = 'Git Stash' },
+      { '<leader>gd', function() snacks_search.project('git_diff') end,     desc = 'Git Diff (Hunks)' },
       { '<leader>gf', function() snacks_search.project('git_log_file') end, desc = 'Git Log File' },
-      { '<leader>fc', function() Snacks.picker.commands() end, desc = '[F]ind [C]ommands' },
+      { '<leader>fc', function() Snacks.picker.commands() end,              desc = '[F]ind [C]ommands' },
       {
         '<leader>fn',
         function()
@@ -242,10 +242,10 @@ return {
         end,
         desc = '[F]ind [N]eovim files',
       },
-      { '<leader>fh', function() Snacks.picker.help() end, desc = '[F]ind [H]elp' },
-      { '<leader>fk', function() Snacks.picker.keymaps() end, desc = '[F]ind [K]eymaps' },
+      { '<leader>fh', function() Snacks.picker.help() end,        desc = '[F]ind [H]elp' },
+      { '<leader>fk', function() Snacks.picker.keymaps() end,     desc = '[F]ind [K]eymaps' },
       { '<leader>fd', function() Snacks.picker.diagnostics() end, desc = '[F]ind [D]iagnostics' },
-      { '<leader>fp', function() Snacks.picker.projects() end, desc = '[F]ind [P]rojects' },
+      { '<leader>fp', function() Snacks.picker.projects() end,    desc = '[F]ind [P]rojects' },
     },
   },
   {
@@ -253,9 +253,7 @@ return {
     name = 'catppuccin',
     priority = 1000,
     config = function()
-      require('catppuccin').setup {
-        float = {},
-      }
+      require('catppuccin').setup {}
       vim.cmd.colorscheme 'catppuccin-latte'
     end,
   },
@@ -351,7 +349,7 @@ return {
     opts = {},
     keys = {
       { '<leader>wr', '<cmd>AutoSession search<CR>', desc = 'Session search' },
-      { '<leader>ws', '<cmd>AutoSession save<CR>', desc = 'Save session' },
+      { '<leader>ws', '<cmd>AutoSession save<CR>',   desc = 'Save session' },
       { '<leader>wa', '<cmd>AutoSession toggle<CR>', desc = 'Toggle autosave' },
     },
   },
@@ -391,11 +389,11 @@ return {
       }
     end,
     keys = {
-      { '<leader>oo', '<cmd>OverseerToggle<cr>', desc = '[O]verseer [T]oggle' },
-      { '<leader>or', '<cmd>OverseerRun<cr>', desc = '[O]verseer [R]un' },
+      { '<leader>oo', '<cmd>OverseerToggle<cr>',     desc = '[O]verseer [T]oggle' },
+      { '<leader>or', '<cmd>OverseerRun<cr>',        desc = '[O]verseer [R]un' },
       { '<leader>oa', '<cmd>OverseerTaskAction<cr>', desc = '[O]verseer [A]ction' },
-      { '<leader>ob', '<cmd>OverseerBuild<cr>', desc = '[O]verseer [B]uild' },
-      { '<leader>os', '<cmd>OverseerShell<cr>', desc = '[O]verseer [S]hell' },
+      { '<leader>ob', '<cmd>OverseerBuild<cr>',      desc = '[O]verseer [B]uild' },
+      { '<leader>os', '<cmd>OverseerShell<cr>',      desc = '[O]verseer [S]hell' },
     },
   },
   {
@@ -409,11 +407,11 @@ return {
       },
     },
     keys = {
-      { 's', mode = { 'n', 'x', 'o' }, function() require('flash').jump() end, desc = 'Flash' },
-      { 'S', mode = { 'n', 'x', 'o' }, function() require('flash').treesitter_search() end, desc = 'Flash Treesitter' },
-      { 'r', mode = 'o', function() require('flash').remote() end, desc = 'Remote Flash' },
-      { 'R', mode = { 'o', 'x' }, function() require('flash').treesitter_search() end, desc = 'Treesitter Search' },
-      { '<c-s-s>', mode = { 'c' }, function() require('flash').toggle() end, desc = 'Toggle Flash Search' },
+      { 's',       mode = { 'n', 'x', 'o' }, function() require('flash').jump() end,              desc = 'Flash' },
+      { 'S',       mode = { 'n', 'x', 'o' }, function() require('flash').treesitter_search() end, desc = 'Flash Treesitter' },
+      { 'r',       mode = 'o',               function() require('flash').remote() end,            desc = 'Remote Flash' },
+      { 'R',       mode = { 'o', 'x' },      function() require('flash').treesitter_search() end, desc = 'Treesitter Search' },
+      { '<c-s-s>', mode = { 'c' },           function() require('flash').toggle() end,            desc = 'Toggle Flash Search' },
     },
   },
   {

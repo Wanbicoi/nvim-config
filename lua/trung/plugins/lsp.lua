@@ -86,8 +86,10 @@ return {
           if vim.fn.has 'nvim-0.12' == 1 then
             if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_inlineCompletion, event.buf) then
               vim.lsp.inline_completion.enable(true, { bufnr = event.buf })
-              vim.keymap.set('i', '<c-f>', vim.lsp.inline_completion.get, { desc = 'LSP: accept inline completion', buffer = event.buf })
-              vim.keymap.set('i', '<c-g>', vim.lsp.inline_completion.select, { desc = 'LSP: switch inline completion', buffer = event.buf })
+              vim.keymap.set('i', '<c-f>', vim.lsp.inline_completion.get,
+                { desc = 'LSP: accept inline completion', buffer = event.buf })
+              vim.keymap.set('i', '<c-g>', vim.lsp.inline_completion.select,
+                { desc = 'LSP: switch inline completion', buffer = event.buf })
             end
           end
         end,
@@ -161,6 +163,7 @@ return {
     opts = {
       library = {
         { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
+        'snacks.nvim',
       },
     },
   },

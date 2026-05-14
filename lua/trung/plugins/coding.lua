@@ -61,7 +61,8 @@ return {
       }
       local get_option = vim.filetype.get_option
       vim.filetype.get_option = function(filetype, option)
-        return option == 'commentstring' and require('ts_context_commentstring.internal').calculate_commentstring() or get_option(filetype, option)
+        return option == 'commentstring' and require('ts_context_commentstring.internal').calculate_commentstring() or
+        get_option(filetype, option)
       end
     end,
   },
@@ -99,6 +100,41 @@ return {
       }
     end,
   },
-  require 'trung.plugins.autopairs',
-  require 'trung.plugins.indent_line',
+  {
+    'windwp/nvim-autopairs',
+    event = 'InsertEnter',
+    config = true,
+  },
+  {
+    'windwp/nvim-ts-autotag',
+    event = { 'BufReadPre', 'BufNewFile' },
+    config = function()
+      require('nvim-ts-autotag').setup {
+        opts = {
+          enable_close = true,
+          enable_rename = true,
+          enable_close_on_slash = true,
+        },
+      }
+    end,
+  },
+  {
+    'shellRaining/hlchunk.nvim',
+    event = { 'BufReadPre', 'BufNewFile' },
+    config = function()
+      require('hlchunk').setup {
+        chunk = {
+          enable = true,
+          duration = 100,
+          delay = 150,
+        },
+        indent = {
+          enable = true,
+        },
+        line_num = {
+          enable = true,
+        },
+      }
+    end,
+  }
 }

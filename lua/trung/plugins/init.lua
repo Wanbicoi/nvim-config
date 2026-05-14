@@ -19,10 +19,10 @@ require('lazy').setup({
   require 'trung.plugins.terminal',
 
   -- Optional extras
-  -- require 'trung.plugins.debug',
-  -- require 'trung.plugins.lint',
-  -- require 'trung.plugins.ctags',
-  -- require 'trung.plugins.avante',
+  -- require 'trung.plugins.extras.debug',
+  -- require 'trung.plugins.extras.lint',
+  -- require 'trung.plugins.extras.ctags',
+  -- require 'trung.plugins.extras.avante',
 }, {
   performance = {
     rtp = {

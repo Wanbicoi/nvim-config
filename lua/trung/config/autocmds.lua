@@ -1,9 +1,7 @@
--- lua/autocmds.lua
-
 -- Autosave on focus lost
 vim.api.nvim_create_autocmd({ 'FocusLost', 'BufLeave' }, {
   desc = 'Autosave when focus is lost or buffer is left',
-  group = vim.api.nvim_create_augroup('kickstart-autosave', { clear = true }),
+  group = vim.api.nvim_create_augroup('trung-autosave', { clear = true }),
   callback = function()
     local buftype = vim.bo.buftype
     local filetype = vim.bo.filetype
@@ -19,7 +17,7 @@ vim.api.nvim_create_autocmd({ 'FocusLost', 'BufLeave' }, {
 -- Auto-reload files when they change on disk
 vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter', 'CursorHold', 'CursorHoldI' }, {
   desc = 'Reload file when focus is gained or buffer is entered',
-  group = vim.api.nvim_create_augroup('kickstart-autoreload', { clear = true }),
+  group = vim.api.nvim_create_augroup('trung-autoreload', { clear = true }),
   callback = function()
     local buftype = vim.bo.buftype
     if vim.api.nvim_buf_get_name(0) ~= '' and buftype == '' then
@@ -33,7 +31,7 @@ vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter', 'CursorHold', 'CursorHo
 --  See `:help vim.highlight.on_yank()`
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
-  group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
+  group = vim.api.nvim_create_augroup('trung-highlight-yank', { clear = true }),
   callback = function()
     vim.highlight.on_yank()
   end,
@@ -75,37 +73,3 @@ vim.api.nvim_create_autocmd({ 'BufEnter' }, {
   end,
 })
 
--- [[ Auto-change CWD to project root ]]
--- This replicates the behavior of project.nvim
--- Using built-in vim.fs.root() for Neovim 0.10+
--- local root_patterns = { '.git', '.gitignore', 'Cargo.toml', 'package.json', 'go.mod', '.sln', '.csproj' }
---
--- local function find_project_root()
---   local path = vim.api.nvim_buf_get_name(0)
---   return vim.fs.root(path, root_patterns)
--- end
--- -- Auto-change directory when opening a file
--- vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
---   desc = 'Auto change directory to project root',
---   group = vim.api.nvim_create_augroup('auto-project-root', { clear = true }),
---   callback = function(args)
---     -- Skip special buffers
---     local buftype = vim.bo[args.buf].buftype
---     if buftype ~= '' then
---       return
---     end
---
---     -- Skip if file doesn't exist
---     local filepath = vim.api.nvim_buf_get_name(args.buf)
---     if filepath == '' or vim.fn.filereadable(filepath) == 0 then
---       return
---     end
---
---     local root = find_project_root()
---     if root and root ~= vim.fn.getcwd() then
---       vim.cmd('cd ' .. vim.fn.fnameescape(root))
---       -- Optional: uncomment to get notifications when CWD changes
---       -- vim.notify('Changed directory to: ' .. root, vim.log.levels.INFO)
---     end
---   end,
--- })

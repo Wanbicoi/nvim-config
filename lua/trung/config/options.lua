@@ -106,10 +106,6 @@ if vim.g.neovide then
   end, { desc = 'Paste clipboard into terminal' })
 end
 
--- 🆙 Support ascx filetype
-vim.filetype.add { extension = { ascx = 'html', json = 'jsonc' } }
-vim.treesitter.language.register('html', 'ascx')
-
 -- disable builtin colorscheme
 vim.opt.wildignore:append {
   'blue.vim',

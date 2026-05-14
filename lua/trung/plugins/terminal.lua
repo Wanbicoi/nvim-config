@@ -11,7 +11,7 @@ local function setup_toggleterm()
   }
 end
 
-local snacks_search = require('kickstart.util.snacks_search')
+local snacks_search = require('trung.utils.snacks_search')
 
 local function setup_lazygit(Terminal)
   local lazygit = Terminal:new {
@@ -77,8 +77,7 @@ local function setup_agent_coding(Terminal)
   local function agent_coding_send_file()
     local file = vim.fn.expand '%'
     local line = vim.fn.line '.'
-    local col = vim.fn.col '.'
-    local position = string.format('@%s:L%d:C%d', file, line, col)
+    local position = string.format('@%s:L%d', file, line)
     send_to_agent_coding(position .. '\n')
   end
 
@@ -98,12 +97,12 @@ local function setup_agent_coding(Terminal)
   end
 
   local function open_agent_coding()
-    if agent_coding:is_open() then
+    if agent_coding.job_id then
       agent_coding:toggle()
       return
     end
 
-    vim.ui.select({ 'Project root' , 'Current folder'}, {
+    vim.ui.select({ 'Project root', 'Current folder' }, {
       prompt = 'Open agent_coding terminal in:',
     }, function(choice)
       if not choice then

@@ -3,7 +3,6 @@ return {
   dependencies = {
     'nvim-neotest/nvim-nio',
     'nvim-lua/plenary.nvim',
-    'nvim-treesitter/nvim-treesitter',
     { 'StevanFreeborn/neotest-playwright', branch = 'fork' },
   },
   config = function()

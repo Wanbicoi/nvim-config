@@ -4,7 +4,6 @@
 
 return {
   {
-    dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' },
     'lewis6991/gitsigns.nvim',
     event = 'VeryLazy',
     opts = {

@@ -1,5 +1,6 @@
 require 'options'
 require 'autocmds'
+local snacks_search = require 'kickstart.util.snacks_search'
 
 vim.filetype.add {
   extension = {
@@ -7,31 +8,6 @@ vim.filetype.add {
   },
 }
 
-local function setup_cds_treesitter_parser()
-  require('nvim-treesitter.parsers').cds = {
-    install_info = {
-      url = 'https://github.com/cap-js-community/tree-sitter-cds.git',
-      files = { 'src/parser.c', 'src/scanner.c' },
-      branch = 'main',
-      queries = 'nvim',
-      generate_requires_npm = false,
-      requires_generate_from_grammar = false,
-    },
-    filetype = 'cds',
-  }
-end
-
-vim.api.nvim_create_autocmd('User', {
-  pattern = 'TSUpdate',
-  callback = setup_cds_treesitter_parser,
-})
-
-vim.api.nvim_create_autocmd('FileType', {
-  pattern = 'cds',
-  callback = function(args)
-    pcall(vim.treesitter.start, args.buf)
-  end,
-})
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
@@ -120,7 +96,7 @@ require('lazy').setup({
     'lewis6991/gitsigns.nvim',
     opts = {},
   },
-  { -- Useful plugin to show you pending keybinds.
+  {                     -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
     opts = {
@@ -166,11 +142,11 @@ require('lazy').setup({
 
       -- Document existing key chains
       spec = {
-        { '<leader>c', group = '[C]ode', mode = { 'n', 'x' } },
+        { '<leader>c', group = '[C]ode',            mode = { 'n', 'x' } },
         { '<leader>d', group = '[D]iff' },
         { '<leader>w', group = '[W]orkspace' },
         { '<leader>t', group = '[T]est / [T]oggle' },
-        { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+        { '<leader>h', group = 'Git [H]unk',        mode = { 'n', 'v' } },
         { '<leader>o', group = '[O]verseer' },
         { '<leader>s', group = '[S]wap Textobjects' },
       },
@@ -237,49 +213,44 @@ require('lazy').setup({
         -- },
 
         -- Source-specific configs
-        -- sources = {
-        --   files = {
-        --     hidden = false,
-        --     ignored = false,
-        --     -- Auto-detect project root for files picker
-        --     follow = true, -- follow symlinks
-        --   },
-        --   grep = {
-        --     live = true,
-        --     -- Auto-detect project root for grep
-        --     follow = true,
-        --   },
-        --   projects = {
-        --     -- Root patterns to detect projects (same as your old project.nvim config)
-        --     patterns = { '.git', '.gitignore', 'Cargo.toml', 'package.json', 'go.mod', '.sln', '.csproj' },
-        --
-        --     -- Use frecency for sorting (recent + frequent projects appear first)
-        --     matcher = {
-        --       frecency = true,
-        --       sort_empty = true,
-        --     },
-        --
-        --     -- Include recent file directories as projects
-        --     recent = true,
-        --
-        --     -- Max depth for scanning directories (if you add dev directories below)
-        --     max_depth = 2,
-        --
-        --     -- Optionally: Add your dev/projects directories here
-        --     -- dev = { '~/dev', '~/projects', '~/work' },
-        --   },
-        -- },
+        sources = {
+          -- files = {
+          --   -- hidden = false,
+          --   -- ignored = false,
+          --   -- Auto-detect project root for files picker
+          --   follow = true, -- follow symlinks
+          -- },
+          --   grep = {
+          --     live = true,
+          --     -- Auto-detect project root for grep
+          --     follow = true,
+          --   },
+          projects = {
+            -- -- Root patterns to detect projects (same as your old project.nvim config)
+            -- patterns = { '.git', '.gitignore', 'Cargo.toml', 'package.json', 'go.mod', '.sln', '.csproj' },
+            --
+            -- -- Use frecency for sorting (recent + frequent projects appear first)
+            -- matcher = {
+            --   frecency = true,
+            --   sort_empty = true,
+            -- },
+            --
+            -- -- Include recent file directories as projects
+            -- recent = true,
+            --
+            -- -- Max depth for scanning directories (if you add dev directories below)
+            -- max_depth = 2,
+
+            -- Optionally: Add your dev/projects directories here
+            dev = { '~/Repos' },
+          },
+        },
       },
     },
-    -- init = function()
-    --   -- Helper function to find project root (for Snacks picker when needed)
-    --   -- Using built-in vim.fs.root() for Neovim 0.10+
-    --   _G.get_project_root = function()
-    --     local root_patterns = { '.git', '.gitignore', 'Cargo.toml', 'package.json', 'go.mod', '.sln', '.csproj' }
-    --     local path = vim.api.nvim_buf_get_name(0)
-    --     return vim.fs.root(path, root_patterns)
-    --   end
-    -- end,
+    init = function()
+      -- Helper function to find project root (for Snacks picker when needed)
+      _G.get_project_root = snacks_search.get_project_root
+    end,
     keys = {
       {
         '<leader>gB',
@@ -292,21 +263,28 @@ require('lazy').setup({
       {
         '<leader><leader>',
         function()
-          Snacks.picker.git_files { show_untracked = true }
+          snacks_search.project('git_files', { show_untracked = true })
         end,
         desc = '[F]ind [G]it Files',
       },
       {
         '<leader>fa',
         function()
-          Snacks.picker.files { hidden = true, ignored = true }
+          snacks_search.project('files', { hidden = true, ignored = true })
         end,
         desc = '[F]ind [A]ll',
       },
       {
+        '<leader>Fa',
+        function()
+          snacks_search.pwd('files', { hidden = true, ignored = true })
+        end,
+        desc = '[F]ind [A]ll (cwd)',
+      },
+      {
         '<leader>ff',
         function()
-          Snacks.picker.files {
+          snacks_search.project('files', {
             hidden = true,
             ignore = true,
             exclude = {
@@ -338,9 +316,48 @@ require('lazy').setup({
               '.DS_Store',
               'Thumbs.db',
             },
-          }
+          })
         end,
         desc = '[F]ind [F]iles',
+      },
+      {
+        '<leader>Ff',
+        function()
+          snacks_search.pwd('files', {
+            hidden = true,
+            ignore = true,
+            exclude = {
+              -- dependencies
+              'node_modules',
+              'vendor',
+              'target',
+              'dist',
+              'build',
+              'out',
+              -- language-specific
+              'obj',
+              'bin',
+              '.venv',
+              'venv',
+              '.mypy_cache',
+              '.pytest_cache',
+              -- frameworks
+              '.next',
+              '.nuxt',
+              '.svelte-kit',
+              '.angular',
+              '.expo',
+              -- tooling
+              '.git',
+              '.terraform',
+              '.terragrunt-cache',
+              -- editor junk
+              '.DS_Store',
+              'Thumbs.db',
+            },
+          })
+        end,
+        desc = '[F]ind [F]iles (cwd)',
       },
       {
         '<leader>ft',
@@ -353,34 +370,67 @@ require('lazy').setup({
         '<leader>fW',
         function()
           local word = vim.fn.expand '<cword>'
-          Snacks.picker.files { pattern = word }
+          snacks_search.project('files', { pattern = word })
         end,
         desc = '[F]ind file of the current [W]ord',
       },
       {
+        '<leader>FW',
+        function()
+          local word = vim.fn.expand '<cword>'
+          snacks_search.pwd('files', { pattern = word })
+        end,
+        desc = '[F]ind file of the current [W]ord (cwd)',
+      },
+      {
         '<leader>fw',
         function()
-          Snacks.picker.grep_word()
+          snacks_search.project('grep_word')
         end,
         desc = '[F]ind current [W]ord',
       },
       {
+        '<leader>Fw',
+        function()
+          snacks_search.pwd('grep_word')
+        end,
+        desc = '[F]ind current [W]ord (cwd)',
+      },
+      {
         '<leader>/',
         function()
-          Snacks.picker.grep()
+          snacks_search.project('grep')
         end,
         desc = '[G]rep',
+      },
+      {
+        '<leader>F/',
+        function()
+          snacks_search.pwd('grep')
+        end,
+        desc = '[G]rep (cwd)',
       },
       {
         '<leader>?',
         function()
           local text = vim.fn.getreg '+'
           text = vim.trim(text:gsub('[\n\r]', ' '))
-          Snacks.picker.grep {
+          snacks_search.project('grep', {
             search = text,
-          }
+          })
         end,
         desc = '[G]rep with copied text',
+      },
+      {
+        '<leader>F?',
+        function()
+          local text = vim.fn.getreg '+'
+          text = vim.trim(text:gsub('[\n\r]', ' '))
+          snacks_search.pwd('grep', {
+            search = text,
+          })
+        end,
+        desc = '[G]rep with copied text (cwd)',
       },
       {
         '<leader>fr',
@@ -406,49 +456,49 @@ require('lazy').setup({
       {
         '<leader>gb',
         function()
-          Snacks.picker.git_branches()
+          snacks_search.project('git_branches')
         end,
         desc = 'Git Branches',
       },
       {
         '<leader>gl',
         function()
-          Snacks.picker.git_log()
+          snacks_search.project('git_log')
         end,
         desc = 'Git Log',
       },
       {
         '<leader>gL',
         function()
-          Snacks.picker.git_log_line()
+          snacks_search.project('git_log_line')
         end,
         desc = 'Git Log Line',
       },
       {
         '<leader>gs',
         function()
-          Snacks.picker.git_status()
+          snacks_search.project('git_status')
         end,
         desc = 'Git Status',
       },
       {
         '<leader>gS',
         function()
-          Snacks.picker.git_stash()
+          snacks_search.project('git_stash')
         end,
         desc = 'Git Stash',
       },
       {
         '<leader>gd',
         function()
-          Snacks.picker.git_diff()
+          snacks_search.project('git_diff')
         end,
         desc = 'Git Diff (Hunks)',
       },
       {
         '<leader>gf',
         function()
-          Snacks.picker.git_log_file()
+          snacks_search.project('git_log_file')
         end,
         desc = 'Git Log File',
       },
@@ -487,13 +537,6 @@ require('lazy').setup({
           Snacks.picker.diagnostics()
         end,
         desc = '[F]ind [D]iagnostics',
-      },
-      {
-        '<leader>sb',
-        function()
-          Snacks.picker.lines()
-        end,
-        desc = '[S]earch [B]uffer lines',
       },
       {
         '<leader>fp',
@@ -659,8 +702,10 @@ require('lazy').setup({
           if vim.fn.has 'nvim-0.12' == 1 then
             if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_inlineCompletion, event.buf) then
               vim.lsp.inline_completion.enable(true, { bufnr = event.buf })
-              vim.keymap.set('i', '<c-f>', vim.lsp.inline_completion.get, { desc = 'LSP: accept inline completion', buffer = event.buf })
-              vim.keymap.set('i', '<c-g>', vim.lsp.inline_completion.select, { desc = 'LSP: switch inline completion', buffer = event.buf })
+              vim.keymap.set('i', '<c-f>', vim.lsp.inline_completion.get,
+                { desc = 'LSP: accept inline completion', buffer = event.buf })
+              vim.keymap.set('i', '<c-g>', vim.lsp.inline_completion.select,
+                { desc = 'LSP: switch inline completion', buffer = event.buf })
             end
           end
         end,
@@ -704,15 +749,15 @@ require('lazy').setup({
         -- tailwindcss = {},
         -- gopls = {},
         -- biome = {},
-        -- lua_ls = {
-        --   settings = {
-        --     Lua = {
-        --       completion = {
-        --         callSnippet = 'Replace',
-        --       },
-        --     },
-        --   },
-        -- },
+        lua_ls = {
+          settings = {
+            Lua = {
+              completion = {
+                callSnippet = 'Replace',
+              },
+            },
+          },
+        },
         -- csharp_ls = {},
       }
       require('mason-lspconfig').setup {
@@ -1045,7 +1090,7 @@ require('lazy').setup({
   {
     'projekt0n/github-nvim-theme',
     name = 'github-theme',
-    lazy = false, -- make sure we load this during startup if it is your main colorscheme
+    lazy = false,    -- make sure we load this during startup if it is your main colorscheme
     priority = 1000, -- make sure to load this before all the other start plugins
     config = function()
       require('github-theme').setup {
@@ -1075,8 +1120,8 @@ require('lazy').setup({
           delete = 'gsd',
           find = 'gsf',
           find_left = 'gsF',
-          highlight = 'gsh', -- Highlight surrounding
-          replace = 'gsr', -- Replace surrounding
+          highlight = 'gsh',      -- Highlight surrounding
+          replace = 'gsr',        -- Replace surrounding
           update_n_lines = 'gsn', -- Update `n_lines`
         },
         n_lines = 1000,
@@ -1124,21 +1169,14 @@ require('lazy').setup({
   },
 
   { -- Highlight, edit, and navigate code
-    'nvim-treesitter/nvim-treesitter',
+    'romus204/tree-sitter-manager.nvim',
     event = { 'BufReadPre', 'BufNewFile' },
-    cmd = { 'TSInstall', 'TSInstallSync', 'TSUpdate', 'TSUpdateSync', 'TSUninstall', 'TSInstallInfo' },
-    dependencies = {
-      'nvim-treesitter/nvim-treesitter-textobjects',
-    },
-    build = ':TSUpdate',
-    -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
+    cmd = { 'TSManager' },
     config = function()
-      setup_cds_treesitter_parser()
-
-      -- Setup treesitter with all options
-      require('nvim-treesitter').setup {
+      require('tree-sitter-manager').setup {
         ensure_installed = {
           'bash',
+          'zsh',
           'c',
           'c_sharp',
           'diff',
@@ -1153,121 +1191,21 @@ require('lazy').setup({
           'javascript',
           'typescript',
           'tsx',
+          'mermaid',
           'cds',
         },
-        -- Autoinstall languages that are not installed
         auto_install = true,
-        highlight = {
-          enable = true,
-          -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
-          --  If you are experiencing weird indenting issues, add the language to
-          --  the list of additional_vim_regex_highlighting and disabled languages for indent.
-          additional_vim_regex_highlighting = { 'ruby' },
-        },
-        indent = { enable = true, disable = { 'ruby' } },
-        incremental_selection = {
-          enable = true,
-          keymaps = {
-            init_selection = '<enter>',
-            node_incremental = '<enter>',
-            scope_incremental = false,
-            node_decremental = '<bs>',
-          },
-        },
-        textobjects = {
-          select = {
-            enable = true,
-            lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
-            keymaps = {
-              -- You can use the capture groups defined in textobjects.scm
-              ['af'] = '@function.outer',
-              ['if'] = '@function.inner',
-              ['ac'] = '@class.outer',
-              ['ic'] = '@class.inner',
-              ['aa'] = '@parameter.outer',
-              ['ia'] = '@parameter.inner',
-              ['al'] = '@loop.outer',
-              ['il'] = '@loop.inner',
-              ['ai'] = '@conditional.outer',
-              ['ii'] = '@conditional.inner',
-              ['a/'] = '@comment.outer',
-              ['i/'] = '@comment.inner',
-            },
-            -- You can choose the select mode (default is charwise 'v')
-            selection_modes = {
-              ['@parameter.outer'] = 'v', -- charwise
-              ['@function.outer'] = 'V', -- linewise
-              ['@class.outer'] = 'V', -- linewise
-            },
-          },
-          lsp_interop = {
-            enable = true,
-            border = 'single',
-            peek_definition_code = {
-              ['grp'] = '@function.outer',
-            },
-          },
-          move = {
-            enable = true,
-            set_jumps = true, -- whether to set jumps in the jumplist
-            goto_next_start = {
-              [']f'] = '@function.outer',
-              [']a'] = '@parameter.outer',
-              [']l'] = '@loop.outer',
-              [']i'] = '@conditional.outer',
-              [']/'] = '@comment.outer',
-            },
-            goto_next_end = {
-              [']F'] = '@function.outer',
-              [']A'] = '@parameter.outer',
-              [']L'] = '@loop.outer',
-              [']I'] = '@conditional.outer',
-            },
-            goto_previous_start = {
-              ['[f'] = '@function.outer',
-              ['[a'] = '@parameter.outer',
-              ['[l'] = '@loop.outer',
-              ['[i'] = '@conditional.outer',
-              ['[/'] = '@comment.outer',
-            },
-            goto_previous_end = {
-              ['[F'] = '@function.outer',
-              ['[A'] = '@parameter.outer',
-              ['[L'] = '@loop.outer',
-              ['[I'] = '@conditional.outer',
-            },
-          },
-          swap = {
-            enable = true,
-            swap_next = {
-              ['<leader>sa'] = '@parameter.inner', -- swap parameters/argument with next
-              ['<leader>sf'] = '@function.outer', -- swap function with next
-            },
-            swap_previous = {
-              ['<leader>sA'] = '@parameter.inner', -- swap parameters/argument with prev
-              ['<leader>sF'] = '@function.outer', -- swap function with previous
+        highlight = true,
+        languages = {
+          cds = {
+            install_info = {
+              url = 'https://github.com/cap-js-community/tree-sitter-cds.git',
+              branch = 'main',
+              use_repo_queries = true,
             },
           },
         },
       }
-
-      -- Setup repeatable move after treesitter config
-      local ts_repeat_move = require "nvim-treesitter-textobjects.repeatable_move"
-
-      -- Repeat movement with ; and ,
-      -- ensure ; goes forward and , goes backward regardless of the last direction
-      -- vim.keymap.set({ 'n', 'x', 'o' }, ';', ts_repeat_move.repeat_last_move_next)
-      -- vim.keymap.set({ 'n', 'x', 'o' }, ',', ts_repeat_move.repeat_last_move_previous)
-
-      -- vim way: ; goes to the direction you were moving.
-      vim.keymap.set({ 'n', 'x', 'o' }, ';', ts_repeat_move.repeat_last_move)
-      vim.keymap.set({ 'n', 'x', 'o' }, ',', ts_repeat_move.repeat_last_move_opposite)
-
-      -- Optionally, make builtin f, F, t, T also repeatable with ; and ,
-      -- vim.keymap.set({ 'n', 'x', 'o' }, 'f', ts_repeat_move.builtin_f_expr, { expr = true })
-      -- vim.keymap.set({ 'n', 'x', 'o' }, 'F', ts_repeat_move.builtin_F_expr, { expr = true })
-      -- vim.keymap.set({ 'n', 'x', 'o' }, 't', ts_repeat_move.builtin_t_expr, { expr = true })
-      -- vim.keymap.set({ 'n', 'x', 'o' }, 'T', ts_repeat_move.builtin_T_expr, { expr = true })
     end,
   },
   {
@@ -1279,13 +1217,13 @@ require('lazy').setup({
       }
       local get_option = vim.filetype.get_option
       vim.filetype.get_option = function(filetype, option)
-        return option == 'commentstring' and require('ts_context_commentstring.internal').calculate_commentstring() or get_option(filetype, option)
+        return option == 'commentstring' and require('ts_context_commentstring.internal').calculate_commentstring() or
+            get_option(filetype, option)
       end
     end,
   },
   {
     'nvim-treesitter/nvim-treesitter-context',
-    dependencies = 'nvim-treesitter/nvim-treesitter',
     event = 'BufEnter',
     config = function()
       require('treesitter-context').setup {
@@ -1298,41 +1236,6 @@ require('lazy').setup({
       end, { silent = true, desc = 'Go to co[n]text' })
     end,
   },
-  -- {
-  --   'olimorris/codecompanion.nvim',
-  --   opts = {
-  --     display = {
-  --       chat = {
-  --         show_settings = true,
-  --       },
-  --     },
-  --     adapters = {
-  --       gemini = function()
-  --         return require('codecompanion.adapters').extend('gemini', {
-  --           schema = {
-  --             model = {
-  --               default = 'gemini-2.0-flash-thinking-exp-01-21',
-  --             },
-  --           },
-  --         })
-  --       end,
-  --     },
-  --     strategies = {
-  --       chat = { adapter = 'gemini' },
-  --       inline = { adapter = 'gemini' },
-  --     },
-  --   },
-  --   cmd = {
-  --     'CodeCompanion',
-  --     'CodeCompanionChat',
-  --     'CodeCompanionCmd',
-  --     'CodeCompanionActions',
-  --   },
-  --   dependencies = {
-  --     'nvim-lua/plenary.nvim',
-  --     'nvim-treesitter/nvim-treesitter',
-  --   },
-  -- },
   {
     'stevearc/dressing.nvim',
     opts = {},
@@ -1355,11 +1258,9 @@ require('lazy').setup({
   --   ft = { 'markdown', 'codecompanion', 'Avante' },
   -- },
   {
-    'norcalli/nvim-colorizer.lua',
-    config = function()
-      require('colorizer').setup()
-    end,
-    event = 'VeryLazy',
+    "catgoose/nvim-colorizer.lua",
+    event = "BufReadPre",
+    opts = {},
   },
   -- {
   --   'folke/zen-mode.nvim',
@@ -1383,7 +1284,7 @@ require('lazy').setup({
     },
     keys = {
       { '<leader>wr', '<cmd>AutoSession search<CR>', desc = 'Session search' },
-      { '<leader>ws', '<cmd>AutoSession save<CR>', desc = 'Save session' },
+      { '<leader>ws', '<cmd>AutoSession save<CR>',   desc = 'Save session' },
       { '<leader>wa', '<cmd>AutoSession toggle<CR>', desc = 'Toggle autosave' },
     },
   },
@@ -1446,10 +1347,7 @@ require('lazy').setup({
         default_direction = 'prefer_left',
       },
     },
-    dependencies = {
-      'nvim-treesitter/nvim-treesitter',
-      'nvim-tree/nvim-web-devicons',
-    },
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
     cmd = {
       'AerialToggle',
     },
@@ -1477,18 +1375,24 @@ require('lazy').setup({
       }
     end,
     keys = {
-      { '<leader>oo', '<cmd>OverseerToggle<cr>', desc = '[O]verseer [T]oggle' },
-      { '<leader>or', '<cmd>OverseerRun<cr>', desc = '[O]verseer [R]un' },
+      { '<leader>oo', '<cmd>OverseerToggle<cr>',     desc = '[O]verseer [T]oggle' },
+      { '<leader>or', '<cmd>OverseerRun<cr>',        desc = '[O]verseer [R]un' },
       { '<leader>oa', '<cmd>OverseerTaskAction<cr>', desc = '[O]verseer [A]ction' },
-      { '<leader>ob', '<cmd>OverseerBuild<cr>', desc = '[O]verseer [B]uild' },
-      { '<leader>os', '<cmd>OverseerShell<cr>', desc = '[O]verseer [S]hell' },
+      { '<leader>ob', '<cmd>OverseerBuild<cr>',      desc = '[O]verseer [B]uild' },
+      { '<leader>os', '<cmd>OverseerShell<cr>',      desc = '[O]verseer [S]hell' },
     },
   },
   {
     'folke/flash.nvim',
     event = 'VeryLazy',
     ---@type Flash.Config
-    opts = {},
+    opts = {
+      modes = {
+        char = {
+          enabled = false,
+        }
+      }
+    },
     keys = {
       {
         's',
@@ -1532,33 +1436,16 @@ require('lazy').setup({
       },
     },
   },
-  -- {
-  --   'LunarVim/bigfile.nvim',
-  --   event = 'VeryLazy',
-  --   opts = {
-  --     filesize = 2, -- size of the file in MiB, the plugin round file sizes to the closest MiB
-  --     pattern = { '*' }, -- autocmd pattern or function see <### Overriding the detection of big files>
-  --     features = { -- features to disable
-  --       'indent_blankline',
-  --       'lsp',
-  --       'treesitter',
-  --       'syntax',
-  --       'matchparen',
-  --       -- 'vimopts',
-  --       -- 'filetype',
-  --     },
-  --   },
-  -- },
   {
     'sindrets/diffview.nvim',
     cmd = { 'DiffviewOpen', 'DiffviewFileHistory', 'DiffviewClose', 'DiffviewToggleFiles', 'DiffviewFocusFiles', 'DiffviewRefresh' },
     keys = {
-      { '<leader>do', '<cmd>DiffviewOpen<cr>', desc = 'Diffview Open' },
-      { '<leader>dc', '<cmd>DiffviewClose<cr>', desc = 'Diffview Close' },
+      { '<leader>do', '<cmd>DiffviewOpen<cr>',        desc = 'Diffview Open' },
+      { '<leader>dc', '<cmd>DiffviewClose<cr>',       desc = 'Diffview Close' },
       { '<leader>dh', '<cmd>DiffviewFileHistory<cr>', desc = 'Diffview File History' },
       { '<leader>dt', '<cmd>DiffviewToggleFiles<cr>', desc = 'Diffview Toggle Files' },
-      { '<leader>df', '<cmd>DiffviewFocusFiles<cr>', desc = 'Diffview Focus Files' },
-      { '<leader>dr', '<cmd>DiffviewRefresh<cr>', desc = 'Diffview Refresh' },
+      { '<leader>df', '<cmd>DiffviewFocusFiles<cr>',  desc = 'Diffview Focus Files' },
+      { '<leader>dr', '<cmd>DiffviewRefresh<cr>',     desc = 'Diffview Refresh' },
     },
     config = function()
       local actions = require 'diffview.actions'
@@ -1593,7 +1480,6 @@ require('lazy').setup({
   {
     'danymat/neogen',
     cmd = { 'Neogen' },
-    dependencies = 'nvim-treesitter/nvim-treesitter',
     config = function()
       require('neogen').setup {
         enabled = true,
@@ -1607,31 +1493,6 @@ require('lazy').setup({
       }
     end,
   },
-  -- {
-  --   'HakonHarnes/img-clip.nvim',
-  --   event = 'VeryLazy',
-  --   opts = {},
-  --   keys = {
-  --     {
-  --       '<C-S-v>',
-  --       function()
-  --         require('img-clip').paste_image()
-  --       end,
-  --       mode = { 'n', 'i', 'v' },
-  --       desc = 'Paste image from clipboard',
-  --     },
-  --     {
-  --       '<C-S-v>',
-  --       function()
-  --         vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-\\><C-N>', true, false, true), 'n', false)
-  --         require('img-clip').paste_image()
-  --         vim.api.nvim_feedkeys('i', 'n', false)
-  --       end,
-  --       mode = 't',
-  --       desc = 'Paste image from clipboard (terminal mode)',
-  --     },
-  --   },
-  -- },
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.

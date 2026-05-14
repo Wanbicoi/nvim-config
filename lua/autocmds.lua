@@ -78,34 +78,34 @@ vim.api.nvim_create_autocmd({ 'BufEnter' }, {
 -- [[ Auto-change CWD to project root ]]
 -- This replicates the behavior of project.nvim
 -- Using built-in vim.fs.root() for Neovim 0.10+
-local root_patterns = { '.git', '.gitignore', 'Cargo.toml', 'package.json', 'go.mod', '.sln', '.csproj' }
-
-local function find_project_root()
-  local path = vim.api.nvim_buf_get_name(0)
-  return vim.fs.root(path, root_patterns)
-end
--- Auto-change directory when opening a file
-vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
-  desc = 'Auto change directory to project root',
-  group = vim.api.nvim_create_augroup('auto-project-root', { clear = true }),
-  callback = function(args)
-    -- Skip special buffers
-    local buftype = vim.bo[args.buf].buftype
-    if buftype ~= '' then
-      return
-    end
-
-    -- Skip if file doesn't exist
-    local filepath = vim.api.nvim_buf_get_name(args.buf)
-    if filepath == '' or vim.fn.filereadable(filepath) == 0 then
-      return
-    end
-
-    local root = find_project_root()
-    if root and root ~= vim.fn.getcwd() then
-      vim.cmd('cd ' .. vim.fn.fnameescape(root))
-      -- Optional: uncomment to get notifications when CWD changes
-      -- vim.notify('Changed directory to: ' .. root, vim.log.levels.INFO)
-    end
-  end,
-})
+-- local root_patterns = { '.git', '.gitignore', 'Cargo.toml', 'package.json', 'go.mod', '.sln', '.csproj' }
+--
+-- local function find_project_root()
+--   local path = vim.api.nvim_buf_get_name(0)
+--   return vim.fs.root(path, root_patterns)
+-- end
+-- -- Auto-change directory when opening a file
+-- vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
+--   desc = 'Auto change directory to project root',
+--   group = vim.api.nvim_create_augroup('auto-project-root', { clear = true }),
+--   callback = function(args)
+--     -- Skip special buffers
+--     local buftype = vim.bo[args.buf].buftype
+--     if buftype ~= '' then
+--       return
+--     end
+--
+--     -- Skip if file doesn't exist
+--     local filepath = vim.api.nvim_buf_get_name(args.buf)
+--     if filepath == '' or vim.fn.filereadable(filepath) == 0 then
+--       return
+--     end
+--
+--     local root = find_project_root()
+--     if root and root ~= vim.fn.getcwd() then
+--       vim.cmd('cd ' .. vim.fn.fnameescape(root))
+--       -- Optional: uncomment to get notifications when CWD changes
+--       -- vim.notify('Changed directory to: ' .. root, vim.log.levels.INFO)
+--     end
+--   end,
+-- })

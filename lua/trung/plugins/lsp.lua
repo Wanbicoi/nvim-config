@@ -35,15 +35,14 @@ return {
           map('gW', function() Snacks.picker.lsp_workspace_symbols() end, 'Open Workspace Symbols')
           map('grt', function() Snacks.picker.lsp_type_definitions() end, '[G]oto [T]ype Definition')
 
-          vim.cmd.amenu '10.10 PopUp.LSP\\ Definitions <cmd>lua Snacks.picker.lsp_definitions()<CR>'
-          vim.cmd.amenu '10.20 PopUp.LSP\\ References <cmd>lua Snacks.picker.lsp_references()<CR>'
-          vim.cmd.amenu '10.30 PopUp.LSP\\ Implementations <cmd>lua Snacks.picker.lsp_implementations()<CR>'
+          vim.cmd 'silent! aunmenu PopUp'
+          vim.cmd.amenu '10.10 PopUp.LSP\\ References <cmd>lua Snacks.picker.lsp_references()<CR>'
+          vim.cmd.amenu '10.20 PopUp.LSP\\ Implementations <cmd>lua Snacks.picker.lsp_implementations()<CR>'
+          vim.cmd.amenu '10.30 PopUp.LSP\\ Definitions <cmd>lua Snacks.picker.lsp_definitions()<CR>'
           vim.cmd.amenu '10.40 PopUp.LSP\\ Type\\ Definition <cmd>lua Snacks.picker.lsp_type_definitions()<CR>'
           vim.cmd.amenu '10.50 PopUp.LSP\\ Declaration <cmd>lua vim.lsp.buf.declaration()<CR>'
           vim.cmd.amenu '10.60 PopUp.LSP\\ Rename <cmd>lua vim.lsp.buf.rename()<CR>'
           vim.cmd.amenu '10.70 PopUp.LSP\\ Code\\ Action <cmd>lua vim.lsp.buf.code_action()<CR>'
-          vim.cmd.amenu '10.80 PopUp.LSP\\ Document\\ Symbols <cmd>lua Snacks.picker.lsp_symbols()<CR>'
-          vim.cmd.amenu '10.90 PopUp.LSP\\ Workspace\\ Symbols <cmd>lua Snacks.picker.lsp_workspace_symbols()<CR>'
 
           local function client_supports_method(client, method, bufnr)
             if vim.fn.has 'nvim-0.11' == 1 then

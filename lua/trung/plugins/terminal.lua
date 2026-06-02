@@ -55,16 +55,36 @@ local function setup_numbered_terminals(Terminal)
 end
 
 local function setup_agent_coding(Terminal)
-  local agent_coding = Terminal:new {
+  local agent_coding_float = Terminal:new {
     cmd = 'pi',
     hidden = true,
     direction = 'float',
     name = 'agent_coding',
   }
 
+  local agent_coding_right = Terminal:new {
+    cmd = 'pi',
+    hidden = true,
+    direction = 'vertical',
+    name = 'agent_coding_right',
+  }
+
+  local function get_active_agent_coding()
+    if agent_coding_right:is_open() then
+      return agent_coding_right
+    end
+
+    return agent_coding_float
+  end
+
   local function send_to_agent_coding(text)
+    local agent_coding = get_active_agent_coding()
     if not agent_coding:is_open() then
-      agent_coding:open()
+      if agent_coding == agent_coding_right then
+        agent_coding:open(math.floor(vim.o.columns * 0.4), 'vertical')
+      else
+        agent_coding:open()
+      end
     end
 
     vim.defer_fn(function()
@@ -96,9 +116,15 @@ local function setup_agent_coding(Terminal)
     send_to_agent_coding(position .. '\n')
   end
 
-  local function open_agent_coding()
+  local function open_agent_coding(direction)
+    local agent_coding = direction == 'vertical' and agent_coding_right or agent_coding_float
+
     if agent_coding.job_id then
-      agent_coding:toggle()
+      if direction == 'vertical' then
+        agent_coding:toggle(math.floor(vim.o.columns * 0.3), 'vertical')
+      else
+        agent_coding:toggle()
+      end
       return
     end
 
@@ -115,11 +141,16 @@ local function setup_agent_coding(Terminal)
         agent_coding.dir = snacks_search.get_project_root()
       end
 
-      agent_coding:toggle()
+      if direction == 'vertical' then
+        agent_coding:toggle(math.floor(vim.o.columns * 0.3), 'vertical')
+      else
+        agent_coding:toggle()
+      end
     end)
   end
 
-  vim.keymap.set({ 'n', 't' }, '<a-a>', open_agent_coding, { noremap = true, silent = true, desc = 'Toggle agent_coding terminal' })
+  vim.keymap.set({ 'n', 't' }, '<a-a>', function() open_agent_coding('float') end, { noremap = true, silent = true, desc = 'Toggle floating coding agent terminal' })
+  vim.keymap.set({ 'n', 't' }, '<a-A>', function() open_agent_coding('vertical') end, { noremap = true, silent = true, desc = 'Toggle split right coding agent terminal' })
   vim.keymap.set('n', '<leader>af', agent_coding_send_file, { noremap = true, silent = true, desc = '[A]gentCoding send [F]ile' })
   vim.keymap.set('v', '<leader>at', agent_coding_send_selection, { noremap = true, silent = true, desc = '[A]gentCoding send [T]his' })
   vim.keymap.set('n', '<leader>at', agent_coding_send_line, { noremap = true, silent = true, desc = '[A]gentCoding send [T]his' })

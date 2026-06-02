@@ -11,6 +11,7 @@ vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.mouse = 'a'
 vim.opt.mousemodel = 'popup_setpos'
+vim.cmd('autocmd! nvim.popupmenu')
 vim.opt.showmode = false
 vim.schedule(function()
   vim.opt.clipboard = 'unnamedplus'

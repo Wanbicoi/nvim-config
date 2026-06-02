@@ -1,3 +1,4 @@
+local func = require "vim.func"
 return {
   {
     'nmac427/guess-indent.nvim',
@@ -62,7 +63,7 @@ return {
       local get_option = vim.filetype.get_option
       vim.filetype.get_option = function(filetype, option)
         return option == 'commentstring' and require('ts_context_commentstring.internal').calculate_commentstring() or
-        get_option(filetype, option)
+            get_option(filetype, option)
       end
     end,
   },
@@ -136,5 +137,18 @@ return {
         },
       }
     end,
-  }
+  },
+  {
+    "ThePrimeagen/refactoring.nvim",
+    dependencies = {
+      "lewis6991/async.nvim",
+    },
+    init = function()
+      local keymap = vim.keymap
+      keymap.set({ "n", "x" }, "<leader>cr", function()
+        require("refactoring").select_refactor()
+      end, { desc = "Select refactor" })
+    end,
+    lazy = false,
+  },
 }

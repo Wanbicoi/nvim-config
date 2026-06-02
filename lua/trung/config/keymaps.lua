@@ -9,6 +9,40 @@ vim.keymap.set('n', '[e', function()
   vim.diagnostic.jump { severity = vim.diagnostic.severity.ERROR, count = -1 }
 end)
 
+local function open_file_under_cursor()
+  local target = vim.fn.expand('<cfile>')
+  target = target:gsub('^@', '')
+
+  local file, line = target:match('^(.-):L(%d+)$')
+  if not file then
+    file = target:match('^(.-):L%d+%-L%d+$')
+  end
+  file = file or target
+
+  local current_win = vim.api.nvim_get_current_win()
+  local target_win = current_win
+
+  if vim.api.nvim_win_get_config(current_win).relative ~= '' then
+    vim.cmd('close')
+    target_win = vim.api.nvim_get_current_win()
+  elseif vim.bo.buftype == 'terminal' then
+    local left_win = vim.fn.win_getid(vim.fn.winnr('h'))
+    if left_win ~= -1 and left_win ~= current_win then
+      target_win = left_win
+    end
+    vim.cmd('stopinsert')
+  end
+
+  vim.api.nvim_win_call(target_win, function()
+    vim.cmd('edit ' .. vim.fn.fnameescape(file))
+    if line then
+      vim.api.nvim_win_set_cursor(0, { tonumber(line), 0 })
+    end
+  end)
+end
+
+vim.keymap.set({ 'n', 't' }, 'gf', open_file_under_cursor)
+
 vim.keymap.set('n', '<leader>cd', function()
   local cursor = vim.api.nvim_win_get_cursor(0)
   local lnum = cursor[1] - 1

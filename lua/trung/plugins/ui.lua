@@ -61,6 +61,7 @@ return {
       quickfile = { enabled = true },
       statuscolumn = { enabled = true },
       picker = {
+        patterns = { ".git", "_darcs", ".hg", ".bzr", ".svn", "package.json", "Makefile", "AGENTS.md" },
         layout = 'ivy_split',
         win = {
           list = {
@@ -254,7 +255,7 @@ return {
     priority = 1000,
     config = function()
       require('catppuccin').setup {}
-      vim.cmd.colorscheme 'catppuccin-latte'
+      -- vim.cmd.colorscheme 'catppuccin-latte'
     end,
   },
   {
@@ -280,6 +281,7 @@ return {
           },
         },
       }
+      vim.cmd.colorscheme 'github_light'
     end,
   },
   {
@@ -307,7 +309,31 @@ return {
   {
     'nvim-lualine/lualine.nvim',
     opts = {
+      options = {
+        globalstatus = true,
+      },
       sections = {
+        lualine_a = {
+          {
+            function()
+              return ''
+            end,
+            separator = '',
+            on_click = function()
+              vim.api.nvim_feedkeys(vim.keycode '<C-o>', 'n', false)
+            end,
+          },
+          {
+            function()
+              return ''
+            end,
+            separator = '',
+            on_click = function()
+              vim.api.nvim_feedkeys(vim.keycode '<C-i>', 'n', false)
+            end,
+          },
+          'mode'
+        },
         lualine_c = {
           {
             'filename',
@@ -405,6 +431,9 @@ return {
           enabled = false,
         },
       },
+      label = {
+        uppercase = false,
+      }
     },
     keys = {
       { 's',       mode = { 'n', 'x', 'o' }, function() require('flash').jump() end,              desc = 'Flash' },
@@ -423,4 +452,30 @@ return {
     end,
     ft = { 'markdown' },
   },
+  {
+    "LintaoAmons/bookmarks.nvim",
+    -- pin the plugin at specific version for stability
+    -- backup your bookmark sqlite db when there are breaking changes (major version change)
+    tag = "v4.0.0",
+    dependencies = {
+      { "kkharji/sqlite.lua" },
+      -- picker backend (choose one):
+      { "folke/snacks.nvim" },             -- default picker backend
+      { "nvim-lua/plenary.nvim" },
+      { "nvim-telescope/telescope.nvim" }, -- currently required by bookmarks.nvim internals
+    },
+    cmd = { "BookmarksTree" },
+    keys = {
+      {
+        "mm", mode = { "n" }, "<cmd>BookmarksMark<cr>"
+      }
+    },
+    config = function()
+      require("bookmarks").setup({
+        picker = {
+          picker_backend = "snacks", -- "snacks" (default) or "telescope"
+        },
+      })                             -- you must call setup to init sqlite db
+    end,
+  }
 }

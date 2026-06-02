@@ -1,6 +1,6 @@
 local M = {}
 
-local root_patterns = { '.git', '.gitignore', 'Cargo.toml', 'package.json', 'go.mod', '.sln', '.csproj' }
+local root_patterns = { '.git', '.gitignore', 'Cargo.toml', 'package.json', 'go.mod', '.sln', '.csproj', "AGENTS.md" }
 
 local function get_cwd()
   return vim.fn.getcwd()

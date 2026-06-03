@@ -35,14 +35,14 @@ return {
           map('gW', function() Snacks.picker.lsp_workspace_symbols() end, 'Open Workspace Symbols')
           map('grt', function() Snacks.picker.lsp_type_definitions() end, '[G]oto [T]ype Definition')
 
-          vim.cmd 'silent! aunmenu PopUp'
-          vim.cmd.amenu '10.10 PopUp.LSP\\ References <cmd>lua Snacks.picker.lsp_references()<CR>'
-          vim.cmd.amenu '10.20 PopUp.LSP\\ Implementations <cmd>lua Snacks.picker.lsp_implementations()<CR>'
-          vim.cmd.amenu '10.30 PopUp.LSP\\ Definitions <cmd>lua Snacks.picker.lsp_definitions()<CR>'
-          vim.cmd.amenu '10.40 PopUp.LSP\\ Type\\ Definition <cmd>lua Snacks.picker.lsp_type_definitions()<CR>'
-          vim.cmd.amenu '10.50 PopUp.LSP\\ Declaration <cmd>lua vim.lsp.buf.declaration()<CR>'
-          vim.cmd.amenu '10.60 PopUp.LSP\\ Rename <cmd>lua vim.lsp.buf.rename()<CR>'
-          vim.cmd.amenu '10.70 PopUp.LSP\\ Code\\ Action <cmd>lua vim.lsp.buf.code_action()<CR>'
+          pcall(vim.cmd.aunmenu, 'PopUp.LSP')
+          vim.cmd.nmenu '100.110 PopUp.LSP\\ References <cmd>lua Snacks.picker.lsp_references()<CR>'
+          vim.cmd.nmenu '100.120 PopUp.LSP\\ Implementations <cmd>lua Snacks.picker.lsp_implementations()<CR>'
+          vim.cmd.nmenu '100.130 PopUp.LSP\\ Definitions <cmd>lua Snacks.picker.lsp_definitions()<CR>'
+          vim.cmd.nmenu '100.140 PopUp.LSP\\ Type\\ Definition <cmd>lua Snacks.picker.lsp_type_definitions()<CR>'
+          vim.cmd.nmenu '100.150 PopUp.LSP\\ Declaration <cmd>lua vim.lsp.buf.declaration()<CR>'
+          vim.cmd.nmenu '100.160 PopUp.LSP\\ Rename <cmd>lua vim.lsp.buf.rename()<CR>'
+          vim.cmd.nmenu '100.170 PopUp.LSP\\ Code\\ Action <cmd>lua vim.lsp.buf.code_action()<CR>'
 
           local function client_supports_method(client, method, bufnr)
             if vim.fn.has 'nvim-0.11' == 1 then
@@ -53,28 +53,28 @@ return {
           end
 
           local client = vim.lsp.get_client_by_id(event.data.client_id)
-          if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf) then
-            local highlight_augroup = vim.api.nvim_create_augroup('trung-lsp-highlight', { clear = false })
-            vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
-              buffer = event.buf,
-              group = highlight_augroup,
-              callback = vim.lsp.buf.document_highlight,
-            })
-
-            vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
-              buffer = event.buf,
-              group = highlight_augroup,
-              callback = vim.lsp.buf.clear_references,
-            })
-
-            vim.api.nvim_create_autocmd('LspDetach', {
-              group = vim.api.nvim_create_augroup('trung-lsp-detach', { clear = true }),
-              callback = function(event2)
-                vim.lsp.buf.clear_references()
-                vim.api.nvim_clear_autocmds { group = 'trung-lsp-highlight', buffer = event2.buf }
-              end,
-            })
-          end
+          -- if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf) then
+          --   local highlight_augroup = vim.api.nvim_create_augroup('trung-lsp-highlight', { clear = false })
+          --   vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
+          --     buffer = event.buf,
+          --     group = highlight_augroup,
+          --     callback = vim.lsp.buf.document_highlight,
+          --   })
+          --
+          --   vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
+          --     buffer = event.buf,
+          --     group = highlight_augroup,
+          --     callback = vim.lsp.buf.clear_references,
+          --   })
+          --
+          --   vim.api.nvim_create_autocmd('LspDetach', {
+          --     group = vim.api.nvim_create_augroup('trung-lsp-detach', { clear = true }),
+          --     callback = function(event2)
+          --       vim.lsp.buf.clear_references()
+          --       vim.api.nvim_clear_autocmds { group = 'trung-lsp-highlight', buffer = event2.buf }
+          --     end,
+          --   })
+          -- end
 
           if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf) then
             map('<leader>th', function()

@@ -37,39 +37,24 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
--- Add diffget to right-click menu when in diff mode
-vim.api.nvim_create_autocmd({ 'OptionSet' }, {
-  desc = 'Add diffget to right-click menu in diff mode',
-  group = vim.api.nvim_create_augroup('diff-mode-popup', { clear = true }),
-  pattern = 'diff',
+-- Add only custom popup actions
+vim.api.nvim_create_autocmd('BufEnter', {
+  desc = 'Setup custom popup menu',
+  group = vim.api.nvim_create_augroup('trung-popup-search-menu', { clear = true }),
   callback = function()
+    pcall(vim.cmd, 'autocmd! nvim.popupmenu')
+    pcall(vim.cmd.aunmenu, 'PopUp')
+
     if vim.wo.diff then
-      -- Add diffget menu item when entering diff mode
-      vim.cmd.amenu '20.10 PopUp.-DiffSep- :'
-      vim.cmd.amenu '20.20 PopUp.Diff\\ Get <cmd>diffget<CR>'
-      vim.cmd.amenu '20.30 PopUp.Diff\\ Put <cmd>diffput<CR>'
-    else
-      -- Remove diff menu items when leaving diff mode
-      pcall(vim.cmd.aunmenu, 'PopUp.-DiffSep-')
-      pcall(vim.cmd.aunmenu, 'PopUp.Diff\\ Get')
-      pcall(vim.cmd.aunmenu, 'PopUp.Diff\\ Put')
+      vim.cmd.amenu [[100.810 PopUp.-DiffSep- :]]
+      vim.cmd.nmenu [[100.820 PopUp.Diff\ Get <cmd>diffget<CR>]]
+      vim.cmd.nmenu [[100.830 PopUp.Diff\ Put <cmd>diffput<CR>]]
     end
+
+    vim.cmd.nmenu [[100.900 PopUp.-SearchSep- :]]
+    vim.cmd.nmenu [[100.910 PopUp.Grep\ Word\ (Project\ Root) <cmd>lua require('trung.utils.snacks_search').grep_cword_project()<CR>]]
+    vim.cmd.nmenu [[100.920 PopUp.Grep\ Word\ (CWD) <cmd>lua require('trung.utils.snacks_search').grep_cword_pwd()<CR>]]
+    vim.cmd.vmenu [[100.930 PopUp.Grep\ Selection\ (Project\ Root) :<C-U>lua require('trung.utils.snacks_search').grep_visual_project()<CR>]]
+    vim.cmd.vmenu [[100.940 PopUp.Grep\ Selection\ (CWD) :<C-U>lua require('trung.utils.snacks_search').grep_visual_pwd()<CR>]]
   end,
 })
-
--- Also add the menu items when first opening a diff buffer
-vim.api.nvim_create_autocmd({ 'BufEnter' }, {
-  desc = 'Setup diff menu on buffer enter if in diff mode',
-  group = vim.api.nvim_create_augroup('diff-mode-bufenter', { clear = true }),
-  callback = function()
-    if vim.wo.diff then
-      pcall(vim.cmd.aunmenu, 'PopUp.-DiffSep-')
-      pcall(vim.cmd.aunmenu, 'PopUp.Diff\\ Get')
-      pcall(vim.cmd.aunmenu, 'PopUp.Diff\\ Put')
-      vim.cmd.amenu '20.10 PopUp.-DiffSep- :'
-      vim.cmd.amenu '20.20 PopUp.Diff\\ Get <cmd>diffget<CR>'
-      vim.cmd.amenu '20.30 PopUp.Diff\\ Put <cmd>diffput<CR>'
-    end
-  end,
-})
-

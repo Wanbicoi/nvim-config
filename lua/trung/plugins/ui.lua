@@ -390,7 +390,7 @@ return {
           solid = true,
         },
       }
-      vim.cmd.colorscheme 'catppuccin-nvim'
+      -- vim.cmd.colorscheme 'catppuccin-nvim'
     end,
   },
   {
@@ -398,9 +398,12 @@ return {
     priority = 1000,
     config = function()
       require('gruvbox').setup {
-        transparent_mode = false,
+        transparent_mode = true,
+        inverse = false,
+        contrast = 'hard',
       }
       vim.o.background = 'light'
+      vim.cmd.colorscheme 'gruvbox'
     end,
   },
   {
@@ -621,6 +624,16 @@ return {
       vim.g.mkdp_filetypes = { 'markdown' }
     end,
     ft = { 'markdown' },
+  },
+  {
+    'RRethy/vim-illuminate',
+    config = function()
+      require('illuminate').configure {
+        delay = 100,
+        under_cursor = true,
+      }
+    end,
+    enabled = false,
   },
   {
     'LintaoAmons/bookmarks.nvim',

@@ -182,20 +182,21 @@ return {
     cmd = { 'ConformInfo' },
     keys = {
       {
-        '<leader>fm',
+        '==',
         function()
           require('conform').format { async = true, lsp_format = 'fallback' }
         end,
-        mode = '',
-        desc = '[F]or[m]at buffer',
+        mode = 'n',
+        desc = 'Format buffer',
       },
     },
     opts = {
-      notify_on_error = false,
+      notify_on_error = true,
       formatters_by_ft = {
         lua = { 'stylua' },
         python = { 'ruff_format' },
         json = { 'prettierd' },
+        jsonc = { 'prettierd' },
         yaml = { 'prettierd' },
         javascript = { 'prettierd', 'prettier', stop_after_first = true },
         javascriptreact = { 'prettierd', 'prettier', stop_after_first = true },

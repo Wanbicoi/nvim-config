@@ -40,11 +40,11 @@ return {
         },
       },
       spec = {
-        { '<leader>c', group = '[C]ode',            mode = { 'n', 'x' } },
+        { '<leader>c', group = '[C]ode', mode = { 'n', 'x' } },
         { '<leader>d', group = '[D]iff' },
         { '<leader>w', group = '[W]orkspace' },
         { '<leader>t', group = '[T]est / [T]oggle' },
-        { '<leader>h', group = 'Git [H]unk',        mode = { 'n', 'v' } },
+        { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
         { '<leader>o', group = '[O]verseer' },
         { '<leader>s', group = '[S]wap Textobjects' },
       },
@@ -61,7 +61,7 @@ return {
       quickfile = { enabled = true },
       statuscolumn = { enabled = true },
       picker = {
-        patterns = { ".git", "_darcs", ".hg", ".bzr", ".svn", "package.json", "Makefile", "AGENTS.md" },
+        patterns = { '.git', '_darcs', '.hg', '.bzr', '.svn', 'package.json', 'Makefile', 'AGENTS.md' },
         layout = 'ivy_split',
         win = {
           list = {
@@ -186,7 +186,13 @@ return {
         end,
         desc = '[F]ind [F]iles (cwd)',
       },
-      { '<leader>ft', function() Snacks.picker.pickers() end,            desc = '[F]ind Picker [T]ypes' },
+      {
+        '<leader>ft',
+        function()
+          Snacks.picker.pickers()
+        end,
+        desc = '[F]ind Picker [T]ypes',
+      },
       {
         '<leader>fW',
         function()
@@ -203,10 +209,34 @@ return {
         end,
         desc = '[F]ind file of the current [W]ord (cwd)',
       },
-      { '<leader>fw', function() snacks_search.project('grep_word') end, desc = '[F]ind current [W]ord' },
-      { '<leader>Fw', function() snacks_search.pwd('grep_word') end,     desc = '[F]ind current [W]ord (cwd)' },
-      { '<leader>/',  function() snacks_search.project('grep') end,      desc = '[G]rep' },
-      { '<leader>F/', function() snacks_search.pwd('grep') end,          desc = '[G]rep (cwd)' },
+      {
+        '<leader>fw',
+        function()
+          snacks_search.project 'grep_word'
+        end,
+        desc = '[F]ind current [W]ord',
+      },
+      {
+        '<leader>Fw',
+        function()
+          snacks_search.pwd 'grep_word'
+        end,
+        desc = '[F]ind current [W]ord (cwd)',
+      },
+      {
+        '<leader>/',
+        function()
+          snacks_search.project 'grep'
+        end,
+        desc = '[G]rep',
+      },
+      {
+        '<leader>F/',
+        function()
+          snacks_search.pwd 'grep'
+        end,
+        desc = '[G]rep (cwd)',
+      },
       {
         '<leader>?',
         function()
@@ -225,17 +255,83 @@ return {
         end,
         desc = '[G]rep with copied text (cwd)',
       },
-      { '<leader>fr', function() Snacks.picker.resume() end,                desc = '[F]ind [R]esume' },
-      { '<leader>fo', function() Snacks.picker.recent() end,                desc = '[F]ind Recent Files' },
-      { '_',          function() Snacks.picker.buffers() end,               desc = '[_] Find existing buffers' },
-      { '<leader>gb', function() snacks_search.project('git_branches') end, desc = 'Git Branches' },
-      { '<leader>gl', function() snacks_search.project('git_log') end,      desc = 'Git Log' },
-      { '<leader>gL', function() snacks_search.project('git_log_line') end, desc = 'Git Log Line' },
-      { '<leader>gs', function() snacks_search.project('git_status') end,   desc = 'Git Status' },
-      { '<leader>gS', function() snacks_search.project('git_stash') end,    desc = 'Git Stash' },
-      { '<leader>gd', function() snacks_search.project('git_diff') end,     desc = 'Git Diff (Hunks)' },
-      { '<leader>gf', function() snacks_search.project('git_log_file') end, desc = 'Git Log File' },
-      { '<leader>fc', function() Snacks.picker.commands() end,              desc = '[F]ind [C]ommands' },
+      {
+        '<leader>fr',
+        function()
+          Snacks.picker.resume()
+        end,
+        desc = '[F]ind [R]esume',
+      },
+      {
+        '<leader>fo',
+        function()
+          Snacks.picker.recent()
+        end,
+        desc = '[F]ind Recent Files',
+      },
+      {
+        '_',
+        function()
+          Snacks.picker.buffers()
+        end,
+        desc = '[_] Find existing buffers',
+      },
+      {
+        '<leader>gb',
+        function()
+          snacks_search.project 'git_branches'
+        end,
+        desc = 'Git Branches',
+      },
+      {
+        '<leader>gl',
+        function()
+          snacks_search.project 'git_log'
+        end,
+        desc = 'Git Log',
+      },
+      {
+        '<leader>gL',
+        function()
+          snacks_search.project 'git_log_line'
+        end,
+        desc = 'Git Log Line',
+      },
+      {
+        '<leader>gs',
+        function()
+          snacks_search.project 'git_status'
+        end,
+        desc = 'Git Status',
+      },
+      {
+        '<leader>gS',
+        function()
+          snacks_search.project 'git_stash'
+        end,
+        desc = 'Git Stash',
+      },
+      {
+        '<leader>gd',
+        function()
+          snacks_search.project 'git_diff'
+        end,
+        desc = 'Git Diff (Hunks)',
+      },
+      {
+        '<leader>gf',
+        function()
+          snacks_search.project 'git_log_file'
+        end,
+        desc = 'Git Log File',
+      },
+      {
+        '<leader>fc',
+        function()
+          Snacks.picker.commands()
+        end,
+        desc = '[F]ind [C]ommands',
+      },
       {
         '<leader>fn',
         function()
@@ -243,10 +339,41 @@ return {
         end,
         desc = '[F]ind [N]eovim files',
       },
-      { '<leader>fh', function() Snacks.picker.help() end,        desc = '[F]ind [H]elp' },
-      { '<leader>fk', function() Snacks.picker.keymaps() end,     desc = '[F]ind [K]eymaps' },
-      { '<leader>fd', function() Snacks.picker.diagnostics() end, desc = '[F]ind [D]iagnostics' },
-      { '<leader>fp', function() Snacks.picker.projects() end,    desc = '[F]ind [P]rojects' },
+      {
+        '<leader>fh',
+        function()
+          Snacks.picker.help()
+        end,
+        desc = '[F]ind [H]elp',
+      },
+      {
+        '<leader>fk',
+        function()
+          Snacks.picker.keymaps()
+        end,
+        desc = '[F]ind [K]eymaps',
+      },
+      {
+        '<leader>fd',
+        function()
+          Snacks.picker.diagnostics()
+        end,
+        desc = '[F]ind [D]iagnostics',
+      },
+      {
+        '<leader>fp',
+        function()
+          Snacks.picker.projects()
+        end,
+        desc = '[F]ind [P]rojects',
+      },
+      {
+        '<leader>fm',
+        function()
+          Snacks.picker.marks()
+        end,
+        desc = '[F]ind [M]arks',
+      },
     },
   },
   {
@@ -254,8 +381,16 @@ return {
     name = 'catppuccin',
     priority = 1000,
     config = function()
-      require('catppuccin').setup {}
-      -- vim.cmd.colorscheme 'catppuccin-latte'
+      require('catppuccin').setup {
+        flavour = 'latte', -- latte, frappe, macchiato, mocha
+        auto_integrations = true,
+        transparent_background = true,
+        float = {
+          transparent = true,
+          solid = true,
+        },
+      }
+      vim.cmd.colorscheme 'catppuccin-nvim'
     end,
   },
   {
@@ -281,7 +416,7 @@ return {
           },
         },
       }
-      vim.cmd.colorscheme 'github_light'
+      -- vim.cmd.colorscheme 'github_light'
     end,
   },
   {
@@ -332,7 +467,7 @@ return {
               vim.api.nvim_feedkeys(vim.keycode '<C-i>', 'n', false)
             end,
           },
-          'mode'
+          'mode',
         },
         lualine_c = {
           {
@@ -375,7 +510,7 @@ return {
     opts = {},
     keys = {
       { '<leader>wr', '<cmd>AutoSession search<CR>', desc = 'Session search' },
-      { '<leader>ws', '<cmd>AutoSession save<CR>',   desc = 'Save session' },
+      { '<leader>ws', '<cmd>AutoSession save<CR>', desc = 'Save session' },
       { '<leader>wa', '<cmd>AutoSession toggle<CR>', desc = 'Toggle autosave' },
     },
   },
@@ -415,11 +550,11 @@ return {
       }
     end,
     keys = {
-      { '<leader>oo', '<cmd>OverseerToggle<cr>',     desc = '[O]verseer [T]oggle' },
-      { '<leader>or', '<cmd>OverseerRun<cr>',        desc = '[O]verseer [R]un' },
+      { '<leader>oo', '<cmd>OverseerToggle<cr>', desc = '[O]verseer [T]oggle' },
+      { '<leader>or', '<cmd>OverseerRun<cr>', desc = '[O]verseer [R]un' },
       { '<leader>oa', '<cmd>OverseerTaskAction<cr>', desc = '[O]verseer [A]ction' },
-      { '<leader>ob', '<cmd>OverseerBuild<cr>',      desc = '[O]verseer [B]uild' },
-      { '<leader>os', '<cmd>OverseerShell<cr>',      desc = '[O]verseer [S]hell' },
+      { '<leader>ob', '<cmd>OverseerBuild<cr>', desc = '[O]verseer [B]uild' },
+      { '<leader>os', '<cmd>OverseerShell<cr>', desc = '[O]verseer [S]hell' },
     },
   },
   {
@@ -433,14 +568,49 @@ return {
       },
       label = {
         uppercase = false,
-      }
+      },
     },
     keys = {
-      { 's',       mode = { 'n', 'x', 'o' }, function() require('flash').jump() end,              desc = 'Flash' },
-      { 'S',       mode = { 'n', 'x', 'o' }, function() require('flash').treesitter_search() end, desc = 'Flash Treesitter' },
-      { 'r',       mode = 'o',               function() require('flash').remote() end,            desc = 'Remote Flash' },
-      { 'R',       mode = { 'o', 'x' },      function() require('flash').treesitter_search() end, desc = 'Treesitter Search' },
-      { '<c-s-s>', mode = { 'c' },           function() require('flash').toggle() end,            desc = 'Toggle Flash Search' },
+      {
+        's',
+        mode = { 'n', 'x', 'o' },
+        function()
+          require('flash').jump()
+        end,
+        desc = 'Flash',
+      },
+      {
+        'S',
+        mode = { 'n', 'x', 'o' },
+        function()
+          require('flash').treesitter_search()
+        end,
+        desc = 'Flash Treesitter',
+      },
+      {
+        'r',
+        mode = 'o',
+        function()
+          require('flash').remote()
+        end,
+        desc = 'Remote Flash',
+      },
+      {
+        'R',
+        mode = { 'o', 'x' },
+        function()
+          require('flash').treesitter_search()
+        end,
+        desc = 'Treesitter Search',
+      },
+      {
+        '<c-s-s>',
+        mode = { 'c' },
+        function()
+          require('flash').toggle()
+        end,
+        desc = 'Toggle Flash Search',
+      },
     },
   },
   {
@@ -453,29 +623,31 @@ return {
     ft = { 'markdown' },
   },
   {
-    "LintaoAmons/bookmarks.nvim",
+    'LintaoAmons/bookmarks.nvim',
     -- pin the plugin at specific version for stability
     -- backup your bookmark sqlite db when there are breaking changes (major version change)
-    tag = "v4.0.0",
+    tag = 'v4.0.0',
     dependencies = {
-      { "kkharji/sqlite.lua" },
+      { 'kkharji/sqlite.lua' },
       -- picker backend (choose one):
-      { "folke/snacks.nvim" },             -- default picker backend
-      { "nvim-lua/plenary.nvim" },
-      { "nvim-telescope/telescope.nvim" }, -- currently required by bookmarks.nvim internals
+      { 'folke/snacks.nvim' }, -- default picker backend
+      { 'nvim-lua/plenary.nvim' },
+      { 'nvim-telescope/telescope.nvim' }, -- currently required by bookmarks.nvim internals
     },
-    cmd = { "BookmarksTree" },
+    cmd = { 'BookmarksTree' },
     keys = {
       {
-        "mm", mode = { "n" }, "<cmd>BookmarksMark<cr>"
-      }
+        'mm',
+        mode = { 'n' },
+        '<cmd>BookmarksMark<cr>',
+      },
     },
     config = function()
-      require("bookmarks").setup({
+      require('bookmarks').setup {
         picker = {
-          picker_backend = "snacks", -- "snacks" (default) or "telescope"
+          picker_backend = 'snacks', -- "snacks" (default) or "telescope"
         },
-      })                             -- you must call setup to init sqlite db
+      } -- you must call setup to init sqlite db
     end,
-  }
+  },
 }

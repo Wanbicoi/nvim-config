@@ -1,4 +1,3 @@
-local func = require "vim.func"
 return {
   {
     'nmac427/guess-indent.nvim',
@@ -23,7 +22,7 @@ return {
           'bash',
           'zsh',
           'c',
-          'c_sharp',
+          -- 'c_sharp',
           'diff',
           'html',
           'lua',
@@ -38,6 +37,8 @@ return {
           'tsx',
           'mermaid',
           'cds',
+          'json5',
+          'python'
         },
         auto_install = true,
         highlight = true,

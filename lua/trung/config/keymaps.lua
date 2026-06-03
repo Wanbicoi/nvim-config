@@ -1,6 +1,7 @@
 vim.keymap.set('t', '<c-q>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 vim.keymap.set('n', '<c-s>', '<cmd>:w<cr>', { desc = 'Save all files' })
 vim.keymap.set('v', '<leader>r', '"0y:%s/\\V<C-r>0//g<Left><Left>')
+vim.keymap.set('x', 'p', '"_dP', { desc = 'Paste without overwriting clipboard' })
 
 vim.keymap.set('n', ']e', function()
   vim.diagnostic.jump { severity = vim.diagnostic.severity.ERROR, count = 1 }
@@ -10,27 +11,32 @@ vim.keymap.set('n', '[e', function()
 end)
 
 local function open_file_under_cursor()
-  local target = vim.fn.expand('<cfile>')
+  local target = vim.fn.expand '<cfile>'
   target = target:gsub('^@', '')
 
-  local file, line = target:match('^(.-):L(%d+)$')
+  local file, line = target:match '^(.-):L(%d+)$'
   if not file then
-    file = target:match('^(.-):L%d+%-L%d+$')
+    file = target:match '^(.-):L%d+%-L%d+$'
   end
   file = file or target
+
+  if vim.fn.filereadable(file) == 0 then
+    vim.notify('File not found: ' .. file, vim.log.levels.WARN, { title = 'Open File' })
+    return
+  end
 
   local current_win = vim.api.nvim_get_current_win()
   local target_win = current_win
 
   if vim.api.nvim_win_get_config(current_win).relative ~= '' then
-    vim.cmd('close')
+    vim.cmd 'close'
     target_win = vim.api.nvim_get_current_win()
   elseif vim.bo.buftype == 'terminal' then
-    local left_win = vim.fn.win_getid(vim.fn.winnr('h'))
+    local left_win = vim.fn.win_getid(vim.fn.winnr 'h')
     if left_win ~= -1 and left_win ~= current_win then
       target_win = left_win
     end
-    vim.cmd('stopinsert')
+    vim.cmd 'stopinsert'
   end
 
   vim.api.nvim_win_call(target_win, function()
@@ -41,7 +47,8 @@ local function open_file_under_cursor()
   end)
 end
 
-vim.keymap.set({ 'n', 't' }, 'gf', open_file_under_cursor)
+_G.OpenFileUnderCursor = open_file_under_cursor
+vim.keymap.set({ 'n' }, 'gf', open_file_under_cursor)
 
 vim.keymap.set('n', '<leader>cd', function()
   local cursor = vim.api.nvim_win_get_cursor(0)

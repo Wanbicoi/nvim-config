@@ -7,8 +7,7 @@ return {
     opts = {
       delay = 500,
       icons = {
-        mappings = vim.g.have_nerd_font,
-        keys = vim.g.have_nerd_font and {} or {
+        keys = {
           Up = '<Up> ',
           Down = '<Down> ',
           Left = '<Left> ',
@@ -46,7 +45,6 @@ return {
         { '<leader>t', group = '[T]est / [T]oggle' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
         { '<leader>o', group = '[O]verseer' },
-        { '<leader>s', group = '[S]wap Textobjects' },
       },
     },
   },
@@ -363,7 +361,14 @@ return {
       {
         '<leader>fp',
         function()
-          Snacks.picker.projects()
+          Snacks.picker.projects {
+            dev = {
+              "~/Repos"
+            },
+            matcher = {
+              cwd_bonus = true,
+            },
+          }
         end,
         desc = '[F]ind [P]rojects',
       },
@@ -420,28 +425,6 @@ return {
         },
       }
       -- vim.cmd.colorscheme 'github_light'
-    end,
-  },
-  {
-    'echasnovski/mini.nvim',
-    event = 'BufEnter',
-    config = function()
-      require('mini.surround').setup {
-        mappings = {
-          add = 'gsa',
-          delete = 'gsd',
-          find = 'gsf',
-          find_left = 'gsF',
-          highlight = 'gsh',
-          replace = 'gsr',
-          update_n_lines = 'gsn',
-        },
-        n_lines = 1000,
-      }
-      require('mini.bufremove').setup()
-      vim.keymap.set('n', '<leader>x', MiniBufremove.delete, { desc = '[X] Delete current buffer' })
-      vim.keymap.set('n', '<leader>X', MiniBufremove.wipeout, { desc = '[X] Wipeout current buffer' })
-      vim.g.minisessions_disable = true
     end,
   },
   {

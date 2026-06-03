@@ -38,13 +38,11 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 })
 
 -- Add only custom popup actions
+-- Always use 100 for PopUp menu
 vim.api.nvim_create_autocmd('BufEnter', {
   desc = 'Setup custom popup menu',
   group = vim.api.nvim_create_augroup('trung-popup-search-menu', { clear = true }),
   callback = function()
-    pcall(vim.cmd, 'autocmd! nvim.popupmenu')
-    pcall(vim.cmd.aunmenu, 'PopUp')
-
     if vim.wo.diff then
       vim.cmd.amenu [[100.810 PopUp.-DiffSep- :]]
       vim.cmd.nmenu [[100.820 PopUp.Diff\ Get <cmd>diffget<CR>]]
@@ -52,9 +50,11 @@ vim.api.nvim_create_autocmd('BufEnter', {
     end
 
     vim.cmd.nmenu [[100.900 PopUp.-SearchSep- :]]
-    vim.cmd.nmenu [[100.910 PopUp.Grep\ Word\ (Project\ Root) <cmd>lua require('trung.utils.snacks_search').grep_cword_project()<CR>]]
-    vim.cmd.nmenu [[100.920 PopUp.Grep\ Word\ (CWD) <cmd>lua require('trung.utils.snacks_search').grep_cword_pwd()<CR>]]
-    vim.cmd.vmenu [[100.930 PopUp.Grep\ Selection\ (Project\ Root) :<C-U>lua require('trung.utils.snacks_search').grep_visual_project()<CR>]]
-    vim.cmd.vmenu [[100.940 PopUp.Grep\ Selection\ (CWD) :<C-U>lua require('trung.utils.snacks_search').grep_visual_pwd()<CR>]]
+    vim.cmd.nmenu [[100.905 PopUp.Open\ File\ Under\ Cursor <cmd>lua _G.OpenFileUnderCursor()<CR>]]
+    vim.cmd.nmenu [[100.910 PopUp.Copy\ All <cmd>%y+<CR>]]
+    vim.cmd.nmenu [[100.920 PopUp.Grep\ Word\ (Project\ Root) <cmd>lua require('trung.utils.snacks_search').grep_cword_project()<CR>]]
+    vim.cmd.nmenu [[100.930 PopUp.Grep\ Word\ (CWD) <cmd>lua require('trung.utils.snacks_search').grep_cword_pwd()<CR>]]
+    vim.cmd.vmenu [[100.940 PopUp.Grep\ Selection\ (Project\ Root) :<C-U>lua require('trung.utils.snacks_search').grep_visual_project()<CR>]]
+    vim.cmd.vmenu [[100.950 PopUp.Grep\ Selection\ (CWD) :<C-U>lua require('trung.utils.snacks_search').grep_visual_pwd()<CR>]]
   end,
 })

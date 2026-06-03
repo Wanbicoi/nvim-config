@@ -75,6 +75,7 @@ return {
       require('treesitter-context').setup {
         max_lines = 5,
         multiline_threshold = 2,
+        separator = '—'
       }
       vim.keymap.set('n', '[n', function()
         require('treesitter-context').go_to_context(vim.v.count1)
@@ -151,5 +152,27 @@ return {
       end, { desc = "Select refactor" })
     end,
     lazy = false,
+  },
+  {
+    'echasnovski/mini.nvim',
+    event = 'BufEnter',
+    config = function()
+      require('mini.surround').setup {
+        mappings = {
+          add = 'gsa',
+          delete = 'gsd',
+          find = 'gsf',
+          find_left = 'gsF',
+          highlight = 'gsh',
+          replace = 'gsr',
+          update_n_lines = 'gsn',
+        },
+        n_lines = 1000,
+      }
+      require('mini.bufremove').setup()
+      vim.keymap.set('n', '<leader>x', MiniBufremove.delete, { desc = '[X] Delete current buffer' })
+      vim.keymap.set('n', '<leader>X', MiniBufremove.wipeout, { desc = '[X] Wipeout current buffer' })
+      vim.g.minisessions_disable = true
+    end,
   },
 }

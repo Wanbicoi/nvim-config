@@ -54,24 +54,24 @@ function M.pwd(picker, opts)
 end
 
 function M.grep_cword_project()
-  M.project('grep', { search = vim.fn.expand '<cword>' })
+  M.project('grep', { search = vim.fn.expand '<cword>', supports_live = true })
 end
 
 function M.grep_cword_pwd()
-  M.pwd('grep', { search = vim.fn.expand '<cword>' })
+  M.pwd('grep', { search = vim.fn.expand '<cword>', supports_live = true })
 end
 
 function M.grep_visual_project()
   local text = M.get_visual_selection()
   if text ~= '' then
-    M.project('grep', { search = text })
+    M.project('grep', { search = text, supports_live = true })
   end
 end
 
 function M.grep_visual_pwd()
   local text = M.get_visual_selection()
   if text ~= '' then
-    M.pwd('grep', { search = text })
+    M.pwd('grep', { search = text, supports_live = true })
   end
 end
 

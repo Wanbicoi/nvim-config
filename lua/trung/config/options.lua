@@ -1,9 +1,6 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
--- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = true
-
 vim.o.exrc = true
 vim.o.tabstop = 2
 vim.o.shiftwidth = 2
@@ -28,6 +25,7 @@ vim.opt.updatetime = 250
 vim.opt.timeoutlen = 300
 vim.opt.splitright = true
 vim.opt.splitbelow = true
+vim.o.winborder = 'single'
 
 -- Sets how neovim will display certain whitespace characters in the editor.
 --  See `:help 'list'`
@@ -40,7 +38,7 @@ vim.opt.inccommand = 'split'
 
 vim.opt.cursorline = true
 vim.opt.cursorcolumn = false
-vim.opt.scrolloff = 10
+vim.opt.scrolloff = 1
 vim.opt.autoread = true
 
 -- if performing an operation that would fail due to unsaved changes in the buffer (like `:q`),
@@ -57,6 +55,8 @@ vim.o.foldenable = false
 vim.cmd [[set sessionoptions-=blank,help,terminal]]
 vim.o.winwidth = 40
 vim.o.winminwidth = 20
+
+pcall(vim.cmd.aunmenu, 'PopUp') -- Remove all default menu items for PopUp
 
 if vim.fn.has("win32") == 1 then
   vim.opt.shell = "pwsh"

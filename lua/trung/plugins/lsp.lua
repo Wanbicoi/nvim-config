@@ -25,24 +25,38 @@ return {
             vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
           end
 
-          map('grn', vim.lsp.buf.rename, '[R]e[n]ame')
-          map('gra', vim.lsp.buf.code_action, '[G]oto Code [A]ction', { 'n', 'x' })
-          map('grr', function() Snacks.picker.lsp_references() end, '[G]oto [R]eferences')
-          map('gri', function() Snacks.picker.lsp_implementations() end, '[G]oto [I]mplementation')
-          map('grd', function() Snacks.picker.lsp_definitions() end, '[G]oto [D]efinition')
+          -- Neovim has these by default
+          -- map('grn', vim.lsp.buf.rename, '[R]e[n]ame')
+          -- map('gra', vim.lsp.buf.code_action, '[G]oto Code [A]ction', { 'n', 'x' })
+          map('grr', function()
+            Snacks.picker.lsp_references()
+          end, '[G]oto [R]eferences')
+          map('gri', function()
+            Snacks.picker.lsp_implementations()
+          end, '[G]oto [I]mplementation')
+          map('grd', function()
+            Snacks.picker.lsp_definitions()
+          end, '[G]oto [D]efinition')
           map('grD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-          map('gO', function() Snacks.picker.lsp_symbols() end, 'Open Document Symbols')
-          map('gW', function() Snacks.picker.lsp_workspace_symbols() end, 'Open Workspace Symbols')
-          map('grt', function() Snacks.picker.lsp_type_definitions() end, '[G]oto [T]ype Definition')
+          map('gO', function()
+            Snacks.picker.lsp_symbols()
+          end, 'Open Document Symbols')
+          map('gW', function()
+            Snacks.picker.lsp_workspace_symbols()
+          end, 'Open Workspace Symbols')
+          map('grt', function()
+            Snacks.picker.lsp_type_definitions()
+          end, '[G]oto [T]ype Definition')
 
-          pcall(vim.cmd.aunmenu, 'PopUp.LSP')
           vim.cmd.nmenu '100.110 PopUp.LSP\\ References <cmd>lua Snacks.picker.lsp_references()<CR>'
           vim.cmd.nmenu '100.120 PopUp.LSP\\ Implementations <cmd>lua Snacks.picker.lsp_implementations()<CR>'
           vim.cmd.nmenu '100.130 PopUp.LSP\\ Definitions <cmd>lua Snacks.picker.lsp_definitions()<CR>'
-          vim.cmd.nmenu '100.140 PopUp.LSP\\ Type\\ Definition <cmd>lua Snacks.picker.lsp_type_definitions()<CR>'
-          vim.cmd.nmenu '100.150 PopUp.LSP\\ Declaration <cmd>lua vim.lsp.buf.declaration()<CR>'
-          vim.cmd.nmenu '100.160 PopUp.LSP\\ Rename <cmd>lua vim.lsp.buf.rename()<CR>'
-          vim.cmd.nmenu '100.170 PopUp.LSP\\ Code\\ Action <cmd>lua vim.lsp.buf.code_action()<CR>'
+          -- vim.cmd.nmenu '100.140 PopUp.LSP\\ Type\\ Definition <cmd>lua Snacks.picker.lsp_type_definitions()<CR>'
+          -- vim.cmd.nmenu '100.150 PopUp.LSP\\ Declaration <cmd>lua vim.lsp.buf.declaration()<CR>'
+          -- vim.cmd.nmenu '100.160 PopUp.LSP\\ Rename <cmd>lua vim.lsp.buf.rename()<CR>'
+          -- vim.cmd.nmenu '100.170 PopUp.LSP\\ Code\\ Action <cmd>lua vim.lsp.buf.code_action()<CR>'
+          vim.cmd.nmenu '100.180 PopUp.LSP\\ Hover <cmd>lua vim.lsp.buf.hover()<CR>'
+          vim.cmd.nmenu [[100.190 PopUp.LSP\ Show\ Diagnostic <cmd>lua vim.diagnostic.open_float(nil, { scope = 'line', focus = false, source = 'if_many' })<CR>]]
 
           local function client_supports_method(client, method, bufnr)
             if vim.fn.has 'nvim-0.11' == 1 then
@@ -85,10 +99,8 @@ return {
           if vim.fn.has 'nvim-0.12' == 1 then
             if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_inlineCompletion, event.buf) then
               vim.lsp.inline_completion.enable(true, { bufnr = event.buf })
-              vim.keymap.set('i', '<c-f>', vim.lsp.inline_completion.get,
-                { desc = 'LSP: accept inline completion', buffer = event.buf })
-              vim.keymap.set('i', '<c-g>', vim.lsp.inline_completion.select,
-                { desc = 'LSP: switch inline completion', buffer = event.buf })
+              vim.keymap.set('i', '<c-f>', vim.lsp.inline_completion.get, { desc = 'LSP: accept inline completion', buffer = event.buf })
+              vim.keymap.set('i', '<c-g>', vim.lsp.inline_completion.select, { desc = 'LSP: switch inline completion', buffer = event.buf })
             end
           end
         end,
@@ -96,9 +108,9 @@ return {
 
       vim.diagnostic.config {
         severity_sort = true,
-        float = { border = 'single', source = 'if_many' },
+        float = { source = 'if_many' },
         underline = { severity = vim.diagnostic.severity.ERROR },
-        signs = vim.g.have_nerd_font and {
+        signs = {
           text = {
             [vim.diagnostic.severity.ERROR] = '󰅚 ',
             [vim.diagnostic.severity.WARN] = '󰀪 ',
@@ -113,8 +125,8 @@ return {
             local diagnostic_message = {
               [vim.diagnostic.severity.ERROR] = diagnostic.message,
               [vim.diagnostic.severity.WARN] = diagnostic.message,
-              [vim.diagnostic.severity.INFO] = diagnostic.message,
-              [vim.diagnostic.severity.HINT] = diagnostic.message,
+              -- [vim.diagnostic.severity.INFO] = diagnostic.message,
+              -- [vim.diagnostic.severity.HINT] = diagnostic.message,
             }
             return diagnostic_message[diagnostic.severity]
           end,
@@ -186,7 +198,7 @@ return {
         function()
           require('conform').format { async = true, lsp_format = 'fallback' }
         end,
-        mode = 'n',
+        mode = { 'n', 'v' },
         desc = 'Format buffer',
       },
     },

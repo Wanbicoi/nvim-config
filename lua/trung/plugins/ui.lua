@@ -57,7 +57,12 @@ return {
       words = { enabled = true },
       gitbrowse = { enabled = true },
       quickfile = { enabled = true },
-      statuscolumn = { enabled = true },
+      statuscolumn = {
+        enabled = true,
+        folds = {
+          open = true,
+        },
+      },
       picker = {
         patterns = { '.git', '_darcs', '.hg', '.bzr', '.svn', 'package.json', 'Makefile', 'AGENTS.md' },
         layout = 'ivy_split',
@@ -110,7 +115,7 @@ return {
         desc = '[F]ind [A]ll',
       },
       {
-        '<leader>Fa',
+        '<F2>',
         function()
           snacks_search.pwd('files', { hidden = true, ignored = true })
         end,
@@ -229,7 +234,7 @@ return {
         desc = '[G]rep',
       },
       {
-        '<leader>F/',
+        '<F3>',
         function()
           snacks_search.pwd 'grep'
         end,
@@ -363,7 +368,7 @@ return {
         function()
           Snacks.picker.projects {
             dev = {
-              "~/Repos"
+              '~/Repos',
             },
             matcher = {
               cwd_bonus = true,
@@ -607,16 +612,6 @@ return {
       vim.g.mkdp_filetypes = { 'markdown' }
     end,
     ft = { 'markdown' },
-  },
-  {
-    'RRethy/vim-illuminate',
-    config = function()
-      require('illuminate').configure {
-        delay = 100,
-        under_cursor = true,
-      }
-    end,
-    enabled = false,
   },
   {
     'LintaoAmons/bookmarks.nvim',

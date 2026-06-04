@@ -1,3 +1,13 @@
+-- set underline for CursorHoldI reference
+vim.api.nvim_create_autocmd('ColorScheme', {
+  callback = function()
+    -- Link all reference types to a clean underline style
+    vim.api.nvim_set_hl(0, 'LspReferenceText', { underline = true })
+    vim.api.nvim_set_hl(0, 'LspReferenceRead', { underline = true })
+    vim.api.nvim_set_hl(0, 'LspReferenceWrite', { underline = true })
+    vim.api.nvim_set_hl(0, 'LspReferenceTarget', { underline = true })
+  end,
+})
 -- Autosave on focus lost
 vim.api.nvim_create_autocmd({ 'FocusLost', 'BufLeave' }, {
   desc = 'Autosave when focus is lost or buffer is left',

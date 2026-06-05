@@ -4,7 +4,20 @@ return {
   -- NOTE: And you can specify dependencies as well
   ft = { 'python' },
   dependencies = {
-    'rcarriga/nvim-dap-ui',
+    {
+      'igorlfs/nvim-dap-view',
+      opts = {
+        virtual_text = {
+          enabled = true,
+          position = "eol",
+        },
+        winbar = {
+          controls = {
+            enabled = true,
+          },
+        },
+      },
+    },
     'nvim-neotest/nvim-nio',
     { 'mason-org/mason.nvim', opts = {} },
     'jay-babu/mason-nvim-dap.nvim',
@@ -12,8 +25,7 @@ return {
 
   config = function()
     local dap = require 'dap'
-    local dapui = require 'dapui'
-    dapui.setup()
+    local dapview = require 'dap-view'
 
     require('mason-nvim-dap').setup {
       ensure_installed = { 'python' },
@@ -36,20 +48,8 @@ return {
       end,
     })
 
-    -- Change breakpoint icons
-    -- vim.api.nvim_set_hl(0, 'DapBreak', { fg = '#e51400' })
-    -- vim.api.nvim_set_hl(0, 'DapStop', { fg = '#ffcc00' })
-    -- local breakpoint_icons = vim.g.have_nerd_font
-    --     and { Breakpoint = '', BreakpointCondition = '', BreakpointRejected = '', LogPoint = '', Stopped = '' }
-    --   or { Breakpoint = '●', BreakpointCondition = '⊜', BreakpointRejected = '⊘', LogPoint = '◆', Stopped = '⭔' }
-    -- for type, icon in pairs(breakpoint_icons) do
-    --   local tp = 'Dap' .. type
-    --   local hl = (type == 'Stopped') and 'DapStop' or 'DapBreak'
-    --   vim.fn.sign_define(tp, { text = icon, texthl = hl, numhl = hl })
-    -- end
-
-    dap.listeners.after.event_initialized['dapui_config'] = dapui.open
-    dap.listeners.before.event_terminated['dapui_config'] = dapui.close
-    dap.listeners.before.event_exited['dapui_config'] = dapui.close
+    dap.listeners.after.event_initialized['dapview_config'] = dapview.open
+    dap.listeners.before.event_terminated['dapview_config'] = dapview.close
+    dap.listeners.before.event_exited['dapview_config'] = dapview.close
   end,
 }

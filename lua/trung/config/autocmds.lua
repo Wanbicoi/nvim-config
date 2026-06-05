@@ -68,3 +68,14 @@ vim.api.nvim_create_autocmd('BufEnter', {
     vim.cmd.vmenu [[100.950 PopUp.Grep\ Selection\ (CWD) :<C-U>lua require('trung.utils.snacks_search').grep_visual_pwd()<CR>]]
   end,
 })
+
+-- Auto load script 
+vim.api.nvim_create_autocmd("DirChanged", {
+  callback = function()
+    local file = vim.fn.getcwd() .. "/.nvim.lua"
+    if vim.fn.filereadable(file) == 1 then
+      dofile(file)
+      print("Loaded local config: " .. file)
+    end
+  end,
+})

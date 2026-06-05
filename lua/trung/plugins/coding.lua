@@ -38,7 +38,7 @@ return {
           'mermaid',
           'cds',
           'json5',
-          'python'
+          'python',
         },
         auto_install = true,
         highlight = true,
@@ -63,8 +63,7 @@ return {
       }
       local get_option = vim.filetype.get_option
       vim.filetype.get_option = function(filetype, option)
-        return option == 'commentstring' and require('ts_context_commentstring.internal').calculate_commentstring() or
-            get_option(filetype, option)
+        return option == 'commentstring' and require('ts_context_commentstring.internal').calculate_commentstring() or get_option(filetype, option)
       end
     end,
   },
@@ -75,7 +74,7 @@ return {
       require('treesitter-context').setup {
         max_lines = 5,
         multiline_threshold = 2,
-        separator = '—'
+        separator = '—',
       }
       vim.keymap.set('n', '[n', function()
         require('treesitter-context').go_to_context(vim.v.count1)
@@ -141,15 +140,15 @@ return {
     end,
   },
   {
-    "ThePrimeagen/refactoring.nvim",
+    'ThePrimeagen/refactoring.nvim',
     dependencies = {
-      "lewis6991/async.nvim",
+      'lewis6991/async.nvim',
     },
     init = function()
       local keymap = vim.keymap
-      keymap.set({ "n", "x" }, "<leader>cr", function()
-        require("refactoring").select_refactor()
-      end, { desc = "Select refactor" })
+      keymap.set({ 'n', 'x' }, '<leader>cr', function()
+        require('refactoring').select_refactor()
+      end, { desc = 'Select refactor' })
     end,
     lazy = false,
   },
@@ -174,5 +173,75 @@ return {
       vim.keymap.set('n', '<leader>X', MiniBufremove.wipeout, { desc = '[X] Wipeout current buffer' })
       vim.g.minisessions_disable = true
     end,
+  },
+  {
+    'monaqa/dial.nvim',
+    config = function()
+      local augend = require 'dial.augend'
+      require('dial.config').augends:register_group {
+        default = {
+          augend.constant.alias.bool,
+          augend.constant.alias.Bool,
+        },
+      }
+    end,
+    keys = {
+      {
+        '<C-a>',
+        function()
+          require('dial.map').manipulate('increment', 'normal')
+        end,
+        mode = 'n',
+      },
+      {
+        '<C-x>',
+        function()
+          require('dial.map').manipulate('decrement', 'normal')
+        end,
+        mode = 'n',
+      },
+      {
+        'g<C-a>',
+        function()
+          require('dial.map').manipulate('increment', 'gnormal')
+        end,
+        mode = 'n',
+      },
+      {
+        'g<C-x>',
+        function()
+          require('dial.map').manipulate('decrement', 'gnormal')
+        end,
+        mode = 'n',
+      },
+      {
+        '<C-a>',
+        function()
+          require('dial.map').manipulate('increment', 'visual')
+        end,
+        mode = 'x',
+      },
+      {
+        '<C-x>',
+        function()
+          require('dial.map').manipulate('decrement', 'visual')
+        end,
+        mode = 'x',
+      },
+      {
+        'g<C-a>',
+        function()
+          require('dial.map').manipulate('increment', 'gvisual')
+        end,
+        mode = 'x',
+      },
+      {
+        'g<C-x>',
+        function()
+          require('dial.map').manipulate('decrement', 'gvisual')
+        end,
+        mode = 'x',
+      },
+    },
   },
 }

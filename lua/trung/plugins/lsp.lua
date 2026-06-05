@@ -133,14 +133,6 @@ return {
         -- },
       }
 
-      vim.api.nvim_create_autocmd('CursorHold', {
-        desc = 'Show diagnostic preview when hovering an error',
-        group = vim.api.nvim_create_augroup('trung-diagnostic-hover', { clear = true }),
-        callback = function(args)
-          vim.diagnostic.open_float()
-        end,
-      })
-
       local servers = {
         cssls = {},
         pyright = {},

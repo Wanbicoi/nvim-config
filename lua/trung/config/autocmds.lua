@@ -69,13 +69,19 @@ vim.api.nvim_create_autocmd('BufEnter', {
   end,
 })
 
--- Auto load script 
-vim.api.nvim_create_autocmd("DirChanged", {
+-- Auto load script
+vim.api.nvim_create_autocmd('DirChanged', {
   callback = function()
-    local file = vim.fn.getcwd() .. "/.nvim.lua"
-    if vim.fn.filereadable(file) == 1 then
+    local file = vim.fn.getcwd() .. '/.nvim.lua'
+    if vim.fn.filereadable(file) == 1 and vim.secure.trust { action = 'allow', path = file } then
       dofile(file)
-      print("Loaded local config: " .. file)
+      print('Loaded local config: ' .. file)
     end
   end,
 })
+
+-- split help to right
+vim.cmd([[
+  cabbrev h vert h
+  cabbrev help vert help
+]])

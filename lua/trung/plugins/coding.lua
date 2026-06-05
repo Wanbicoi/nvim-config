@@ -182,6 +182,7 @@ return {
         default = {
           augend.constant.alias.bool,
           augend.constant.alias.Bool,
+          augend.integer.alias.decimal_int,
         },
       }
     end,

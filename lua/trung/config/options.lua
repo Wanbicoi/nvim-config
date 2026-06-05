@@ -1,6 +1,7 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+vim.o.autowriteall = true
 vim.o.exrc = true
 vim.o.tabstop = 2
 vim.o.shiftwidth = 2
@@ -8,7 +9,8 @@ vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.mouse = 'a'
 vim.opt.mousemodel = 'popup_setpos'
-vim.cmd('autocmd! nvim.popupmenu')
+vim.cmd 'autocmd! nvim.popupmenu'
+vim.cmd.aunmenu 'PopUp' -- Remove all default menu items for PopUp
 vim.opt.showmode = false
 vim.schedule(function()
   vim.opt.clipboard = 'unnamedplus'
@@ -24,7 +26,7 @@ vim.opt.signcolumn = 'yes'
 vim.opt.updatetime = 250
 vim.opt.timeoutlen = 300
 vim.opt.splitright = true
-vim.opt.splitbelow = true
+vim.opt.splitbelow = false
 vim.o.winborder = 'single'
 
 -- Sets how neovim will display certain whitespace characters in the editor.
@@ -51,20 +53,18 @@ vim.o.cursorlineopt = 'both'
 vim.o.swapfile = false
 vim.wo.foldmethod = 'indent'
 -- vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-vim.o.foldenable = false
+-- vim.o.foldenable = false -- auto fold on startup
 vim.cmd [[set sessionoptions-=blank,help,terminal]]
 vim.o.winwidth = 40
 vim.o.winminwidth = 20
 
-pcall(vim.cmd.aunmenu, 'PopUp') -- Remove all default menu items for PopUp
-
-if vim.fn.has("win32") == 1 then
-  vim.opt.shell = "pwsh"
-  vim.opt.shellcmdflag = "-NoLogo -NoProfile -Command"
-  vim.opt.shellredir = "2>&1 | Out-File -Encoding utf8 %s"
-  vim.opt.shellpipe  = "2>&1 | Out-File -Encoding utf8 %s"
-  vim.opt.shellquote = ""
-  vim.opt.shellxquote = ""
+if vim.fn.has 'win32' == 1 then
+  vim.opt.shell = 'pwsh'
+  vim.opt.shellcmdflag = '-NoLogo -NoProfile -Command'
+  vim.opt.shellredir = '2>&1 | Out-File -Encoding utf8 %s'
+  vim.opt.shellpipe = '2>&1 | Out-File -Encoding utf8 %s'
+  vim.opt.shellquote = ''
+  vim.opt.shellxquote = ''
 end
 
 if vim.g.neovide then

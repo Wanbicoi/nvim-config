@@ -122,6 +122,13 @@ return {
         desc = '[F]ind [A]ll (cwd)',
       },
       {
+        '<F3>',
+        function()
+          snacks_search.pwd 'grep'
+        end,
+        desc = '[G]rep (cwd)',
+      },
+      {
         '<leader>ff',
         function()
           snacks_search.project('files', {
@@ -232,13 +239,6 @@ return {
           snacks_search.project 'grep'
         end,
         desc = '[G]rep',
-      },
-      {
-        '<F3>',
-        function()
-          snacks_search.pwd 'grep'
-        end,
-        desc = '[G]rep (cwd)',
       },
       {
         '<leader>?',
@@ -493,12 +493,26 @@ return {
   },
   {
     'rmagatti/auto-session',
-    event = 'VeryLazy',
-    opts = {},
+    lazy = false,
+    config = {
+      auto_restore_last_session = true,
+      legacy_cmds = false,
+      session_lens = {
+        picker = 'snacks',
+      },
+      pre_restore_cmds = {
+        function()
+          -- Avoid when launching with a file arg
+          if vim.fn.argc() > 0 then
+            return false
+          end
+
+          return true
+        end,
+      },
+    },
     keys = {
-      { '<leader>wr', '<cmd>AutoSession search<CR>', desc = 'Session search' },
-      { '<leader>ws', '<cmd>AutoSession save<CR>', desc = 'Save session' },
-      { '<leader>wa', '<cmd>AutoSession toggle<CR>', desc = 'Toggle autosave' },
+      { '<leader>fs', '<cmd>AutoSession search<CR>', desc = 'Session search' },
     },
   },
   {
@@ -547,6 +561,7 @@ return {
   {
     'folke/flash.nvim',
     event = 'VeryLazy',
+    enabled = false,
     opts = {
       modes = {
         char = {
@@ -559,7 +574,7 @@ return {
     },
     keys = {
       {
-        '<cr>',
+        's',
         mode = { 'n', 'x', 'o' },
         function()
           require('flash').jump()
@@ -567,7 +582,7 @@ return {
         desc = 'Flash',
       },
       {
-        '<S-CR>',
+        'S',
         mode = { 'n', 'x', 'o' },
         function()
           require('flash').treesitter_search()

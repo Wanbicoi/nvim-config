@@ -9,7 +9,7 @@ vim.api.nvim_create_autocmd('ColorScheme', {
   end,
 })
 -- Autosave on focus lost
-vim.api.nvim_create_autocmd({ 'FocusLost', 'BufLeave' }, {
+vim.api.nvim_create_autocmd('TextChanged', {
   desc = 'Autosave when focus is lost or buffer is left',
   group = vim.api.nvim_create_augroup('trung-autosave', { clear = true }),
   callback = function()
@@ -79,9 +79,3 @@ vim.api.nvim_create_autocmd('DirChanged', {
     end
   end,
 })
-
--- split help to right
-vim.cmd([[
-  cabbrev h vert h
-  cabbrev help vert help
-]])

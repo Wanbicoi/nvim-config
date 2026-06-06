@@ -1,8 +1,14 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+-- split help to right
+vim.cmd([[
+  cabbrev h vert h
+  cabbrev help vert help
+]])
+vim.o.termguicolors = true
 vim.o.autowriteall = true
-vim.o.exrc = true
+vim.o.exrc = false
 vim.o.tabstop = 2
 vim.o.shiftwidth = 2
 vim.opt.number = true
@@ -53,7 +59,7 @@ vim.o.cursorlineopt = 'both'
 vim.o.swapfile = false
 vim.wo.foldmethod = 'indent'
 -- vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
--- vim.o.foldenable = false -- auto fold on startup
+vim.o.foldenable = false -- avoid auto close all on load
 vim.cmd [[set sessionoptions-=blank,help,terminal]]
 vim.o.winwidth = 40
 vim.o.winminwidth = 20

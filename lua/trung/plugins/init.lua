@@ -13,6 +13,7 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
   require 'trung.plugins.coding',
   require 'trung.plugins.ui',
+  require 'trung.plugins.colorscheme',
   require 'trung.plugins.git',
   require 'trung.plugins.lsp',
   require 'trung.plugins.test',

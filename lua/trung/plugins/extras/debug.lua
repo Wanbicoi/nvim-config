@@ -1,7 +1,5 @@
 return {
-  -- NOTE: Yes, you can install new plugins here!
   'mfussenegger/nvim-dap',
-  -- NOTE: And you can specify dependencies as well
   ft = { 'python' },
   dependencies = {
     {
@@ -9,7 +7,7 @@ return {
       opts = {
         virtual_text = {
           enabled = true,
-          position = "eol",
+          position = 'eol',
         },
         winbar = {
           controls = {
@@ -19,23 +17,23 @@ return {
       },
     },
     'nvim-neotest/nvim-nio',
-    { 'mason-org/mason.nvim', opts = {} },
-    'jay-babu/mason-nvim-dap.nvim',
+    -- { 'mason-org/mason.nvim', opts = {} },
+    -- 'jay-babu/mason-nvim-dap.nvim',
   },
 
   config = function()
     local dap = require 'dap'
     local dapview = require 'dap-view'
 
-    require('mason-nvim-dap').setup {
-      ensure_installed = { 'python' },
-      automatic_installation = true,
-      handlers = {
-        function(config)
-          require('mason-nvim-dap').default_setup(config)
-        end,
-      },
-    }
+    -- require('mason-nvim-dap').setup {
+    --   ensure_installed = { 'python' },
+    --   automatic_installation = true,
+    --   handlers = {
+    --     function(config)
+    --       require('mason-nvim-dap').default_setup(config)
+    --     end,
+    --   },
+    -- }
     vim.api.nvim_create_autocmd('FileType', {
       pattern = 'python',
       group = vim.api.nvim_create_augroup('trung-python-dap-popup', { clear = true }),

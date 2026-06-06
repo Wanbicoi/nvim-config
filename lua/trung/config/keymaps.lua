@@ -3,11 +3,40 @@ vim.keymap.set('n', '<c-s>', '<cmd>:w<cr>', { desc = 'Save all files' })
 vim.keymap.set('v', '<leader>r', '"0y:%s/\\V<C-r>0//g<Left><Left>')
 vim.keymap.set('x', 'p', '"_dP', { desc = 'Paste without overwriting clipboard' })
 
+vim.keymap.set('n', ']d', function()
+  vim.diagnostic.jump {
+    count = 1,
+    on_jump = function()
+      vim.diagnostic.open_float()
+    end,
+  }
+end)
+vim.keymap.set('n', '[d', function()
+  vim.diagnostic.jump {
+    count = -1,
+    on_jump = function()
+      vim.diagnostic.open_float()
+    end,
+  }
+end)
+
 vim.keymap.set('n', ']e', function()
-  vim.diagnostic.jump { severity = vim.diagnostic.severity.ERROR, count = 1 }
+  vim.diagnostic.jump {
+    severity = vim.diagnostic.severity.ERROR,
+    count = 1,
+    on_jump = function()
+      vim.diagnostic.open_float()
+    end,
+  }
 end)
 vim.keymap.set('n', '[e', function()
-  vim.diagnostic.jump { severity = vim.diagnostic.severity.ERROR, count = -1 }
+  vim.diagnostic.jump {
+    severity = vim.diagnostic.severity.ERROR,
+    count = -1,
+    on_jump = function()
+      vim.diagnostic.open_float()
+    end,
+  }
 end)
 
 local function open_file_under_cursor()
@@ -97,7 +126,6 @@ vim.keymap.set('n', '<leader>cp', function()
   vim.cmd 'let @+ = expand("%")'
   vim.notify('Relative path copied to clipboard', vim.log.levels.INFO, { title = 'Path Copied' })
 end, { desc = '[C]opy relative current file path' })
-
 
 vim.keymap.set('n', 'q', '<cmd>q<CR>', { noremap = true })
 vim.keymap.set('n', '<esc>', '<cmd>noh<CR>', { noremap = true })

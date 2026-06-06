@@ -59,6 +59,13 @@ vim.api.nvim_create_autocmd('BufEnter', {
       vim.cmd.amenu [[100.810 PopUp.-DiffSep- :]]
       vim.cmd.nmenu [[100.820 PopUp.Diff\ Get <cmd>diffget<CR>]]
       vim.cmd.nmenu [[100.830 PopUp.Diff\ Put <cmd>diffput<CR>]]
+
+      vim.cmd.vmenu [[100.820 PopUp.Diff\ Get <cmd>'<,'>diffget<CR>]]
+      vim.cmd.vmenu [[100.830 PopUp.Diff\ Put <cmd>'<,'>diffput<CR>]]
+    else
+      vim.cmd [[silent! aunmenu PopUp.-DiffSep-]]
+      vim.cmd [[silent! aunmenu PopUp.Diff\ Get]]
+      vim.cmd [[silent! aunmenu PopUp.Diff\ Put]]
     end
 
     vim.cmd.nmenu [[100.900 PopUp.-SearchSep- :]]

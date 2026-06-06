@@ -57,6 +57,13 @@ return {
       words = { enabled = true },
       gitbrowse = { enabled = true },
       quickfile = { enabled = true },
+      notifier = { enabled = true },
+      indent = {
+        enabled = true,
+        chunk = {
+          enabled = true,
+        },
+      },
       statuscolumn = {
         enabled = true,
         folds = {
@@ -88,9 +95,6 @@ return {
         },
       },
     },
-    init = function()
-      _G.get_project_root = snacks_search.get_project_root
-    end,
     keys = {
       {
         '<leader>gB',

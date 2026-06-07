@@ -54,6 +54,7 @@ return {
     lazy = false,
     opts = {
       bigfile = { enabled = true },
+      explorer = { enabled = true },
       words = { enabled = true },
       gitbrowse = { enabled = true },
       quickfile = { enabled = true },
@@ -96,6 +97,14 @@ return {
       },
     },
     keys = {
+      {
+        '<leader>e',
+        function()
+          Snacks.explorer()
+        end,
+        desc = '[E]xplorer',
+        mode = { 'n' },
+      },
       {
         '<leader>gB',
         function()
@@ -393,9 +402,9 @@ return {
   {
     'nvim-lualine/lualine.nvim',
     opts = {
-      options = {
-        globalstatus = true,
-      },
+      -- options = {
+      -- globalstatus = true,
+      -- },
       sections = {
         lualine_a = {
           {
@@ -414,6 +423,16 @@ return {
             separator = '',
             on_click = function()
               vim.api.nvim_feedkeys(vim.keycode '<C-i>', 'n', false)
+            end,
+          },
+          {
+            function()
+              return ''
+            end,
+            separator = '',
+            on_click = function()
+              require('mini.bufremove').setup()
+              MiniBufremove.wipeout()
             end,
           },
           'mode',
@@ -455,6 +474,7 @@ return {
     config = {
       auto_restore_last_session = true,
       legacy_cmds = false,
+      cwd_change_handling = true,
       session_lens = {
         picker = 'snacks',
       },
@@ -480,6 +500,7 @@ return {
       layout = {
         max_width = { 0.3 },
         min_width = { 48, 0.2 },
+        width = 48,
         default_direction = 'prefer_left',
       },
     },
@@ -489,10 +510,10 @@ return {
       {
         '<leader>A',
         function()
-          require('aerial').toggle { direction = 'float' }
+          require('aerial').toggle {}
         end,
-        mode = '',
-        desc = '[A]erial toggle float',
+        mode = 'n',
+        desc = '[A]erial toggle',
       },
     },
   },
@@ -512,7 +533,6 @@ return {
       { '<leader>oo', '<cmd>OverseerToggle<cr>', desc = '[O]verseer [T]oggle' },
       { '<leader>or', '<cmd>OverseerRun<cr>', desc = '[O]verseer [R]un' },
       { '<leader>oa', '<cmd>OverseerTaskAction<cr>', desc = '[O]verseer [A]ction' },
-      { '<leader>ob', '<cmd>OverseerBuild<cr>', desc = '[O]verseer [B]uild' },
       { '<leader>os', '<cmd>OverseerShell<cr>', desc = '[O]verseer [S]hell' },
     },
   },
@@ -576,32 +596,41 @@ return {
   {
     'iamcco/markdown-preview.nvim',
     cmd = { 'MarkdownPreviewToggle', 'MarkdownPreview', 'MarkdownPreviewStop' },
-    build = 'cd app && yarn install',
+    build = 'cd app && npm install',
     init = function()
       vim.g.mkdp_filetypes = { 'markdown' }
     end,
     ft = { 'markdown' },
   },
   ---@module "neominimap.config.meta"
+  -- {
+  --   'Isrothy/neominimap.nvim',
+  --   version = 'v3.x.x',
+  --   lazy = false, -- NOTE: NO NEED to Lazy load
+  --   -- Optional. You can also set your own keybindings
+  --   init = function()
+  --     -- -- The following options are recommended when layout == "float"
+  --     -- vim.opt.wrap = false
+  --     -- vim.o.sidescrolloff = 20 -- Set a large value
+  --
+  --     --- Put your configuration here
+  --     ---@type Neominimap.UserConfig
+  --     vim.g.neominimap = {
+  --       auto_enable = true,
+  --       layout = 'split',
+  --       float = {
+  --         window_border = 'none',
+  --       },
+  --     }
+  --   end,
+  -- },
   {
-    'Isrothy/neominimap.nvim',
-    version = 'v3.x.x',
-    lazy = false, -- NOTE: NO NEED to Lazy load
-    -- Optional. You can also set your own keybindings
-    init = function()
-      -- -- The following options are recommended when layout == "float"
-      -- vim.opt.wrap = false
-      -- vim.o.sidescrolloff = 20 -- Set a large value
-
-      --- Put your configuration here
-      ---@type Neominimap.UserConfig
-      vim.g.neominimap = {
-        auto_enable = true,
-        layout = "split",
-        float = {
-          window_border = "none"
-        }
-      }
-    end,
+    'MeanderingProgrammer/render-markdown.nvim',
+    dependencies = { 'nvim-mini/mini.nvim' }, -- if you use the mini.nvim suite
+    -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.icons' },        -- if you use standalone mini plugins
+    -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
+    ---@module 'render-markdown'
+    ---@type render.md.UserConfig
+    opts = {},
   },
 }

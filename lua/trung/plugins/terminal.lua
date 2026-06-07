@@ -4,14 +4,22 @@ local function setup_toggleterm()
     open_mapping = [[<c-\>]],
     hide_numbers = false,
     direction = 'float',
+    float_opts = {
+      width = function()
+        if vim.o.columns > 180 then
+          return 160
+        end
+        return vim.o.columns * 0.9
+      end,
+    },
     on_open = function()
       vim.opt_local.number = true
-      vim.opt_local.relativenumber = false -- Set to true if you prefer relative
+      vim.opt_local.relativenumber = false -- Set to true if you prefer relative vim.opt_local.relativenumber = false -- Set to true if you prefer relative vim.opt_local.relativenumber = false -- Set to true if you prefer relative
     end,
   }
 end
 
-local snacks_search = require('trung.utils.snacks_search')
+local snacks_search = require 'trung.utils.snacks_search'
 
 local function setup_lazygit(Terminal)
   local lazygit = Terminal:new {
@@ -149,8 +157,12 @@ local function setup_agent_coding(Terminal)
     end)
   end
 
-  vim.keymap.set({ 'n', 't' }, '<a-a>', function() open_agent_coding('float') end, { noremap = true, silent = true, desc = 'Toggle floating coding agent terminal' })
-  vim.keymap.set({ 'n', 't' }, '<a-A>', function() open_agent_coding('vertical') end, { noremap = true, silent = true, desc = 'Toggle split right coding agent terminal' })
+  vim.keymap.set({ 'n', 't' }, '<a-a>', function()
+    open_agent_coding 'float'
+  end, { noremap = true, silent = true, desc = 'Toggle floating coding agent terminal' })
+  vim.keymap.set({ 'n', 't' }, '<a-A>', function()
+    open_agent_coding 'vertical'
+  end, { noremap = true, silent = true, desc = 'Toggle split right coding agent terminal' })
   vim.keymap.set('n', '<leader>af', agent_coding_send_file, { noremap = true, silent = true, desc = '[A]gentCoding send [F]ile' })
   vim.keymap.set('v', '<leader>at', agent_coding_send_selection, { noremap = true, silent = true, desc = '[A]gentCoding send [T]his' })
   vim.keymap.set('n', '<leader>at', agent_coding_send_line, { noremap = true, silent = true, desc = '[A]gentCoding send [T]his' })

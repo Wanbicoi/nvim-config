@@ -56,25 +56,27 @@ vim.api.nvim_create_autocmd('BufEnter', {
   group = vim.api.nvim_create_augroup('trung-popup-search-menu', { clear = true }),
   callback = function()
     if vim.wo.diff then
-      vim.cmd.amenu [[100.810 PopUp.-DiffSep- :]]
-      vim.cmd.nmenu [[100.820 PopUp.Diff\ Get <cmd>diffget<CR>]]
-      vim.cmd.nmenu [[100.830 PopUp.Diff\ Put <cmd>diffput<CR>]]
+      vim.cmd.amenu [[100.210 PopUp.-DiffSep- :]]
+      vim.cmd.nmenu [[100.220 PopUp.Diff\ Get <cmd>diffget<CR>]]
+      vim.cmd.nmenu [[100.230 PopUp.Diff\ Put <cmd>diffput<CR>]]
 
-      vim.cmd.vmenu [[100.820 PopUp.Diff\ Get <cmd>'<,'>diffget<CR>]]
-      vim.cmd.vmenu [[100.830 PopUp.Diff\ Put <cmd>'<,'>diffput<CR>]]
+      vim.cmd.vmenu [[100.220 PopUp.Diff\ Get <cmd>'<,'>diffget<CR>]]
+      vim.cmd.vmenu [[100.230 PopUp.Diff\ Put <cmd>'<,'>diffput<CR>]]
     else
       vim.cmd [[silent! aunmenu PopUp.-DiffSep-]]
       vim.cmd [[silent! aunmenu PopUp.Diff\ Get]]
       vim.cmd [[silent! aunmenu PopUp.Diff\ Put]]
     end
 
-    vim.cmd.nmenu [[100.900 PopUp.-SearchSep- :]]
-    vim.cmd.nmenu [[100.905 PopUp.Open\ File\ Under\ Cursor <cmd>lua _G.OpenFileUnderCursor()<CR>]]
-    vim.cmd.nmenu [[100.910 PopUp.Copy\ All <cmd>%y+<CR>]]
-    vim.cmd.nmenu [[100.920 PopUp.Grep\ Word\ (Project\ Root) <cmd>lua require('trung.utils.snacks_search').grep_cword_project()<CR>]]
-    vim.cmd.nmenu [[100.930 PopUp.Grep\ Word\ (CWD) <cmd>lua require('trung.utils.snacks_search').grep_cword_pwd()<CR>]]
-    vim.cmd.vmenu [[100.940 PopUp.Grep\ Selection\ (Project\ Root) :<C-U>lua require('trung.utils.snacks_search').grep_visual_project()<CR>]]
-    vim.cmd.vmenu [[100.950 PopUp.Grep\ Selection\ (CWD) :<C-U>lua require('trung.utils.snacks_search').grep_visual_pwd()<CR>]]
+    vim.cmd.nmenu [[100.200 PopUp.-SearchSep- :]]
+    vim.cmd.nmenu [[100.205 PopUp.Open\ File\ Under\ Cursor <cmd>lua _G.OpenFileUnderCursor()<CR>]]
+    vim.cmd.nmenu [[100.210 PopUp.Copy\ All <cmd>%y+<CR>]]
+    vim.cmd.nmenu [[100.212 PopUp.Copy\ File\ Name <cmd>let @+=expand('%:t')<CR>]]
+    vim.cmd.nmenu [[100.215 PopUp.Go\ To\ Context <cmd>lua require("treesitter-context").go_to_context(vim.v.count1)<CR>]]
+    vim.cmd.nmenu [[100.220 PopUp.Grep\ Word\ (Project\ Root) <cmd>lua require('trung.utils.snacks_search').grep_cword_project()<CR>]]
+    vim.cmd.nmenu [[100.230 PopUp.Grep\ Word\ (CWD) <cmd>lua require('trung.utils.snacks_search').grep_cword_pwd()<CR>]]
+    vim.cmd.vmenu [[100.240 PopUp.Grep\ Selection\ (Project\ Root) :<C-U>lua require('trung.utils.snacks_search').grep_visual_project()<CR>]]
+    vim.cmd.vmenu [[100.250 PopUp.Grep\ Selection\ (CWD) :<C-U>lua require('trung.utils.snacks_search').grep_visual_pwd()<CR>]]
   end,
 })
 
@@ -143,27 +145,3 @@ vim.api.nvim_create_autocmd('LspProgress', {
   end,
 })
 
-vim.treesitter.query.set(
-  'typescript',
-  'highlights',
-  [[
-; extends
-(call_expression) @function.call
-]]
-)
-local typescript_call_highlight_enabled = false
-
-local function set_typescript_call_highlight(enabled)
-  typescript_call_highlight_enabled = enabled
-
-  if enabled then
-    vim.api.nvim_set_hl(0, '@function.call', { link = 'Visual' })
-  else
-    vim.api.nvim_set_hl(0, '@function.call', {}) -- clear highlight
-  end
-  vim.notify(('TypeScript call highlight %s'):format(enabled and 'enabled' or 'disabled'), vim.log.levels.INFO, { title = 'Treesitter' })
-end
-
-vim.api.nvim_create_user_command('CallExpressionHighlight', function()
-  set_typescript_call_highlight(not typescript_call_highlight_enabled)
-end, { desc = 'Toggle custom TypeScript call highlight' })

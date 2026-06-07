@@ -159,11 +159,19 @@ return {
     cmd = { 'ConformInfo' },
     keys = {
       {
+        '=',
+        function()
+          require('conform').format { async = true, lsp_format = 'fallback' }
+        end,
+        mode = { 'v' },
+        desc = 'Format buffer',
+      },
+      {
         '==',
         function()
           require('conform').format { async = true, lsp_format = 'fallback' }
         end,
-        mode = { 'n', 'v' },
+        mode = { 'n' },
         desc = 'Format buffer',
       },
     },
@@ -182,7 +190,7 @@ return {
         sql = { 'sleek' },
         bash = { 'beautysh' },
         zsh = { 'beautysh' },
-        markdown = { 'prettierd' },
+        markdown = { 'prettierd', 'prettier' },
       },
     },
   },

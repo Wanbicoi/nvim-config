@@ -2,10 +2,10 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- split help to right
-vim.cmd([[
+vim.cmd [[
   cabbrev h vert h
   cabbrev help vert help
-]])
+]]
 vim.o.termguicolors = true
 vim.o.autowriteall = true
 vim.o.exrc = false
@@ -151,3 +151,5 @@ vim.opt.wildignore:append {
   'minicyan.lua',
   'zellner.vim',
 }
+
+vim.cmd [[packadd nvim.undotree]]

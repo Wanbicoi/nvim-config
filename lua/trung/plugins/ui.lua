@@ -73,7 +73,7 @@ return {
       },
       picker = {
         patterns = { '.git', '_darcs', '.hg', '.bzr', '.svn', 'package.json', 'Makefile', 'AGENTS.md' },
-        layout = 'ivy_split',
+        layout = 'dropdown',
         win = {
           list = {
             keys = {
@@ -515,25 +515,6 @@ return {
         mode = 'n',
         desc = '[A]erial toggle',
       },
-    },
-  },
-  {
-    'stevearc/overseer.nvim',
-    config = function()
-      require('overseer').setup {
-        task_list = {
-          keymaps = {
-            ['J'] = 'keymap.next_task',
-            ['K'] = 'keymap.prev_task',
-          },
-        },
-      }
-    end,
-    keys = {
-      { '<leader>oo', '<cmd>OverseerToggle<cr>', desc = '[O]verseer [T]oggle' },
-      { '<leader>or', '<cmd>OverseerRun<cr>', desc = '[O]verseer [R]un' },
-      { '<leader>oa', '<cmd>OverseerTaskAction<cr>', desc = '[O]verseer [A]ction' },
-      { '<leader>os', '<cmd>OverseerShell<cr>', desc = '[O]verseer [S]hell' },
     },
   },
   {

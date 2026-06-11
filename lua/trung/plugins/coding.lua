@@ -241,4 +241,24 @@ return {
     lazy = false, -- Required to make line highlighting work before debugprint is first used
     version = '*', -- Remove if you DON'T want to use the stable version
   },
+  {
+    'stevearc/overseer.nvim',
+    config = function()
+      require('overseer').setup {
+        task_list = {
+          keymaps = {
+            ['J'] = 'keymap.next_task',
+            ['K'] = 'keymap.prev_task',
+          },
+        },
+      }
+    end,
+    keys = {
+      { '<leader>oo', '<cmd>OverseerToggle<cr>', desc = '[O]verseer [T]oggle' },
+      { '<leader>or', '<cmd>OverseerRun<cr>', desc = '[O]verseer [R]un' },
+      { '<F1>', '<cmd>OverseerRun<cr>', desc = '[O]verseer [R]un' },
+      { '<leader>oa', '<cmd>OverseerTaskAction<cr>', desc = '[O]verseer [A]ction' },
+      { '<leader>os', '<cmd>OverseerShell<cr>', desc = '[O]verseer [S]hell' },
+    },
+  },
 }

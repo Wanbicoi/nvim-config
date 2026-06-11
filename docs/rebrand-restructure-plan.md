@@ -58,7 +58,7 @@ lua/
 - `plugins/git.lua` → git workflow plugins like gitsigns, git browse, blame, diff helpers
 - `plugins/lsp.lua` → LSP, diagnostics, completion, formatting, and language server setup
 - `plugins/test.lua` → testing tools, runners, adapters, and debugging helpers
-- `plugins/terminal.lua` → terminal, toggleterm, and shell workflow plugins
+- `plugins/terminal.lua` → terminal and shell workflow plugins
 - `utils/*.lua` → helper functions shared across modules
 
 ## Phase 3 — Reduce `init.lua` to a bootstrap file

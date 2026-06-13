@@ -46,16 +46,54 @@ local function pick_agent_cwd(callback)
   end)
 end
 
+local function hide_agent_coding(kind)
+  local term = Snacks.terminal.get('pi', vim.tbl_extend('force', agent_opts(kind), { create = false }))
+  if term and term:win_valid() then
+    term:hide()
+  end
+end
+
+local function hide_other_floating_terminals(current)
+  for _, term in ipairs(Snacks.terminal.list()) do
+    if term ~= current and term:win_valid() and term.opts.position == 'float' then
+      term:hide()
+    end
+  end
+end
+
+local function toggle_single_floating_terminal(cmd, opts)
+  local term = Snacks.terminal.get(cmd, vim.tbl_extend('force', opts or {}, { create = false }))
+  if term and term:win_valid() then
+    term:hide()
+    return
+  end
+
+  hide_other_floating_terminals(term)
+  Snacks.terminal.focus(cmd, opts)
+end
+
 local function open_agent_coding(kind)
   local state = agent_state[kind]
+  local other_kind = kind == 'right' and 'float' or 'right'
+
+  hide_agent_coding(other_kind)
+
+  local function open()
+    if kind == 'float' then
+      toggle_single_floating_terminal('pi', agent_opts(kind))
+    else
+      Snacks.terminal('pi', agent_opts(kind))
+    end
+  end
+
   if state.cwd then
-    Snacks.terminal('pi', agent_opts(kind))
+    open()
     return
   end
 
   pick_agent_cwd(function(cwd)
     state.cwd = cwd
-    Snacks.terminal('pi', agent_opts(kind))
+    open()
   end)
 end
 
@@ -118,6 +156,75 @@ local function agent_coding_send_line()
   send_to_agent_coding(string.format('@%s:L%d\n', file, line))
 end
 
+local keys = {
+  {
+    '<c-\\>',
+    function()
+      toggle_single_floating_terminal(nil, shell_float_opts { count = vim.v.count1 })
+    end,
+    mode = { 'n', 't' },
+    desc = 'Toggle terminal',
+  },
+  {
+    '<a-l>',
+    function()
+      Snacks.lazygit.open {
+        cwd = snacks_search.get_project_root(),
+        win = vim.tbl_deep_extend('force', float_win(), {
+          border = 'rounded',
+        }),
+      }
+    end,
+    mode = { 'n', 't' },
+    desc = 'Toggle lazygit',
+  },
+  {
+    '<a-a>',
+    function()
+      open_agent_coding 'float'
+    end,
+    mode = { 'n', 't' },
+    desc = 'Toggle floating coding agent terminal',
+  },
+  {
+    '<a-A>',
+    function()
+      open_agent_coding 'right'
+    end,
+    mode = { 'n', 't' },
+    desc = 'Toggle split right coding agent terminal',
+  },
+  {
+    '<leader>af',
+    agent_coding_send_file,
+    mode = 'n',
+    desc = '[A]gentCoding send [F]ile',
+  },
+  {
+    '<leader>at',
+    agent_coding_send_line,
+    mode = 'n',
+    desc = '[A]gentCoding send [T]his',
+  },
+  {
+    '<leader>at',
+    agent_coding_send_selection,
+    mode = 'v',
+    desc = '[A]gentCoding send [T]his',
+  },
+}
+
+for i = 1, 9 do
+  keys[#keys + 1] = {
+    string.format('<a-%d>', i),
+    function()
+      toggle_single_floating_terminal(nil, shell_float_opts { count = i, cwd = snacks_search.get_project_root() })
+    end,
+    mode = { 'n', 't' },
+    desc = string.format('Toggle floating terminal %d', i),
+  }
+end
+
 return {
   {
     'folke/snacks.nvim',
@@ -143,134 +250,6 @@ return {
         },
       }
     end,
-    keys = {
-      {
-        '<c-\\>',
-        function()
-          Snacks.terminal(nil, shell_float_opts { count = vim.v.count1 })
-        end,
-        mode = { 'n', 't' },
-        desc = 'Toggle terminal',
-      },
-      {
-        '<a-l>',
-        function()
-          Snacks.lazygit.open {
-            cwd = snacks_search.get_project_root(),
-            win = vim.tbl_deep_extend('force', float_win(), {
-              border = 'rounded',
-            }),
-          }
-        end,
-        mode = { 'n', 't' },
-        desc = 'Toggle lazygit',
-      },
-      {
-        '<a-a>',
-        function()
-          open_agent_coding 'float'
-        end,
-        mode = { 'n', 't' },
-        desc = 'Toggle floating coding agent terminal',
-      },
-      {
-        '<a-A>',
-        function()
-          open_agent_coding 'right'
-        end,
-        mode = { 'n', 't' },
-        desc = 'Toggle split right coding agent terminal',
-      },
-      {
-        '<leader>af',
-        agent_coding_send_file,
-        mode = 'n',
-        desc = '[A]gentCoding send [F]ile',
-      },
-      {
-        '<leader>at',
-        agent_coding_send_line,
-        mode = 'n',
-        desc = '[A]gentCoding send [T]his',
-      },
-      {
-        '<leader>at',
-        agent_coding_send_selection,
-        mode = 'v',
-        desc = '[A]gentCoding send [T]his',
-      },
-      {
-        '<a-1>',
-        function()
-          Snacks.terminal(nil, shell_float_opts { count = 1, cwd = snacks_search.get_project_root() })
-        end,
-        mode = { 'n', 't' },
-        desc = 'Toggle floating terminal 1',
-      },
-      {
-        '<a-2>',
-        function()
-          Snacks.terminal(nil, shell_float_opts { count = 2, cwd = snacks_search.get_project_root() })
-        end,
-        mode = { 'n', 't' },
-        desc = 'Toggle floating terminal 2',
-      },
-      {
-        '<a-3>',
-        function()
-          Snacks.terminal(nil, shell_float_opts { count = 3, cwd = snacks_search.get_project_root() })
-        end,
-        mode = { 'n', 't' },
-        desc = 'Toggle floating terminal 3',
-      },
-      {
-        '<a-4>',
-        function()
-          Snacks.terminal(nil, shell_float_opts { count = 4, cwd = snacks_search.get_project_root() })
-        end,
-        mode = { 'n', 't' },
-        desc = 'Toggle floating terminal 4',
-      },
-      {
-        '<a-5>',
-        function()
-          Snacks.terminal(nil, shell_float_opts { count = 5, cwd = snacks_search.get_project_root() })
-        end,
-        mode = { 'n', 't' },
-        desc = 'Toggle floating terminal 5',
-      },
-      {
-        '<a-6>',
-        function()
-          Snacks.terminal(nil, shell_float_opts { count = 6, cwd = snacks_search.get_project_root() })
-        end,
-        mode = { 'n', 't' },
-        desc = 'Toggle floating terminal 6',
-      },
-      {
-        '<a-7>',
-        function()
-          Snacks.terminal(nil, shell_float_opts { count = 7, cwd = snacks_search.get_project_root() })
-        end,
-        mode = { 'n', 't' },
-        desc = 'Toggle floating terminal 7',
-      },
-      {
-        '<a-8>',
-        function()
-          Snacks.terminal(nil, shell_float_opts { count = 8, cwd = snacks_search.get_project_root() })
-        end,
-        mode = { 'n', 't' },
-        desc = 'Toggle floating terminal 8',
-      },
-      {
-        '<a-9>',
-        function()
-          Snacks.terminal(nil, shell_float_opts { count = 9, cwd = snacks_search.get_project_root() })
-        end,
-        mode = { 'n', 't' },
-        desc = 'Toggle floating terminal 9',
-      },
-    },
+    keys = keys,
   },
 }

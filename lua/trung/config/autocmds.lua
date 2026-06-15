@@ -71,7 +71,8 @@ vim.api.nvim_create_autocmd('BufEnter', {
     vim.cmd.nmenu [[100.205 PopUp.Open\ File\ Under\ Cursor <cmd>lua _G.OpenFileUnderCursor()<CR>]]
     vim.cmd.nmenu [[100.210 PopUp.Copy\ All <cmd>%y+<CR>]]
     vim.cmd.nmenu [[100.212 PopUp.Copy\ File\ Name <cmd>let @+=expand('%:t')<CR>]]
-    vim.cmd.nmenu [[100.215 PopUp.Go\ To\ Context <cmd>lua require("treesitter-context").go_to_context(vim.v.count1)<CR>]]
+    vim.cmd.nmenu [[100.213 PopUp.Copy\ File\ Position <cmd>let @+=expand('%') . ':' . line('.')<CR>]]
+    vim.cmd.nmenu [[100.215 PopUp.New\ Empty\ File <cmd>vnew<CR>]]
     vim.cmd.nmenu [[100.220 PopUp.Grep\ Word\ (Project\ Root) <cmd>lua require('trung.utils.snacks_search').grep_cword_project()<CR>]]
     vim.cmd.nmenu [[100.230 PopUp.Grep\ Word\ (CWD) <cmd>lua require('trung.utils.snacks_search').grep_cword_pwd()<CR>]]
     vim.cmd.vmenu [[100.240 PopUp.Grep\ Selection\ (Project\ Root) :<C-U>lua require('trung.utils.snacks_search').grep_visual_project()<CR>]]
@@ -99,48 +100,3 @@ vim.api.nvim_create_autocmd('User', {
     end
   end,
 })
-
--- Show lsp progress
----@type table<number, {token:lsp.ProgressToken, msg:string, done:boolean}[]>
-local progress = vim.defaulttable()
-vim.api.nvim_create_autocmd('LspProgress', {
-  ---@param ev {data: {client_id: integer, params: lsp.ProgressParams}}
-  callback = function(ev)
-    local client = vim.lsp.get_client_by_id(ev.data.client_id)
-    local value = ev.data.params.value --[[@as {percentage?: number, title?: string, message?: string, kind: "begin" | "report" | "end"}]]
-    if not client or type(value) ~= 'table' then
-      return
-    end
-    local p = progress[client.id]
-
-    for i = 1, #p + 1 do
-      if i == #p + 1 or p[i].token == ev.data.params.token then
-        p[i] = {
-          token = ev.data.params.token,
-          msg = ('[%3d%%] %s%s'):format(
-            value.kind == 'end' and 100 or value.percentage or 100,
-            value.title or '',
-            value.message and (' **%s**'):format(value.message) or ''
-          ),
-          done = value.kind == 'end',
-        }
-        break
-      end
-    end
-
-    local msg = {} ---@type string[]
-    progress[client.id] = vim.tbl_filter(function(v)
-      return table.insert(msg, v.msg) or not v.done
-    end, p)
-
-    local spinner = { '⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏' }
-    vim.notify(table.concat(msg, '\n'), 'info', {
-      id = 'lsp_progress',
-      title = client.name,
-      opts = function(notif)
-        notif.icon = #progress[client.id] == 0 and ' ' or spinner[math.floor(vim.uv.hrtime() / (1e6 * 80)) % #spinner + 1]
-      end,
-    })
-  end,
-})
-

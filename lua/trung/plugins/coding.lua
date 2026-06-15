@@ -244,7 +244,14 @@ return {
   {
     'stevearc/overseer.nvim',
     config = function()
+      --- overseer.SetupOpts
       require('overseer').setup {
+        component_aliases = {
+          default = {
+            { 'open_output', direction = 'vertical', focus = true },
+            -- 'on_complete_notify',
+          },
+        },
         task_list = {
           keymaps = {
             ['J'] = 'keymap.next_task',
@@ -259,6 +266,48 @@ return {
       { '<F1>', '<cmd>OverseerRun<cr>', desc = '[O]verseer [R]un' },
       { '<leader>oa', '<cmd>OverseerTaskAction<cr>', desc = '[O]verseer [A]ction' },
       { '<leader>os', '<cmd>OverseerShell<cr>', desc = '[O]verseer [S]hell' },
+    },
+  },
+  {
+    'stevearc/conform.nvim',
+    event = { 'BufWritePre' },
+    cmd = { 'ConformInfo' },
+    keys = {
+      {
+        '=',
+        function()
+          require('conform').format { async = true, lsp_format = 'fallback' }
+        end,
+        mode = { 'v' },
+        desc = 'Format buffer',
+      },
+      {
+        '==',
+        function()
+          require('conform').format { async = true, lsp_format = 'fallback' }
+        end,
+        mode = { 'n' },
+        desc = 'Format buffer',
+      },
+    },
+    opts = {
+      notify_on_error = true,
+      formatters_by_ft = {
+        lua = { 'stylua' },
+        python = { 'ruff_format' },
+        json = { 'prettierd', 'prettier', stop_after_first = true },
+        jsonc = { 'prettierd', 'prettier', stop_after_first = true },
+        yaml = { 'prettierd', 'prettier', stop_after_first = true },
+        javascript = { 'prettierd', 'prettier', stop_after_first = true },
+        javascriptreact = { 'prettierd', 'prettier', stop_after_first = true },
+        typescript = { 'prettierd', 'prettier', stop_after_first = true },
+        typescriptreact = { 'prettierd', 'prettier', stop_after_first = true },
+        sql = { 'sleek' },
+        bash = { 'beautysh' },
+        zsh = { 'beautysh' },
+        markdown = { 'prettierd', 'prettier' },
+        make = { 'cmakelang' },
+      },
     },
   },
 }

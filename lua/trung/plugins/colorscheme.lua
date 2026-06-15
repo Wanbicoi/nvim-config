@@ -74,6 +74,9 @@ return {
   {
     'rose-pine/neovim',
     name = 'rose-pine',
+    opts = {
+      variant = "dawn",
+    },
     config = function()
       vim.cmd 'colorscheme rose-pine'
     end,

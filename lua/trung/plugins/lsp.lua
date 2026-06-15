@@ -154,47 +154,6 @@ return {
     ft = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'json' },
   },
   {
-    'stevearc/conform.nvim',
-    event = { 'BufWritePre' },
-    cmd = { 'ConformInfo' },
-    keys = {
-      {
-        '=',
-        function()
-          require('conform').format { async = true, lsp_format = 'fallback' }
-        end,
-        mode = { 'v' },
-        desc = 'Format buffer',
-      },
-      {
-        '==',
-        function()
-          require('conform').format { async = true, lsp_format = 'fallback' }
-        end,
-        mode = { 'n' },
-        desc = 'Format buffer',
-      },
-    },
-    opts = {
-      notify_on_error = true,
-      formatters_by_ft = {
-        lua = { 'stylua' },
-        python = { 'ruff_format' },
-        json = { 'prettierd', 'prettier', stop_after_first = true },
-        jsonc = { 'prettierd', 'prettier', stop_after_first = true },
-        yaml = { 'prettierd', 'prettier', stop_after_first = true },
-        javascript = { 'prettierd', 'prettier', stop_after_first = true },
-        javascriptreact = { 'prettierd', 'prettier', stop_after_first = true },
-        typescript = { 'prettierd', 'prettier', stop_after_first = true },
-        typescriptreact = { 'prettierd', 'prettier', stop_after_first = true },
-        sql = { 'sleek' },
-        bash = { 'beautysh' },
-        zsh = { 'beautysh' },
-        markdown = { 'prettierd', 'prettier' },
-      },
-    },
-  },
-  {
     'saghen/blink.cmp',
     event = { 'InsertEnter', 'CmdlineEnter' },
     dependencies = { 'rafamadriz/friendly-snippets', 'xzbdmw/colorful-menu.nvim' },

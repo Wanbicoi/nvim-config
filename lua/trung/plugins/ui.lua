@@ -58,7 +58,7 @@ return {
       words = { enabled = true },
       gitbrowse = { enabled = true },
       quickfile = { enabled = true },
-      notifier = { enabled = true },
+      notifier = { enabled = true, top_down = false },
       indent = {
         enabled = true,
         chunk = {
@@ -116,7 +116,7 @@ return {
       {
         '<leader><leader>',
         function()
-          snacks_search.project('git_files', { show_untracked = true })
+          snacks_search.project('git_files', { untracked = true })
         end,
         desc = '[F]ind [G]it Files',
       },
@@ -401,6 +401,14 @@ return {
   },
   {
     'nvim-lualine/lualine.nvim',
+    dependencies = {
+      {
+        'linrongbin16/lsp-progress.nvim',
+        config = function()
+          require('lsp-progress').setup()
+        end,
+      },
+    },
     opts = {
       -- options = {
       -- globalstatus = true,
@@ -427,6 +435,15 @@ return {
           },
           {
             function()
+              return ''
+            end,
+            separator = '',
+            on_click = function()
+              require('treesitter-context').go_to_context(vim.v.count1)
+            end,
+          },
+          {
+            function()
               return ''
             end,
             separator = '',
@@ -438,6 +455,9 @@ return {
           'mode',
         },
         lualine_c = {
+          function()
+            return require('lsp-progress').progress()
+          end,
           {
             'filename',
             path = 1,

@@ -47,7 +47,7 @@ local function pick_agent_cwd(callback)
 end
 
 local function hide_agent_coding(kind)
-  local term = Snacks.terminal.get('pi', vim.tbl_extend('force', agent_opts(kind), { create = false }))
+  local term = Snacks.terminal.get('agy', vim.tbl_extend('force', agent_opts(kind), { create = false }))
   if term and term:win_valid() then
     term:hide()
   end
@@ -80,9 +80,9 @@ local function open_agent_coding(kind)
 
   local function open()
     if kind == 'float' then
-      toggle_single_floating_terminal('pi', agent_opts(kind))
+      toggle_single_floating_terminal('agy', agent_opts(kind))
     else
-      Snacks.terminal('pi', agent_opts(kind))
+      Snacks.terminal('agy', agent_opts(kind))
     end
   end
 
@@ -98,7 +98,7 @@ local function open_agent_coding(kind)
 end
 
 local function get_active_agent_kind()
-  local right = Snacks.terminal.get('pi', vim.tbl_extend('force', agent_opts 'right', { create = false }))
+  local right = Snacks.terminal.get('agy', vim.tbl_extend('force', agent_opts 'right', { create = false }))
   if right and right:win_valid() then
     return 'right'
   end
@@ -110,7 +110,7 @@ local function send_to_agent_coding(text)
   local state = agent_state[kind]
 
   local function send()
-    local term = Snacks.terminal.get('pi', agent_opts(kind))
+    local term = Snacks.terminal.get('agy', agent_opts(kind))
     if term and not term:win_valid() then
       term:show()
     end

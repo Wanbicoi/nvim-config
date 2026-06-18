@@ -92,6 +92,7 @@ return {
         sources = {
           projects = {
             dev = { '~/Repos' },
+            patterns = { '.git', '_darcs', '.hg', '.bzr', '.svn', 'package.json', 'Makefile', 'be-group' },
           },
         },
       },
@@ -100,7 +101,7 @@ return {
       {
         '<leader>e',
         function()
-          Snacks.explorer()
+          Snacks.explorer { hidden = true }
         end,
         desc = '[E]xplorer',
         mode = { 'n' },
@@ -405,23 +406,57 @@ return {
       {
         'linrongbin16/lsp-progress.nvim',
         config = function()
-          require('lsp-progress').setup()
+          require('lsp-progress').setup {}
         end,
+      },
+      {
+        'SmiteshP/nvim-navic',
+        opts = {
+          lsp = {
+            auto_attach = true,
+          },
+        },
       },
     },
     opts = {
-      -- options = {
-      -- globalstatus = true,
-      -- },
+      options = {
+        globalstatus = true,
+        disabled_filetypes = {
+          winbar = { 'OverseerList', 'OverseerOutput', 'BookmarksTree', 'qf' },
+        },
+      },
       sections = {
         lualine_c = {
           function()
             return require('lsp-progress').progress()
           end,
+          {
+            'navic',
+            color_correction = nil,
+            -- Can be nil, "static" or "dynamic". This option is useful only when you have highlights enabled.
+            -- Many colorschemes don't define same backgroud for nvim-navic as their lualine statusline backgroud.
+            -- Setting it to "static" will perform a adjustment once when the component is being setup. This should
+            --	 be enough when the lualine section isn't changing colors based on the mode.
+            -- Setting it to "dynamic" will keep updating the highlights according to the current modes colors for
+            --	 the current section.
+            navic_opts = nil, -- lua table with same format as setup's option. All options except "lsp" options take effect when set here.
+            on_click = function()
+              local navic = require 'nvim-navic'
+              if navic.is_available() then
+                local data = navic.get_data()
+                if data and #data >= 2 then
+                  local parent = data[#data - 1]
+                  if parent and parent.scope and parent.scope.start then
+                    vim.api.nvim_win_set_cursor(0, { parent.scope.start.line, parent.scope.start.character })
+                  end
+                end
+              end
+            end,
+          },
         },
       },
       winbar = {
-        lualine_z = {
+        lualine_a = {
           {
             function()
               return ''
@@ -440,15 +475,15 @@ return {
               vim.api.nvim_feedkeys(vim.keycode '<C-i>', 'n', false)
             end,
           },
-          {
-            function()
-              return ''
-            end,
-            separator = '',
-            on_click = function()
-              require('treesitter-context').go_to_context(vim.v.count1)
-            end,
-          },
+          -- {
+          --   function()
+          --     return ''
+          --   end,
+          --   separator = '',
+          --   on_click = function()
+          --     require('treesitter-context').go_to_context(vim.v.count1)
+          --   end,
+          -- },
           {
             function()
               return ''
@@ -460,10 +495,10 @@ return {
             end,
           },
         },
-        lualine_b = {
+        lualine_c = {
           {
             'filename',
-            path = 1,
+            path = 3,
           },
         },
       },
@@ -502,23 +537,26 @@ return {
     'rmagatti/auto-session',
     lazy = false,
     config = {
-      auto_restore_last_session = true,
+      -- auto_restore_last_session = true,
+      auto_create = false,
       legacy_cmds = false,
-      cwd_change_handling = true,
+      cwd_change_handling = false,
       session_lens = {
         picker = 'snacks',
       },
-      pre_restore_cmds = {
-        function()
-          -- Avoid when launching with a file arg
-          if vim.fn.argc() > 0 then
-            return false
-          end
-
-          return true
-        end,
+      bypass_save_filetypes = {
+        'BookmarksTree',
       },
     },
+    -- init = function()
+    --   vim.api.nvim_create_autocmd('VimEnter', {
+    --     desc = 'Auto call auto-session',
+    --     group = vim.api.nvim_create_augroup('trung-autosave', { clear = true }),
+    --     callback = function()
+    --       vim.cmd [[AutoSession search]]
+    --     end,
+    --   })
+    -- end,
     keys = {
       { '<leader>fs', '<cmd>AutoSession search<CR>', desc = 'Session search' },
     },
@@ -642,6 +680,8 @@ return {
     -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
     ---@module 'render-markdown'
     ---@type render.md.UserConfig
-    opts = {},
+    opts = {
+      file_types = { 'markdown', 'practice-description' },
+    },
   },
 }

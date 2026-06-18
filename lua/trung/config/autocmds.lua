@@ -67,12 +67,13 @@ vim.api.nvim_create_autocmd('BufEnter', {
       vim.cmd [[silent! aunmenu PopUp.Diff\ Put]]
     end
 
-    vim.cmd.nmenu [[100.200 PopUp.-SearchSep- :]]
+    vim.cmd.nmenu [[100.200 PopUp.-File- :]]
     vim.cmd.nmenu [[100.205 PopUp.Open\ File\ Under\ Cursor <cmd>lua _G.OpenFileUnderCursor()<CR>]]
     vim.cmd.nmenu [[100.210 PopUp.Copy\ All <cmd>%y+<CR>]]
     vim.cmd.nmenu [[100.212 PopUp.Copy\ File\ Name <cmd>let @+=expand('%:t')<CR>]]
     vim.cmd.nmenu [[100.213 PopUp.Copy\ File\ Position <cmd>let @+=expand('%') . ':' . line('.')<CR>]]
     vim.cmd.nmenu [[100.215 PopUp.New\ Empty\ File <cmd>vnew<CR>]]
+    vim.cmd.nmenu [[100.219 PopUp.-SearchSep- :]]
     vim.cmd.nmenu [[100.220 PopUp.Grep\ Word\ (Project\ Root) <cmd>lua require('trung.utils.snacks_search').grep_cword_project()<CR>]]
     vim.cmd.nmenu [[100.230 PopUp.Grep\ Word\ (CWD) <cmd>lua require('trung.utils.snacks_search').grep_cword_pwd()<CR>]]
     vim.cmd.vmenu [[100.240 PopUp.Grep\ Selection\ (Project\ Root) :<C-U>lua require('trung.utils.snacks_search').grep_visual_project()<CR>]]
@@ -81,15 +82,15 @@ vim.api.nvim_create_autocmd('BufEnter', {
 })
 
 -- Auto load script
-vim.api.nvim_create_autocmd('DirChanged', {
-  callback = function()
-    local file = vim.fn.getcwd() .. '/.nvim.lua'
-    if vim.fn.filereadable(file) == 1 and vim.secure.trust { action = 'allow', path = file } then
-      dofile(file)
-      print('Loaded local config: ' .. file)
-    end
-  end,
-})
+-- vim.api.nvim_create_autocmd('DirChanged', {
+--   callback = function()
+--     local file = vim.fn.getcwd() .. '/.nvim.lua'
+--     if vim.fn.filereadable(file) == 1 and vim.secure.trust { action = 'allow', path = file } then
+--       dofile(file)
+--       print('Loaded local config: ' .. file)
+--     end
+--   end,
+-- })
 
 -- lsp rename file
 vim.api.nvim_create_autocmd('User', {
@@ -98,5 +99,14 @@ vim.api.nvim_create_autocmd('User', {
     if event.data.actions[1].type == 'move' then
       Snacks.rename.on_rename_file(event.data.actions[1].src_url, event.data.actions[1].dest_url)
     end
+  end,
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "help", "markdown" },
+  callback = function()
+    vim.opt_local.wrap = true
+    vim.opt_local.linebreak = true
+    vim.opt_local.breakindent = true
   end,
 })

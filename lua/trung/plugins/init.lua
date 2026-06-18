@@ -20,7 +20,7 @@ require('lazy').setup({
   require 'trung.plugins.terminal',
 
   -- Optional extras
-  require 'trung.plugins.extras.debug',
+  -- require 'trung.plugins.extras.debug',
   -- require 'trung.plugins.extras.lint',
   -- require 'trung.plugins.extras.ctags',
   -- require 'trung.plugins.extras.avante',

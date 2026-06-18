@@ -68,20 +68,6 @@ return {
     end,
   },
   {
-    'nvim-treesitter/nvim-treesitter-context',
-    event = 'BufEnter',
-    config = function()
-      require('treesitter-context').setup {
-        max_lines = 5,
-        multiline_threshold = 2,
-        separator = '—',
-      }
-      vim.keymap.set('n', '[n', function()
-        require('treesitter-context').go_to_context(vim.v.count1)
-      end, { silent = true, desc = 'Go to co[n]text' })
-    end,
-  },
-  {
     'catgoose/nvim-colorizer.lua',
     event = 'BufReadPre',
     opts = {},
@@ -248,7 +234,7 @@ return {
       require('overseer').setup {
         component_aliases = {
           default = {
-            { 'open_output', direction = 'vertical', focus = true },
+            { 'open_output', focus = true },
             -- 'on_complete_notify',
           },
         },

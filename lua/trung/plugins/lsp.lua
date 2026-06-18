@@ -13,8 +13,8 @@ return {
         },
       },
       'mason-org/mason-lspconfig.nvim',
-      -- { 'j-hui/fidget.nvim', opts = {} },
       'saghen/blink.cmp',
+      'SmiteshP/nvim-navic',
     },
     config = function()
       vim.api.nvim_create_autocmd('LspAttach', {

@@ -4,17 +4,20 @@ vim.g.maplocalleader = ' '
 -- split help to right
 vim.cmd [[
   cabbrev h vert h
+  cabbrev term vsplit term://zsh
   cabbrev help vert help
 ]]
 vim.o.termguicolors = true
 vim.o.autowriteall = true
-vim.o.exrc = false
-vim.o.tabstop = 2
+vim.o.exrc = true
+vim.opt.tabstop = 2
+vim.o.sessionoptions = 'blank,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions'
 vim.o.shiftwidth = 2
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.mouse = 'a'
 vim.opt.mousemodel = 'popup_setpos'
+-- vim.opt.mousemoveevent = true
 vim.cmd 'autocmd! nvim.popupmenu'
 vim.cmd.aunmenu 'PopUp' -- Remove all default menu items for PopUp
 vim.opt.showmode = false
@@ -55,12 +58,12 @@ vim.opt.autoread = true
 vim.opt.confirm = true
 -- vim.o.incsearch = false
 vim.o.wrap = false
+vim.o.linebreak = true -- only applied when wrap is on
 vim.o.cursorlineopt = 'both'
 vim.o.swapfile = false
 vim.wo.foldmethod = 'indent'
 -- vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
 vim.o.foldenable = false -- avoid auto close all on load
-vim.cmd [[set sessionoptions-=blank,help,terminal]]
 vim.o.winwidth = 40
 vim.o.winminwidth = 20
 

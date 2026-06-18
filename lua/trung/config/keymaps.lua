@@ -6,17 +6,13 @@ vim.keymap.set('x', 'p', '"_dP', { desc = 'Paste without overwriting clipboard' 
 vim.keymap.set('n', ']d', function()
   vim.diagnostic.jump {
     count = 1,
-    on_jump = function()
-      vim.diagnostic.open_float()
-    end,
+    float = true,
   }
 end)
 vim.keymap.set('n', '[d', function()
   vim.diagnostic.jump {
     count = -1,
-    on_jump = function()
-      vim.diagnostic.open_float()
-    end,
+    float = true,
   }
 end)
 
@@ -24,18 +20,14 @@ vim.keymap.set('n', ']e', function()
   vim.diagnostic.jump {
     severity = vim.diagnostic.severity.ERROR,
     count = 1,
-    on_jump = function()
-      vim.diagnostic.open_float()
-    end,
+    float = true,
   }
 end)
 vim.keymap.set('n', '[e', function()
   vim.diagnostic.jump {
     severity = vim.diagnostic.severity.ERROR,
     count = -1,
-    on_jump = function()
-      vim.diagnostic.open_float()
-    end,
+    float = true,
   }
 end)
 

@@ -307,6 +307,7 @@ return {
         zsh = { 'beautysh' },
         markdown = { 'prettierd', 'prettier' },
         make = { 'cmakelang' },
+        xml = { 'xmlformatter' },
       },
     },
   },

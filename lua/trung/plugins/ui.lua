@@ -414,7 +414,14 @@ return {
       -- globalstatus = true,
       -- },
       sections = {
-        lualine_a = {
+        lualine_c = {
+          function()
+            return require('lsp-progress').progress()
+          end,
+        },
+      },
+      winbar = {
+        lualine_z = {
           {
             function()
               return ''
@@ -452,17 +459,20 @@ return {
               MiniBufremove.wipeout()
             end,
           },
-          'mode',
         },
-        lualine_c = {
-          function()
-            return require('lsp-progress').progress()
-          end,
+        lualine_b = {
           {
             'filename',
             path = 1,
           },
         },
+      },
+      extensions = {
+        'oil',
+        'aerial',
+        'overseer',
+        'quickfix',
+        'mason',
       },
     },
   },

@@ -491,7 +491,7 @@ return {
             end,
             separator = '',
             on_click = function()
-              vim.cmd 'Oil --float'
+              require('oil').open_float()
             end,
           },
         },
@@ -518,6 +518,12 @@ return {
         ['q'] = { 'actions.close', mode = 'n' },
         ['gc'] = { 'actions.copy_to_system_clipboard', mode = 'n' },
         ['c-o'] = { 'actions.open_external', mode = 'n' },
+        ['<LeftMouse>'] = function()
+          local mouse = vim.fn.getmousepos()
+          vim.api.nvim_win_set_cursor(mouse.winid, { mouse.line, mouse.column - 1 })
+          require('oil').select()
+        end,
+        ['<RightMouse>'] = { 'actions.parent', mode = 'n' },
       },
       float = {
         padding = 4,
@@ -686,6 +692,11 @@ return {
   },
   {
     'soulis-1256/eagle.nvim',
+    opts = {},
+    event = 'VeryLazy',
+  },
+  {
+    'dstein64/nvim-scrollview',
     opts = {},
     event = 'VeryLazy',
   },

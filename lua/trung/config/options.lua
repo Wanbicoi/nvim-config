@@ -17,7 +17,7 @@ vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.mouse = 'a'
 vim.opt.mousemodel = 'popup_setpos'
--- vim.opt.mousemoveevent = true
+vim.opt.mousemoveevent = true
 vim.cmd 'autocmd! nvim.popupmenu'
 vim.cmd.aunmenu 'PopUp' -- Remove all default menu items for PopUp
 vim.opt.showmode = false
@@ -77,20 +77,22 @@ if vim.fn.has 'win32' == 1 then
 end
 
 if vim.g.neovide then
-  vim.o.guifont = 'CodeNewRoman Nerd Font Propo:h11' -- text below applies for VimScript
+  vim.o.guifont = 'JetBrainsMono Nerd Font:h10.5' -- text below applies for VimScript
   vim.g.neovide_cursor_vfx_mode = 'pixiedust'
   -- vim.g.neovide_cursor_vfx_mode = 'sonicboom'
-  vim.g.neovide_floating_shadow = true
-  vim.g.neovide_floating_z_height = 10
-  vim.g.neovide_floating_blur_amount_x = 0
-  vim.g.neovide_floating_blur_amount_y = 0
+  vim.g.neovide_floating_shadow = false
+  -- vim.g.neovide_floating_z_height = 10
+  vim.g.neovide_floating_blur_amount_x = 2
+  vim.g.neovide_floating_blur_amount_y = 2
+
+  vim.g.neovide_remember_window_size = true
 
   vim.g.neovide_scroll_animation_length = 0.2
   vim.g.neovide_text_contrast = 0.6
   vim.g.neovide_text_gamma = 1
   vim.g.neovide_cursor_animation_length = 0.02
 
-  vim.g.neovide_title_background_color = 'white'
+  vim.g.neovide_title_background_color = '#faf4ed'
   vim.g.neovide_title_text_color = 'black'
 
   vim.g.neovide_progress_bar_enabled = true

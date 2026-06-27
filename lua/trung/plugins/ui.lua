@@ -475,15 +475,6 @@ return {
               vim.api.nvim_feedkeys(vim.keycode '<C-i>', 'n', false)
             end,
           },
-          -- {
-          --   function()
-          --     return ''
-          --   end,
-          --   separator = '',
-          --   on_click = function()
-          --     require('treesitter-context').go_to_context(vim.v.count1)
-          --   end,
-          -- },
           {
             function()
               return ''
@@ -492,6 +483,15 @@ return {
             on_click = function()
               require('mini.bufremove').setup()
               MiniBufremove.wipeout()
+            end,
+          },
+          {
+            function()
+              return '󰏖 '
+            end,
+            separator = '',
+            on_click = function()
+              vim.cmd 'Oil --float'
             end,
           },
         },
@@ -683,5 +683,10 @@ return {
     opts = {
       file_types = { 'markdown', 'practice-description' },
     },
+  },
+  {
+    'soulis-1256/eagle.nvim',
+    opts = {},
+    event = 'VeryLazy',
   },
 }

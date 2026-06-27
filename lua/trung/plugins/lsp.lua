@@ -55,7 +55,7 @@ return {
           -- vim.cmd.nmenu '100.150 PopUp.LSP\\ Declaration <cmd>lua vim.lsp.buf.declaration()<CR>'
           -- vim.cmd.nmenu '100.160 PopUp.LSP\\ Rename <cmd>lua vim.lsp.buf.rename()<CR>'
           -- vim.cmd.nmenu '100.170 PopUp.LSP\\ Code\\ Action <cmd>lua vim.lsp.buf.code_action()<CR>'
-          vim.cmd.nmenu '100.180 PopUp.LSP\\ Hover <cmd>lua vim.lsp.buf.hover()<CR>'
+          -- vim.cmd.nmenu '100.180 PopUp.LSP\\ Hover <cmd>lua vim.lsp.buf.hover()<CR>'
           vim.cmd.nmenu [[100.190 PopUp.LSP\ Show\ Diagnostic <cmd>lua vim.diagnostic.open_float(nil, { scope = 'line', focus = false, source = 'if_many' })<CR>]]
 
           local function client_supports_method(client, method, bufnr)

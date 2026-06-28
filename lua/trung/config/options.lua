@@ -50,6 +50,7 @@ vim.opt.inccommand = 'split'
 vim.opt.cursorline = true
 vim.opt.cursorcolumn = false
 vim.opt.scrolloff = 1
+vim.o.sidescrolloff = 5 -- Set a large value
 vim.opt.autoread = true
 
 -- if performing an operation that would fail due to unsaved changes in the buffer (like `:q`),
@@ -77,7 +78,8 @@ if vim.fn.has 'win32' == 1 then
 end
 
 if vim.g.neovide then
-  vim.o.guifont = 'JetBrainsMono Nerd Font:h10.5' -- text below applies for VimScript
+  vim.o.guifont = 'JetBrainsMono Nerd Font:h10.5'
+  -- vim.o.guifont = 'UbuntuMono Nerd Font Propo:h10.5'
   vim.g.neovide_cursor_vfx_mode = 'pixiedust'
   -- vim.g.neovide_cursor_vfx_mode = 'sonicboom'
   vim.g.neovide_floating_shadow = false

@@ -696,8 +696,46 @@ return {
     event = 'VeryLazy',
   },
   {
-    'dstein64/nvim-scrollview',
+    'lewis6991/satellite.nvim',
     opts = {},
     event = 'VeryLazy',
+  },
+  {
+    'glacambre/firenvim',
+    build = ':call firenvim#install(0)',
+    config = function()
+      vim.g.firenvim_config = {
+        globalSettings = {
+          ['<C-w>'] = 'noop',
+          ['<C-n>'] = 'default',
+        },
+        localSettings = {
+          ['.*'] = {
+            cmdline = 'neovim',
+            content = 'text',
+            priority = 0,
+            selector = 'textarea',
+            takeover = 'never',
+          },
+          ['.*designgurus\\.io.*'] = {
+            takeover = 'always',
+            priority = 1, -- Higher priority so it overrides the catch-all rule
+            cmdline = 'neovim',
+            content = 'text',
+            selector = 'textarea.inputarea.monaco-mouse-cursor-text',
+            filename = '/home/troy/Downloads/coding/main.py',
+          },
+        },
+      }
+
+      vim.api.nvim_create_autocmd({ 'BufEnter' }, {
+        pattern = '*designgurus*.txt',
+        callback = function()
+          vim.cmd 'set filetype=python'
+          vim.cmd 'GuessIndent'
+        end,
+      })
+      vim.o.guifont = 'JetBrainsMono Nerd Font Propo:h9.5'
+    end,
   },
 }

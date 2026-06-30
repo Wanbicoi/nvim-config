@@ -61,17 +61,6 @@ local function hide_other_floating_terminals(current)
   end
 end
 
-local function toggle_single_floating_terminal(cmd, opts)
-  local term = Snacks.terminal.get(cmd, vim.tbl_extend('force', opts or {}, { create = false }))
-  if term and term:win_valid() then
-    term:hide()
-    return
-  end
-
-  hide_other_floating_terminals(term)
-  Snacks.terminal.focus(cmd, opts)
-end
-
 local function open_agent_coding(kind)
   local state = agent_state[kind]
   local other_kind = kind == 'right' and 'float' or 'right'
@@ -80,7 +69,8 @@ local function open_agent_coding(kind)
 
   local function open()
     if kind == 'float' then
-      toggle_single_floating_terminal('agy', agent_opts(kind))
+      hide_other_floating_terminals(nil)
+      Snacks.terminal.focus('agy', agent_opts(kind))
     else
       Snacks.terminal('agy', agent_opts(kind))
     end
@@ -158,14 +148,6 @@ end
 
 local keys = {
   {
-    '<c-\\>',
-    function()
-      toggle_single_floating_terminal(nil, shell_float_opts { count = vim.v.count1 })
-    end,
-    mode = { 'n', 't' },
-    desc = 'Toggle terminal',
-  },
-  {
     '<a-l>',
     function()
       Snacks.lazygit.open {
@@ -175,24 +157,24 @@ local keys = {
         }),
       }
     end,
-    mode = { 'n', 't' },
-    desc = 'Toggle lazygit',
+    mode = { 'n' },
+    desc = 'Open lazygit',
   },
   {
     '<a-a>',
     function()
       open_agent_coding 'float'
     end,
-    mode = { 'n', 't' },
-    desc = 'Toggle floating coding agent terminal',
+    mode = { 'n' },
+    desc = 'Open floating coding agent terminal',
   },
   {
     '<a-A>',
     function()
       open_agent_coding 'right'
     end,
-    mode = { 'n', 't' },
-    desc = 'Toggle split right coding agent terminal',
+    mode = { 'n' },
+    desc = 'Open split right coding agent terminal',
   },
   {
     '<leader>af',
@@ -218,10 +200,10 @@ for i = 1, 9 do
   keys[#keys + 1] = {
     string.format('<a-%d>', i),
     function()
-      toggle_single_floating_terminal(nil, shell_float_opts { count = i, cwd = snacks_search.get_project_root() })
+      Snacks.terminal(nil, shell_float_opts { count = i, cwd = snacks_search.get_project_root() })
     end,
-    mode = { 'n', 't' },
-    desc = string.format('Toggle floating terminal %d', i),
+    mode = { 'n' },
+    desc = string.format('Open floating terminal %d', i),
   }
 end
 

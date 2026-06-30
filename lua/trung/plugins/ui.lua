@@ -546,7 +546,7 @@ return {
       -- auto_restore_last_session = true,
       auto_create = false,
       legacy_cmds = false,
-      cwd_change_handling = false,
+      cwd_change_handling = true,
       session_lens = {
         picker = 'snacks',
       },

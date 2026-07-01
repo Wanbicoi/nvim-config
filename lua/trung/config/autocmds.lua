@@ -17,7 +17,7 @@ vim.api.nvim_create_autocmd('TextChanged', {
     local buftype = vim.bo.buftype
     local filetype = vim.bo.filetype
     local bufname = vim.api.nvim_buf_get_name(0)
-    local ignore_filetypes = { 'oil', 'help', 'diffview', 'gitcommit', 'gitrebase', 'TelescopePrompt', 'snacks_picker_input' }
+    local ignore_filetypes = { 'minifiles', 'minifiles-help', 'help', 'diffview', 'gitcommit', 'gitrebase', 'TelescopePrompt', 'snacks_picker_input' }
 
     if vim.bo.modified and bufname ~= '' and buftype == '' and not vim.tbl_contains(ignore_filetypes, filetype) then
       vim.cmd 'silent! wall'
@@ -92,18 +92,15 @@ vim.api.nvim_create_autocmd('BufEnter', {
 --   end,
 -- })
 
--- lsp rename file
 vim.api.nvim_create_autocmd('User', {
-  pattern = 'OilActionsPost',
+  pattern = 'MiniFilesActionRename',
   callback = function(event)
-    if event.data.actions[1].type == 'move' then
-      Snacks.rename.on_rename_file(event.data.actions[1].src_url, event.data.actions[1].dest_url)
-    end
+    Snacks.rename.on_rename_file(event.data.from, event.data.to)
   end,
 })
 
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "help", "markdown" },
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { 'help', 'markdown' },
   callback = function()
     vim.opt_local.wrap = true
     vim.opt_local.linebreak = true

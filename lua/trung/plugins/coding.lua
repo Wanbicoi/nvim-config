@@ -138,7 +138,57 @@ return {
       require('mini.bufremove').setup()
       vim.keymap.set('n', '<leader>x', MiniBufremove.delete, { desc = '[X] Delete current buffer' })
       vim.keymap.set('n', '<leader>X', MiniBufremove.wipeout, { desc = '[X] Wipeout current buffer' })
-      vim.g.minisessions_disable = true
+      require('mini.files').setup {}
+      vim.keymap.set('n', '-', function()
+        require('mini.files').open(vim.api.nvim_buf_get_name(0))
+      end, { desc = 'Open mini.files (directory of current file)' })
+
+      vim.api.nvim_create_autocmd('User', {
+        pattern = 'MiniFilesBufferCreate',
+        callback = function(args)
+          local buf_id = args.data.buf_id
+
+          local yank_path = function()
+            local path = (require('mini.files').get_fs_entry() or {}).path
+            if path == nil then return vim.notify('Cursor is not on valid entry') end
+            vim.fn.setreg(vim.v.register, path)
+            vim.fn.setreg('+', path)
+            vim.notify('Yanked path: ' .. path)
+          end
+
+          local ui_open = function()
+            local path = (require('mini.files').get_fs_entry() or {}).path
+            if path == nil then return vim.notify('Cursor is not on valid entry') end
+            vim.ui.open(path)
+          end
+
+          vim.keymap.set('n', 'gy', yank_path, { buffer = buf_id, desc = 'Yank path' })
+          vim.keymap.set('n', 'gc', yank_path, { buffer = buf_id, desc = 'Yank path' })
+          vim.keymap.set('n', 'gx', ui_open, { buffer = buf_id, desc = 'Open with system app' })
+          vim.keymap.set('n', '<C-o>', ui_open, { buffer = buf_id, desc = 'Open with system app' })
+
+          vim.keymap.set('n', '<LeftMouse>', function()
+            local mouse = vim.fn.getmousepos()
+            if vim.api.nvim_win_is_valid(mouse.winid) then
+              local clicked_buf = vim.api.nvim_win_get_buf(mouse.winid)
+              local num_lines = vim.api.nvim_buf_line_count(clicked_buf)
+              if mouse.line >= 1 and mouse.line <= num_lines then
+                vim.api.nvim_set_current_win(mouse.winid)
+                vim.api.nvim_win_set_cursor(mouse.winid, { mouse.line, 0 })
+                require('mini.files').go_in { close_on_file = true }
+              end
+            end
+          end, { buffer = buf_id, desc = 'Go in plus' })
+
+          vim.keymap.set('n', '<RightMouse>', function()
+            local mouse = vim.fn.getmousepos()
+            if vim.api.nvim_win_is_valid(mouse.winid) then
+              vim.api.nvim_set_current_win(mouse.winid)
+              require('mini.files').go_out()
+            end
+          end, { buffer = buf_id, desc = 'Go out' })
+        end,
+      })
     end,
   },
   {

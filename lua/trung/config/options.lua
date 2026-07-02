@@ -17,6 +17,7 @@ vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.mouse = 'n'
 vim.opt.mousemodel = 'popup_setpos'
+vim.opt.mousetime = 190
 vim.opt.mousemoveevent = true
 vim.cmd 'autocmd! nvim.popupmenu'
 vim.cmd.aunmenu 'PopUp' -- Remove all default menu items for PopUp

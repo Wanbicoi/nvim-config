@@ -1,3 +1,4 @@
+vim.keymap.set('n', '<2-LeftMouse>', 'yiw', { desc = 'Copy word' })
 vim.keymap.set('t', '<c-q>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 vim.keymap.set('n', '<c-s>', '<cmd>:w<cr>', { desc = 'Save all files' })
 vim.keymap.set('v', '<leader>r', '"0y:%s/\\V<C-r>0//g<Left><Left>')

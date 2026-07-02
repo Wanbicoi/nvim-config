@@ -54,30 +54,37 @@ vim.api.nvim_create_autocmd('BufEnter', {
   desc = 'Setup custom popup menu',
   group = vim.api.nvim_create_augroup('trung-popup-search-menu', { clear = true }),
   callback = function()
+    vim.cmd.nmenu [[100.280 PopUp.-DiffSep- :]]
     if vim.wo.diff then
-      vim.cmd.amenu [[100.210 PopUp.-DiffSep- :]]
-      vim.cmd.nmenu [[100.220 PopUp.Diff\ Get <cmd>diffget<CR>]]
-      vim.cmd.nmenu [[100.230 PopUp.Diff\ Put <cmd>diffput<CR>]]
+      vim.cmd.nmenu [[100.281 PopUp.Diff\ Off <cmd>diffoff<CR>]]
+      vim.cmd [[silent! aunmenu PopUp.Diff\ This]]
 
-      vim.cmd.vmenu [[100.220 PopUp.Diff\ Get <cmd>'<,'>diffget<CR>]]
-      vim.cmd.vmenu [[100.230 PopUp.Diff\ Put <cmd>'<,'>diffput<CR>]]
+      vim.cmd.nmenu [[100.284 PopUp.Diff\ Get <cmd>diffget<CR>]]
+      vim.cmd.nmenu [[100.285 PopUp.Diff\ Put <cmd>diffput<CR>]]
+      vim.opt.mouse = 'a'
+      vim.cmd.vmenu [[100.284 PopUp.Diff\ Get <cmd>'<,'>diffget<CR>]]
+      vim.cmd.vmenu [[100.285 PopUp.Diff\ Put <cmd>'<,'>diffput<CR>]]
     else
-      vim.cmd [[silent! aunmenu PopUp.-DiffSep-]]
+      vim.opt.mouse = 'n'
+      vim.cmd.nmenu [[100.281 PopUp.Diff\ This <cmd>diffthis<CR>]]
+      vim.cmd [[silent! aunmenu PopUp.Diff\ Off]]
+
       vim.cmd [[silent! aunmenu PopUp.Diff\ Get]]
       vim.cmd [[silent! aunmenu PopUp.Diff\ Put]]
     end
 
     vim.cmd.nmenu [[100.200 PopUp.-File- :]]
     vim.cmd.nmenu [[100.205 PopUp.Open\ File\ Under\ Cursor <cmd>lua _G.OpenFileUnderCursor()<CR>]]
-    vim.cmd.nmenu [[100.210 PopUp.Copy\ All <cmd>%y+<CR>]]
+    vim.cmd.nmenu [[100.206 PopUp.Copy\ All <cmd>%y+<CR>]]
     vim.cmd.nmenu [[100.212 PopUp.Copy\ File\ Name <cmd>let @+=expand('%:t')<CR>]]
     vim.cmd.nmenu [[100.213 PopUp.Copy\ File\ Position <cmd>let @+=expand('%') . ':' . line('.')<CR>]]
     vim.cmd.nmenu [[100.215 PopUp.New\ Empty\ File <cmd>vnew<CR>]]
-    vim.cmd.nmenu [[100.219 PopUp.-SearchSep- :]]
-    vim.cmd.nmenu [[100.220 PopUp.Grep\ Word\ (Project\ Root) <cmd>lua require('trung.utils.snacks_search').grep_cword_project()<CR>]]
-    vim.cmd.nmenu [[100.230 PopUp.Grep\ Word\ (CWD) <cmd>lua require('trung.utils.snacks_search').grep_cword_pwd()<CR>]]
-    vim.cmd.vmenu [[100.240 PopUp.Grep\ Selection\ (Project\ Root) :<C-U>lua require('trung.utils.snacks_search').grep_visual_project()<CR>]]
-    vim.cmd.vmenu [[100.250 PopUp.Grep\ Selection\ (CWD) :<C-U>lua require('trung.utils.snacks_search').grep_visual_pwd()<CR>]]
+
+    vim.cmd.amenu [[100.319 PopUp.-SearchSep- :]]
+    vim.cmd.nmenu [[100.320 PopUp.Grep\ Word\ (Project\ Root) <cmd>lua require('trung.utils.snacks_search').grep_cword_project()<CR>]]
+    vim.cmd.nmenu [[100.321 PopUp.Grep\ Word\ (CWD) <cmd>lua require('trung.utils.snacks_search').grep_cword_pwd()<CR>]]
+    vim.cmd.vmenu [[100.320 PopUp.Grep\ Selection\ (Project\ Root) :<C-U>lua require('trung.utils.snacks_search').grep_visual_project()<CR>]]
+    vim.cmd.vmenu [[100.321 PopUp.Grep\ Selection\ (CWD) :<C-U>lua require('trung.utils.snacks_search').grep_visual_pwd()<CR>]]
   end,
 })
 

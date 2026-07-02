@@ -15,7 +15,7 @@ vim.o.sessionoptions = 'blank,curdir,folds,help,tabpages,winsize,winpos,terminal
 vim.o.shiftwidth = 2
 vim.opt.number = true
 vim.opt.relativenumber = true
-vim.opt.mouse = 'a'
+vim.opt.mouse = 'n'
 vim.opt.mousemodel = 'popup_setpos'
 vim.opt.mousemoveevent = true
 vim.cmd 'autocmd! nvim.popupmenu'

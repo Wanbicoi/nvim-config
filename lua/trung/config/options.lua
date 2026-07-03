@@ -80,7 +80,7 @@ end
 
 vim.defer_fn(function()
   if vim.g.neovide then
-    vim.o.guifont = 'JetBrainsMono Nerd Font:h10.5'
+    vim.o.guifont = 'JetBrainsMono Nerd Font:h10'
     -- vim.o.guifont = 'UbuntuMono Nerd Font Propo:h10.5'
     vim.g.neovide_cursor_vfx_mode = 'pixiedust'
     -- vim.g.neovide_cursor_vfx_mode = 'sonicboom'

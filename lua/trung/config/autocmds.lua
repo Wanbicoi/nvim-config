@@ -65,7 +65,7 @@ vim.api.nvim_create_autocmd('BufEnter', {
       vim.cmd.vmenu [[100.284 PopUp.Diff\ Get <cmd>'<,'>diffget<CR>]]
       vim.cmd.vmenu [[100.285 PopUp.Diff\ Put <cmd>'<,'>diffput<CR>]]
     else
-      vim.opt.mouse = 'n'
+      vim.opt.mouse = 'ni'
       vim.cmd.nmenu [[100.281 PopUp.Diff\ This <cmd>diffthis<CR>]]
       vim.cmd [[silent! aunmenu PopUp.Diff\ Off]]
 
@@ -76,8 +76,9 @@ vim.api.nvim_create_autocmd('BufEnter', {
     vim.cmd.nmenu [[100.200 PopUp.-File- :]]
     vim.cmd.nmenu [[100.205 PopUp.Open\ File\ Under\ Cursor <cmd>lua _G.OpenFileUnderCursor()<CR>]]
     vim.cmd.nmenu [[100.206 PopUp.Copy\ All <cmd>%y+<CR>]]
+    vim.cmd.nmenu [[100.211 PopUp.Copy\ Word\ Under\ Cursor yiw]]
     vim.cmd.nmenu [[100.212 PopUp.Copy\ File\ Name <cmd>let @+=expand('%:t')<CR>]]
-    vim.cmd.nmenu [[100.213 PopUp.Copy\ File\ Position <cmd>let @+=expand('%') . ':' . line('.')<CR>]]
+    vim.cmd.nmenu [[100.213 PopUp.Copy\ Code\ Position <cmd>let @+=expand('%') . ':' . line('.')<CR>]]
     vim.cmd.nmenu [[100.215 PopUp.New\ Empty\ File <cmd>vnew<CR>]]
 
     vim.cmd.amenu [[100.319 PopUp.-SearchSep- :]]
@@ -112,5 +113,17 @@ vim.api.nvim_create_autocmd('FileType', {
     vim.opt_local.wrap = true
     vim.opt_local.linebreak = true
     vim.opt_local.breakindent = true
+  end,
+})
+
+vim.api.nvim_create_autocmd({ 'TermOpen', 'BufEnter' }, {
+  group = vim.api.nvim_create_augroup('TerminalInsertFocus', { clear = true }),
+  pattern = 'term://*', -- Target only terminal buffers
+  callback = function()
+    vim.schedule(function()
+      if vim.bo.buftype == 'terminal' then
+        vim.cmd 'startinsert'
+      end
+    end)
   end,
 })

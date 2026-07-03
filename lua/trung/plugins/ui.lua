@@ -549,6 +549,35 @@ return {
         width = 48,
         default_direction = 'prefer_left',
       },
+      -- 1. Ensure Variable and Constant are permitted for JS/TS
+      filter_kind = {
+        'Class',
+        'Constructor',
+        'Enum',
+        'Function',
+        'Interface',
+        'Module',
+        'Method',
+        'Struct',
+        -- Required to catch arrow functions:
+        'Variable',
+        'Constant',
+      },
+
+      post_parse_symbol = function(bufnr, item, _)
+        local filetype = vim.bo[bufnr].filetype
+        if filetype == 'typescript' or filetype == 'typescriptreact' or filetype == 'javascript' or filetype == 'javascriptreact' then
+          -- If it's a constant or variable, only keep it if it acts like a function component or block (has children)
+          if item.kind == 'Constant' or item.kind == 'Variable' then
+            return item.children and #item.children > 0
+          end
+          if item.kind == 'Function' and (string.match(item.name, ' callback$') or item.name == '<function>') then
+            return false
+          end
+        end
+
+        return true -- Keep everything else intact
+      end,
     },
     dependencies = { 'nvim-tree/nvim-web-devicons' },
     cmd = { 'AerialToggle' },

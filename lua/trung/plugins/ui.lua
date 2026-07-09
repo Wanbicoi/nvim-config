@@ -491,7 +491,7 @@ return {
             end,
             separator = '',
             on_click = function()
-              require('mini.files').open(vim.api.nvim_buf_get_name(0))
+              require('oil').open_float()
             end,
           },
         },
@@ -503,6 +503,7 @@ return {
         },
       },
       extensions = {
+        'oil',
         'aerial',
         'overseer',
         'quickfix',
@@ -510,7 +511,34 @@ return {
       },
     },
   },
-
+  {
+    'stevearc/oil.nvim',
+    opts = {
+      keymaps = {
+        ['q'] = { 'actions.close', mode = 'n' },
+        ['gc'] = { 'actions.copy_to_system_clipboard', mode = 'n' },
+        ['c-o'] = { 'actions.open_external', mode = 'n' },
+        ['<LeftMouse>'] = function()
+          local mouse = vim.fn.getmousepos()
+          vim.api.nvim_win_set_cursor(mouse.winid, { mouse.line, mouse.column - 1 })
+          require('oil').select()
+        end,
+        ['<RightMouse>'] = { 'actions.parent', mode = 'n' },
+      },
+      float = {
+        padding = 4,
+        max_width = 80,
+        border = 'single',
+      },
+      view_options = {
+        show_hidden = true,
+      },
+    },
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
+    keys = {
+      { '-', '<CMD>Oil --float<CR>', desc = 'Open parent directory' },
+    },
+  },
   {
     'rmagatti/auto-session',
     lazy = false,
@@ -658,6 +686,28 @@ return {
     end,
     ft = { 'markdown' },
   },
+  ---@module "neominimap.config.meta"
+  -- {
+  --   'Isrothy/neominimap.nvim',
+  --   version = 'v3.x.x',
+  --   lazy = false, -- NOTE: NO NEED to Lazy load
+  --   -- Optional. You can also set your own keybindings
+  --   init = function()
+  --     -- -- The following options are recommended when layout == "float"
+  --     -- vim.opt.wrap = false
+  --     -- vim.o.sidescrolloff = 20 -- Set a large value
+  --
+  --     --- Put your configuration here
+  --     ---@type Neominimap.UserConfig
+  --     vim.g.neominimap = {
+  --       auto_enable = true,
+  --       layout = 'split',
+  --       float = {
+  --         window_border = 'none',
+  --       },
+  --     }
+  --   end,
+  -- },
   {
     'MeanderingProgrammer/render-markdown.nvim',
     dependencies = { 'nvim-mini/mini.nvim' }, -- if you use the mini.nvim suite
@@ -669,11 +719,11 @@ return {
       file_types = { 'markdown', 'practice-description' },
     },
   },
-  -- {
-  --   'soulis-1256/eagle.nvim',
-  --   opts = {},
-  --   event = 'VeryLazy',
-  -- },
+  {
+    'soulis-1256/eagle.nvim',
+    opts = {},
+    event = 'VeryLazy',
+  },
   {
     'lewis6991/satellite.nvim',
     opts = {},

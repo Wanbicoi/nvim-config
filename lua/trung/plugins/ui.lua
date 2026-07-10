@@ -719,11 +719,11 @@ return {
       file_types = { 'markdown', 'practice-description' },
     },
   },
-  {
-    'soulis-1256/eagle.nvim',
-    opts = {},
-    event = 'VeryLazy',
-  },
+  -- {
+  --   'soulis-1256/eagle.nvim',
+  --   opts = {},
+  --   event = 'VeryLazy',
+  -- },
   {
     'lewis6991/satellite.nvim',
     opts = {},

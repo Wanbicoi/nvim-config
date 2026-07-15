@@ -5,6 +5,22 @@ local agent_state = {
   right = { count = 102 },
 }
 
+vim.api.nvim_create_autocmd({ 'TermClose', 'BufWipeout' }, {
+  group = vim.api.nvim_create_augroup('agy_terminal_monitor', { clear = true }),
+  callback = function(ev)
+    local ok, snacks_term = pcall(function()
+      return vim.b[ev.buf].snacks_terminal
+    end)
+    if ok and snacks_term and snacks_term.cmd == 'agy' then
+      if snacks_term.id == 101 then
+        agent_state.float.cwd = nil
+      elseif snacks_term.id == 102 then
+        agent_state.right.cwd = nil
+      end
+    end
+  end,
+})
+
 local function float_win()
   local width = vim.o.columns > 180 and 160 or math.floor(vim.o.columns * 0.9)
   return {

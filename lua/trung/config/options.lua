@@ -7,6 +7,7 @@ vim.cmd [[
   cabbrev term vsplit term://zsh
   cabbrev help vert help
 ]]
+vim.opt.shada = "!,'3000,<50,s10,h,r/tmp/,r/private"
 vim.o.termguicolors = true
 vim.o.autowriteall = true
 vim.o.exrc = true

@@ -71,9 +71,29 @@ return {
           open = true,
         },
       },
+      ---@type snacks.picker.Config
       picker = {
         patterns = { '.git', '_darcs', '.hg', '.bzr', '.svn', 'package.json', 'Makefile', 'AGENTS.md' },
-        layout = 'dropdown',
+        layout = {
+          layout = {
+            backdrop = false,
+            row = 1,
+            width = 0.7,
+            min_width = 80,
+            height = 0.9,
+            border = 'none',
+            box = 'vertical',
+            { win = 'preview', title = '{preview}', height = 0.7, border = true },
+            {
+              box = 'vertical',
+              border = true,
+              title = '{title} {live} {flags}',
+              title_pos = 'center',
+              { win = 'input', height = 1, border = 'bottom' },
+              { win = 'list', border = 'none' },
+            },
+          },
+        },
         win = {
           list = {
             keys = {

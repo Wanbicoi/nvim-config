@@ -464,10 +464,10 @@ return {
               local navic = require 'nvim-navic'
               if navic.is_available() then
                 local data = navic.get_data()
-                if data and #data >= 2 then
-                  local parent = data[#data - 1]
-                  if parent and parent.scope and parent.scope.start then
-                    vim.api.nvim_win_set_cursor(0, { parent.scope.start.line, parent.scope.start.character })
+                if data and #data >= 1 then
+                  local target = #data >= 2 and data[#data - 1] or data[1]
+                  if target and target.scope and target.scope.start then
+                    vim.api.nvim_win_set_cursor(0, { target.scope.start.line, target.scope.start.character })
                   end
                 end
               end
@@ -526,8 +526,36 @@ return {
         'oil',
         'aerial',
         'overseer',
-        'quickfix',
         'mason',
+        {
+          sections = {
+            lualine_a = {
+              {
+                function()
+                  return ''
+                end,
+                separator = '',
+                on_click = function()
+                  pcall(vim.cmd, 'colder')
+                end,
+              },
+              {
+                function()
+                  return ''
+                end,
+                on_click = function()
+                  pcall(vim.cmd, 'cnewer')
+                end,
+              },
+            },
+            lualine_b = {
+              function()
+                return 'Quickfix List'
+              end,
+            },
+          },
+          filetypes = { 'qf' },
+        },
       },
     },
   },

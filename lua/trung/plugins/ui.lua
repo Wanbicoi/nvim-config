@@ -424,12 +424,6 @@ return {
     'nvim-lualine/lualine.nvim',
     dependencies = {
       {
-        'linrongbin16/lsp-progress.nvim',
-        config = function()
-          require('lsp-progress').setup {}
-        end,
-      },
-      {
         'SmiteshP/nvim-navic',
         opts = {
           lsp = {
@@ -447,9 +441,7 @@ return {
       },
       sections = {
         lualine_c = {
-          function()
-            return require('lsp-progress').progress()
-          end,
+          'lsp_status',
           {
             'navic',
             color_correction = nil,

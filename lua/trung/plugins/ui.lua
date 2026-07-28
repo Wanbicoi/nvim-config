@@ -1,5 +1,21 @@
 local snacks_search = require 'trung.utils.snacks_search'
 
+local function set_wezterm_title(session_name)
+  local title = session_name
+  if type(title) ~= 'string' or title == '' then
+    title = vim.fn.fnamemodify(vim.fn.getcwd(), ':t')
+  else
+    title = vim.fn.fnamemodify(title:gsub('/+$', ''), ':t')
+  end
+
+  if title and title ~= '' then
+    local wezterm_bin = vim.fn.executable 'wezterm.exe' == 1 and 'wezterm.exe' or (vim.fn.executable 'wezterm' == 1 and 'wezterm' or nil)
+    if wezterm_bin then
+      vim.fn.system { wezterm_bin, 'cli', 'set-tab-title', title }
+    end
+  end
+end
+
 return {
   {
     'folke/which-key.nvim',
@@ -587,9 +603,11 @@ return {
   {
     'rmagatti/auto-session',
     lazy = false,
-    config = {
+    opts = {
       -- auto_restore_last_session = true,
       auto_create = false,
+      post_restore_cmds = { set_wezterm_title },
+      post_save_cmds = { set_wezterm_title },
       legacy_cmds = false,
       cwd_change_handling = true,
       session_lens = {

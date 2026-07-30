@@ -10,10 +10,16 @@ local function normalize_text(text)
   return vim.trim((text or ''):gsub('[\n\r]', ' '))
 end
 
-function M.get_project_root(bufnr)
-  bufnr = bufnr or 0
-  local path = vim.api.nvim_buf_get_name(bufnr)
-  if path == '' then
+function M.get_project_root(target)
+  local path
+  if type(target) == 'string' and target ~= '' then
+    path = target
+  else
+    local bufnr = (type(target) == 'number' and target) or 0
+    path = vim.api.nvim_buf_get_name(bufnr)
+  end
+
+  if not path or path == '' then
     return get_cwd()
   end
 

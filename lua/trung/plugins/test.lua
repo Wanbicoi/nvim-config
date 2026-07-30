@@ -7,6 +7,8 @@ return {
     'nvim-neotest/neotest-jest',
   },
   config = function()
+    local snacks_search = require 'trung.utils.snacks_search'
+
     require('neotest').setup {
       adapters = {
         -- require('neotest-playwright').adapter {
@@ -23,7 +25,7 @@ return {
           jestConfigFile = 'custom.jest.config.ts',
           env = { CI = true },
           cwd = function(path)
-            return vim.fn.getcwd()
+            return snacks_search.get_project_root(path)
           end,
           isTestFile = require('neotest-jest.jest-util').defaultIsTestFile,
         },
@@ -32,28 +34,28 @@ return {
   end,
   keys = {
     {
-      '<leader>tr',
+      '<leader>Tr',
       function()
         require('neotest').run.run()
       end,
       desc = '[T]est [R]un',
     },
     {
-      '<leader>tf',
+      '<leader>Tf',
       function()
         require('neotest').run.run(vim.fn.expand '%')
       end,
       desc = '[T]est [F]ile',
     },
     {
-      '<leader>ts',
+      '<leader>Ts',
       function()
         require('neotest').summary.toggle()
       end,
       desc = '[T]est [S]ummary',
     },
     {
-      '<leader>to',
+      '<leader>To',
       function()
         require('neotest').output.open { enter = true }
       end,

@@ -440,6 +440,10 @@ return {
         desc = '[F]ind [M]arks',
       },
     },
+    config = function(_, opts)
+      require('snacks').setup(opts)
+      _ = Snacks.notifier
+    end,
   },
   {
     'nvim-lualine/lualine.nvim',

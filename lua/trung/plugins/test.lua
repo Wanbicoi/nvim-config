@@ -34,32 +34,32 @@ return {
   end,
   keys = {
     {
-      '<leader>Tr',
-      function()
-        require('neotest').run.run()
-      end,
-      desc = '[T]est [R]un',
-    },
-    {
-      '<leader>Tf',
-      function()
-        require('neotest').run.run(vim.fn.expand '%')
-      end,
-      desc = '[T]est [F]ile',
-    },
-    {
-      '<leader>Ts',
+      '<leader>T',
       function()
         require('neotest').summary.toggle()
       end,
-      desc = '[T]est [S]ummary',
+      desc = '[T]est',
     },
-    {
-      '<leader>To',
-      function()
-        require('neotest').output.open { enter = true }
-      end,
-      desc = '[T]est [O]utput',
-    },
+    -- {
+    --   '<leader>Tr',
+    --   function()
+    --     require('neotest').run.run()
+    --   end,
+    --   desc = '[T]est [R]un',
+    -- },
+    -- {
+    --   '<leader>Tf',
+    --   function()
+    --     require('neotest').run.run(vim.fn.expand '%')
+    --   end,
+    --   desc = '[T]est [F]ile',
+    -- },
+    -- {
+    --   '<leader>To',
+    --   function()
+    --     require('neotest').output.open { enter = true }
+    --   end,
+    --   desc = '[T]est [O]utput',
+    -- },
   },
 }

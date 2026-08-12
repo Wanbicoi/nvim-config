@@ -461,7 +461,7 @@ return {
       options = {
         globalstatus = true,
         disabled_filetypes = {
-          winbar = { 'OverseerList', 'OverseerOutput', 'BookmarksTree', 'qf' },
+          winbar = { 'OverseerList', 'OverseerOutput', 'BookmarksTree', 'qf', 'kulala_ui' },
         },
       },
       sections = {
@@ -619,6 +619,9 @@ return {
       },
       bypass_save_filetypes = {
         'BookmarksTree',
+        'kulala_ui',
+        'terminal',
+        ''
       },
     },
     -- init = function()

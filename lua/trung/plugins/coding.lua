@@ -270,13 +270,9 @@ return {
       {
         '==',
         function()
-          require('conform').format {
-            async = true,
-            lsp_format = 'fallback',
-            callback = function()
-              vim.cmd [[GuessIndent]]
-            end,
-          }
+          require('conform').format { async = true, lsp_format = 'fallback', callback = function ()
+          vim.cmd [[GuessIndent]]
+        end}
         end,
         mode = { 'n' },
         desc = 'Format buffer',
@@ -300,6 +296,7 @@ return {
         markdown = { 'prettierd', 'prettier' },
         make = { 'cmakelang' },
         xml = { 'xmlformatter' },
+        http = { 'kulala-fmt' },
       },
     },
   },

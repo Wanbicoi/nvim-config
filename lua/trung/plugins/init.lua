@@ -25,6 +25,7 @@ require('lazy').setup({
   -- require 'trung.plugins.extras.ctags',
   -- require 'trung.plugins.extras.avante',
   require 'trung.plugins.extras.bookmarks',
+  require 'trung.plugins.extras.kulala',
 }, {
   performance = {
     rtp = {

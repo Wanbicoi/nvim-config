@@ -620,8 +620,6 @@ return {
       bypass_save_filetypes = {
         'BookmarksTree',
         'kulala_ui',
-        'terminal',
-        ''
       },
     },
     -- init = function()

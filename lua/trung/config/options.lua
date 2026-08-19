@@ -7,7 +7,7 @@ vim.cmd [[
   cabbrev term vsplit term://zsh
   cabbrev help vert help
 ]]
-vim.opt.shada = "!,'3000,<50,s10,h,r/tmp/,r/private"
+vim.opt.shada = "!,'100000,<50,s10,h,r/tmp/,r/private"
 vim.o.termguicolors = true
 vim.o.autowriteall = true
 vim.o.exrc = true
@@ -25,6 +25,20 @@ vim.cmd.aunmenu 'PopUp' -- Remove all default menu items for PopUp
 vim.opt.showmode = false
 vim.schedule(function()
   vim.opt.clipboard = 'unnamedplus'
+  if vim.fn.has 'wsl' == 1 then
+    vim.g.clipboard = {
+      name = 'WslClipboard',
+      copy = {
+        ['+'] = 'clip.exe',
+        ['*'] = 'clip.exe',
+      },
+      paste = {
+        ['+'] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("r", ""))',
+        ['*'] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("r", ""))',
+      },
+      cache_enabled = 0,
+    }
+  end
 end)
 
 -- Enable break indent

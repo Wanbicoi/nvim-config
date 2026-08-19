@@ -492,6 +492,14 @@ return {
           },
         },
       },
+      inactive_winbar = {
+        lualine_c = {
+          {
+            'filename',
+            path = 3,
+          },
+        },
+      },
       winbar = {
         lualine_a = {
           {
@@ -583,7 +591,7 @@ return {
         ['q'] = { 'actions.close', mode = 'n' },
         ['gc'] = { 'actions.copy_to_system_clipboard', mode = 'n' },
         ['c-o'] = { 'actions.open_external', mode = 'n' },
-        ['<LeftMouse>'] = function()
+        ['<2-LeftMouse>'] = function()
           local mouse = vim.fn.getmousepos()
           vim.api.nvim_win_set_cursor(mouse.winid, { mouse.line, mouse.column - 1 })
           require('oil').select()

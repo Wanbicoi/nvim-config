@@ -10,6 +10,14 @@ return {
     ui = {
       max_response_size = 1048576,
       split_direction = 'below',
+      pickers = {
+        snacks = {
+          layout = function()
+            local has_snacks, snacks_picker = pcall(require, 'snacks.picker')
+            return not has_snacks and {} or vim.tbl_deep_extend('force', snacks_picker.config.layout 'custom_dropdown', {})
+          end,
+        },
+      },
     },
   },
   config = function(_, opts)

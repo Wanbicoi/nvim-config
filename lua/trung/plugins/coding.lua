@@ -221,8 +221,8 @@ return {
     },
     init = function()
       vim.cmd.nmenu [[100.300 PopUp.-Debugprint- :]]
-      vim.cmd.nmenu [[100.301 PopUp.Debugprint\ Variable\ Below g?v]]
-      vim.cmd.nmenu [[100.302 PopUp.Debugprint\ Variable\ Surround g?sv]]
+      vim.cmd.nmenu [[100.301 PopUp.󰐰\ Debugprint\ Variable\ Below g?v]]
+      vim.cmd.nmenu [[100.302 PopUp.󰐰\ Debugprint\ Variable\ Surround g?sv]]
     end,
     lazy = false, -- Required to make line highlighting work before debugprint is first used
     version = '*', -- Remove if you DON'T want to use the stable version

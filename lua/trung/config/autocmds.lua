@@ -56,36 +56,36 @@ vim.api.nvim_create_autocmd('BufEnter', {
   callback = function()
     vim.cmd.nmenu [[100.280 PopUp.-DiffSep- :]]
     if vim.wo.diff then
-      vim.cmd.nmenu [[100.281 PopUp.Diff\ Off <cmd>diffoff<CR>]]
-      vim.cmd [[silent! aunmenu PopUp.Diff\ This]]
+      vim.cmd.nmenu [[100.281 PopUp.󰦫\ Diff\ Off <cmd>diffoff<CR>]]
+      vim.cmd [[silent! aunmenu PopUp.\ Diff\ This]]
 
-      vim.cmd.nmenu [[100.284 PopUp.Diff\ Get <cmd>diffget<CR>]]
-      vim.cmd.nmenu [[100.285 PopUp.Diff\ Put <cmd>diffput<CR>]]
+      vim.cmd.nmenu [[100.284 PopUp.󰏑\ Diff\ Get <cmd>diffget<CR>]]
+      vim.cmd.nmenu [[100.285 PopUp.󰏒\ Diff\ Put <cmd>diffput<CR>]]
       vim.opt.mouse = 'a'
-      vim.cmd.vmenu [[100.284 PopUp.Diff\ Get <cmd>'<,'>diffget<CR>]]
-      vim.cmd.vmenu [[100.285 PopUp.Diff\ Put <cmd>'<,'>diffput<CR>]]
+      vim.cmd.vmenu [[100.284 PopUp.󰏑\ Diff\ Get <cmd>'<,'>diffget<CR>]]
+      vim.cmd.vmenu [[100.285 PopUp.󰏒\ Diff\ Put <cmd>'<,'>diffput<CR>]]
     else
       vim.opt.mouse = 'ni'
-      vim.cmd.nmenu [[100.281 PopUp.Diff\ This <cmd>diffthis<CR>]]
-      vim.cmd [[silent! aunmenu PopUp.Diff\ Off]]
+      vim.cmd.nmenu [[100.281 PopUp.\ Diff\ This <cmd>diffthis<CR>]]
+      vim.cmd [[silent! aunmenu PopUp.󰦫\ Diff\ Off]]
 
-      vim.cmd [[silent! aunmenu PopUp.Diff\ Get]]
-      vim.cmd [[silent! aunmenu PopUp.Diff\ Put]]
+      vim.cmd [[silent! aunmenu PopUp.󰏑\ Diff\ Get]]
+      vim.cmd [[silent! aunmenu PopUp.󰏒\ Diff\ Put]]
     end
 
     vim.cmd.nmenu [[100.200 PopUp.-File- :]]
-    vim.cmd.nmenu [[100.205 PopUp.Open\ File\ Under\ Cursor <cmd>lua _G.OpenFileUnderCursor()<CR>]]
-    vim.cmd.nmenu [[100.206 PopUp.Copy\ All <cmd>%y+<CR>]]
-    vim.cmd.nmenu [[100.211 PopUp.Copy\ Word\ Under\ Cursor yiw]]
-    vim.cmd.nmenu [[100.212 PopUp.Copy\ File\ Name <cmd>let @+=expand('%:t')<CR>]]
-    vim.cmd.nmenu [[100.213 PopUp.Copy\ Code\ Position <cmd>let @+=expand('%') . ':' . line('.')<CR>]]
-    vim.cmd.nmenu [[100.215 PopUp.New\ Empty\ File <cmd>vnew<CR>]]
+    vim.cmd.nmenu [[100.205 PopUp.󰈞\ Open\ File\ Under\ Cursor <cmd>lua _G.OpenFileUnderCursor()<CR>]]
+    vim.cmd.nmenu [[100.206 PopUp.󰆏\ Copy\ All <cmd>%y+<CR>]]
+    vim.cmd.nmenu [[100.211 PopUp.󰘲\ Copy\ Word\ Under\ Cursor yiw]]
+    vim.cmd.nmenu [[100.212 PopUp.󰈔\ Copy\ File\ Name <cmd>let @+=expand('%:t')<CR>]]
+    vim.cmd.nmenu [[100.213 PopUp.󰈙\ Copy\ Code\ Position <cmd>let @+=expand('%') . ':' . line('.')<CR>]]
+    vim.cmd.nmenu [[100.215 PopUp.󰝰\ New\ Empty\ File <cmd>vnew<CR>]]
 
-    vim.cmd.amenu [[100.319 PopUp.-SearchSep- :]]
-    vim.cmd.nmenu [[100.320 PopUp.Grep\ Word\ (Project\ Root) <cmd>lua require('trung.utils.snacks_search').grep_cword_project()<CR>]]
-    vim.cmd.nmenu [[100.321 PopUp.Grep\ Word\ (CWD) <cmd>lua require('trung.utils.snacks_search').grep_cword_pwd()<CR>]]
-    vim.cmd.vmenu [[100.320 PopUp.Grep\ Selection\ (Project\ Root) :<C-U>lua require('trung.utils.snacks_search').grep_visual_project()<CR>]]
-    vim.cmd.vmenu [[100.321 PopUp.Grep\ Selection\ (CWD) :<C-U>lua require('trung.utils.snacks_search').grep_visual_pwd()<CR>]]
+    vim.cmd.nmenu [[100.107 PopUp.󰈗\ Grep\ Word\ (Project\ Root) <cmd>lua require('trung.utils.snacks_search').grep_cword_project()<CR>]]
+    vim.cmd.nmenu [[100.108 PopUp.󰈻\ Grep\ Word\ (CWD) <cmd>lua require('trung.utils.snacks_search').grep_cword_pwd()<CR>]]
+    vim.cmd.vmenu [[100.107 PopUp.󰈗\ Grep\ Selection\ (Project\ Root) :<C-U>lua require('trung.utils.snacks_search').grep_visual_project()<CR>]]
+    vim.cmd.vmenu [[100.108 PopUp.󰈻\ Grep\ Selection\ (CWD) :<C-U>lua require('trung.utils.snacks_search').grep_visual_pwd()<CR>]]
+    vim.cmd.amenu [[100.109 PopUp.-SearchSep- :]]
   end,
 })
 
@@ -110,8 +110,8 @@ vim.api.nvim_create_autocmd('User', {
   end,
 })
 
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "help", "markdown" },
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { 'help', 'markdown' },
   callback = function()
     vim.opt_local.wrap = true
     vim.opt_local.linebreak = true
@@ -128,5 +128,12 @@ vim.api.nvim_create_autocmd({ 'TermOpen', 'BufEnter' }, {
         vim.cmd 'startinsert'
       end
     end)
+  end,
+})
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'json',
+  callback = function()
+    vim.api.nvim_buf_create_user_command(0, 'JsonSort', '%!jq -S .', {})
   end,
 })

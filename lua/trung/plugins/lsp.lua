@@ -48,15 +48,15 @@ return {
             Snacks.picker.lsp_type_definitions()
           end, '[G]oto [T]ype Definition')
 
-          vim.cmd.nmenu '100.110 PopUp.LSP\\ References <cmd>lua Snacks.picker.lsp_references()<CR>'
-          vim.cmd.nmenu '100.120 PopUp.LSP\\ Implementations <cmd>lua Snacks.picker.lsp_implementations()<CR>'
-          vim.cmd.nmenu '100.130 PopUp.LSP\\ Definitions <cmd>lua Snacks.picker.lsp_definitions()<CR>'
-          -- vim.cmd.nmenu '100.140 PopUp.LSP\\ Type\\ Definition <cmd>lua Snacks.picker.lsp_type_definitions()<CR>'
-          -- vim.cmd.nmenu '100.150 PopUp.LSP\\ Declaration <cmd>lua vim.lsp.buf.declaration()<CR>'
-          -- vim.cmd.nmenu '100.160 PopUp.LSP\\ Rename <cmd>lua vim.lsp.buf.rename()<CR>'
-          -- vim.cmd.nmenu '100.170 PopUp.LSP\\ Code\\ Action <cmd>lua vim.lsp.buf.code_action()<CR>'
-          -- vim.cmd.nmenu '100.180 PopUp.LSP\\ Hover <cmd>lua vim.lsp.buf.hover()<CR>'
-          vim.cmd.nmenu [[100.190 PopUp.LSP\ Show\ Diagnostic <cmd>lua vim.diagnostic.open_float(nil, { scope = 'line', focus = false, source = 'if_many' })<CR>]]
+          vim.cmd.nmenu [[100.110 PopUp.󰌷\ LSP\ References <cmd>lua Snacks.picker.lsp_references()<CR>]]
+          vim.cmd.nmenu [[100.120 PopUp.󰡱\ LSP\ Implementations <cmd>lua Snacks.picker.lsp_implementations()<CR>]]
+          vim.cmd.nmenu [[100.130 PopUp.󰳽\ LSP\ Definitions <cmd>lua Snacks.picker.lsp_definitions()<CR>]]
+          -- vim.cmd.nmenu [[100.140 PopUp.󰊕\ LSP\ Type\ Definition <cmd>lua Snacks.picker.lsp_type_definitions()<CR>]]
+          -- vim.cmd.nmenu [[100.150 PopUp.󰳽\ LSP\ Declaration <cmd>lua vim.lsp.buf.declaration()<CR>]]
+          -- vim.cmd.nmenu [[100.160 PopUp.󰑕\ LSP\ Rename <cmd>lua vim.lsp.buf.rename()<CR>]]
+          -- vim.cmd.nmenu [[100.170 PopUp.󰌵\ LSP\ Code\ Action <cmd>lua vim.lsp.buf.code_action()<CR>]]
+          -- vim.cmd.nmenu [[100.180 PopUp.󰋼\ LSP\ Hover <cmd>lua vim.lsp.buf.hover()<CR>]]
+          vim.cmd.nmenu [[100.190 PopUp.󰒡\ LSP\ Diagnostics <cmd>lua vim.diagnostic.open_float(nil, { scope = 'line', focus = false, source = 'if_many' })<CR>]]
 
           local function client_supports_method(client, method, bufnr)
             if vim.fn.has 'nvim-0.11' == 1 then

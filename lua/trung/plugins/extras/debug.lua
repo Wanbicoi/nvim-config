@@ -104,10 +104,10 @@ return {
       group = vim.api.nvim_create_augroup('trung-python-dap-popup', { clear = true }),
       callback = function()
         vim.cmd.amenu [[100.300 PopUp.-DapSep- :]]
-        vim.cmd.nmenu [[100.310 PopUp.DAP\ Start <cmd>lua require('dap').continue()<CR>]]
-        vim.cmd.nmenu [[100.330 PopUp.DAP\ Toggle\ Breakpoint <cmd>lua require('dap').toggle_breakpoint()<CR>]]
-        vim.cmd.nmenu [[100.340 PopUp.DAP\ Conditional\ Breakpoint <cmd>lua require('dap').set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>]]
-        vim.cmd.nmenu [[100.390 PopUp.DAP\ Terminate <cmd>lua require('dap').terminate()<CR>]]
+        vim.cmd.nmenu [[100.310 PopUp.\ DAP\ Start <cmd>lua require('dap').continue()<CR>]]
+        vim.cmd.nmenu [[100.330 PopUp.\ DAP\ Toggle\ Breakpoint <cmd>lua require('dap').toggle_breakpoint()<CR>]]
+        vim.cmd.nmenu [[100.340 PopUp.\ DAP\ Conditional\ Breakpoint <cmd>lua require('dap').set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>]]
+        vim.cmd.nmenu [[100.390 PopUp.\ DAP\ Terminate <cmd>lua require('dap').terminate()<CR>]]
       end,
     })
 

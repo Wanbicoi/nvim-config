@@ -123,11 +123,7 @@ vim.api.nvim_create_autocmd({ 'TermOpen', 'BufEnter' }, {
   group = vim.api.nvim_create_augroup('TerminalInsertFocus', { clear = true }),
   pattern = 'term://*', -- Target only terminal buffers
   callback = function()
-    vim.schedule(function()
-      if vim.bo.buftype == 'terminal' then
-        vim.cmd 'startinsert'
-      end
-    end)
+    vim.cmd 'startinsert'
   end,
 })
 

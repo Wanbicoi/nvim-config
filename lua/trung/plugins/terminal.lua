@@ -127,7 +127,7 @@ local function send_to_agent_coding(text)
       end
       local chan = vim.bo[term.buf].channel
       if chan and chan > 0 then
-        vim.fn.chansend(chan, text)
+        vim.api.nvim_chan_send(chan, text)
       end
     end, 100)
   end

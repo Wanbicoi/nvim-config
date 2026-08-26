@@ -1,5 +1,7 @@
 local snacks_search = require 'trung.utils.snacks_search'
 
+local current_agent = 'agy'
+
 local agent_state = {
   float = { count = 101 },
   right = { count = 102 },
@@ -11,7 +13,7 @@ vim.api.nvim_create_autocmd({ 'TermClose', 'BufWipeout' }, {
     local ok, snacks_term = pcall(function()
       return vim.b[ev.buf].snacks_terminal
     end)
-    if ok and snacks_term and snacks_term.cmd == 'agy' then
+    if ok and snacks_term and (snacks_term.cmd == 'agy' or snacks_term.cmd == 'claude') then
       if snacks_term.id == 101 then
         agent_state.float.cwd = nil
       elseif snacks_term.id == 102 then
@@ -50,22 +52,33 @@ local function agent_opts(kind)
   }
 end
 
-local function pick_agent_cwd(callback)
-  vim.ui.select({ 'Project root', 'Current folder' }, {
-    prompt = 'Open agent_coding terminal in:',
-  }, function(choice)
-    if not choice then
+local function pick_agent_and_cwd(callback)
+  vim.ui.select({ 'agy', 'claude' }, {
+    prompt = 'Select Coding Agent:',
+  }, function(agent_choice)
+    if not agent_choice then
       return
     end
+    current_agent = agent_choice
 
-    callback(choice == 'Current folder' and vim.uv.cwd() or snacks_search.get_project_root())
+    vim.ui.select({ 'Project root', 'Current folder' }, {
+      prompt = string.format('Open %s terminal in:', current_agent),
+    }, function(cwd_choice)
+      if not cwd_choice then
+        return
+      end
+
+      callback(cwd_choice == 'Current folder' and vim.uv.cwd() or snacks_search.get_project_root())
+    end)
   end)
 end
 
 local function hide_agent_coding(kind)
-  local term = Snacks.terminal.get('agy', vim.tbl_extend('force', agent_opts(kind), { create = false }))
-  if term and term:win_valid() then
-    term:hide()
+  for _, agent in ipairs({ 'agy', 'claude' }) do
+    local term = Snacks.terminal.get(agent, vim.tbl_extend('force', agent_opts(kind), { create = false }))
+    if term and term:win_valid() then
+      term:hide()
+    end
   end
 end
 
@@ -86,9 +99,9 @@ local function open_agent_coding(kind)
   local function open()
     if kind == 'float' then
       hide_other_floating_terminals(nil)
-      Snacks.terminal.focus('agy', agent_opts(kind))
+      Snacks.terminal.focus(current_agent, agent_opts(kind))
     else
-      Snacks.terminal('agy', agent_opts(kind))
+      Snacks.terminal(current_agent, agent_opts(kind))
     end
   end
 
@@ -97,18 +110,20 @@ local function open_agent_coding(kind)
     return
   end
 
-  pick_agent_cwd(function(cwd)
+  pick_agent_and_cwd(function(cwd)
     state.cwd = cwd
     open()
   end)
 end
 
 local function get_active_agent_kind()
-  local right = Snacks.terminal.get('agy', vim.tbl_extend('force', agent_opts 'right', { create = false }))
-  if right and right:win_valid() then
-    return 'right'
+  for _, agent in ipairs({ 'agy', 'claude' }) do
+    local right = Snacks.terminal.get(agent, vim.tbl_extend('force', agent_opts 'right', { create = false }))
+    if right and right:win_valid() then
+      return 'right'
+    end
   end
-  return 'float'
+  return 'right'
 end
 
 local function send_to_agent_coding(text)
@@ -116,9 +131,15 @@ local function send_to_agent_coding(text)
   local state = agent_state[kind]
 
   local function send()
-    local term = Snacks.terminal.get('agy', agent_opts(kind))
-    if term and not term:win_valid() then
-      term:show()
+    local term = Snacks.terminal.get(current_agent, agent_opts(kind))
+    if term then
+      if kind == 'float' then
+        hide_other_floating_terminals(term)
+      end
+      if not term:win_valid() then
+        term:show()
+      end
+      term:focus()
     end
 
     vim.defer_fn(function()
@@ -129,6 +150,10 @@ local function send_to_agent_coding(text)
       if chan and chan > 0 then
         vim.api.nvim_chan_send(chan, text)
       end
+      if term and term:win_valid() then
+        term:focus()
+        vim.cmd 'startinsert'
+      end
     end, 100)
   end
 
@@ -137,7 +162,7 @@ local function send_to_agent_coding(text)
     return
   end
 
-  pick_agent_cwd(function(cwd)
+  pick_agent_and_cwd(function(cwd)
     state.cwd = cwd
     send()
   end)
@@ -177,7 +202,7 @@ local keys = {
     desc = 'Open lazygit',
   },
   {
-    '<a-a>',
+    '<a-A>',
     function()
       open_agent_coding 'float'
     end,
@@ -185,7 +210,7 @@ local keys = {
     desc = 'Open floating coding agent terminal',
   },
   {
-    '<a-A>',
+    '<a-a>',
     function()
       open_agent_coding 'right'
     end,
@@ -222,6 +247,11 @@ for i = 1, 9 do
     desc = string.format('Open floating terminal %d', i),
   }
 end
+
+_G.agent_coding = {
+  send_line = agent_coding_send_line,
+  send_selection = agent_coding_send_selection,
+}
 
 return {
   {

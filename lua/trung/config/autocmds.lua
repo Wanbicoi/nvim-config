@@ -74,12 +74,15 @@ vim.api.nvim_create_autocmd('BufEnter', {
     end
 
     vim.cmd.nmenu [[100.200 PopUp.-File- :]]
+    vim.cmd.nmenu [[100.201 PopUp.󰒊\ Send\ This To Agent<cmd>lua _G.agent_coding.send_line()<CR>]]
+    vim.cmd.vmenu [[100.202 PopUp.󰒊\ Send\ This To Agent:<C-U>lua _G.agent_coding.send_selection()<CR>]]
     vim.cmd.nmenu [[100.205 PopUp.󰈞\ Open\ File\ Under\ Cursor <cmd>lua _G.OpenFileUnderCursor()<CR>]]
     vim.cmd.nmenu [[100.206 PopUp.󰆏\ Copy\ All <cmd>%y+<CR>]]
     vim.cmd.nmenu [[100.211 PopUp.󰘲\ Copy\ Word\ Under\ Cursor yiw]]
     vim.cmd.nmenu [[100.212 PopUp.󰈔\ Copy\ File\ Name <cmd>let @+=expand('%:t')<CR>]]
     vim.cmd.nmenu [[100.213 PopUp.󰈙\ Copy\ Code\ Position <cmd>let @+=expand('%') . ':' . line('.')<CR>]]
     vim.cmd.nmenu [[100.215 PopUp.󰝰\ New\ Empty\ File <cmd>vnew<CR>]]
+    vim.cmd.nmenu [[100.218 PopUp.-AgentSep- :]]
 
     vim.cmd.nmenu [[100.107 PopUp.󰈗\ Grep\ Word\ (Project\ Root) <cmd>lua require('trung.utils.snacks_search').grep_cword_project()<CR>]]
     vim.cmd.nmenu [[100.108 PopUp.󰈻\ Grep\ Word\ (CWD) <cmd>lua require('trung.utils.snacks_search').grep_cword_pwd()<CR>]]

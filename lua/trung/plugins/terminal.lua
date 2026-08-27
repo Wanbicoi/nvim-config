@@ -2,6 +2,11 @@ local snacks_search = require 'trung.utils.snacks_search'
 
 local current_agent = 'agy'
 
+local agent_cmds = {
+  agy = 'agy --dangerously-skip-permissions',
+  claude = 'claude --dangerously-skip-permissions',
+}
+
 local agent_state = {
   float = { count = 101 },
   right = { count = 102 },
@@ -13,11 +18,16 @@ vim.api.nvim_create_autocmd({ 'TermClose', 'BufWipeout' }, {
     local ok, snacks_term = pcall(function()
       return vim.b[ev.buf].snacks_terminal
     end)
-    if ok and snacks_term and (snacks_term.cmd == 'agy' or snacks_term.cmd == 'claude') then
-      if snacks_term.id == 101 then
-        agent_state.float.cwd = nil
-      elseif snacks_term.id == 102 then
-        agent_state.right.cwd = nil
+    if ok and snacks_term then
+      for _, cmd in pairs(agent_cmds) do
+        if snacks_term.cmd == cmd then
+          if snacks_term.id == 101 then
+            agent_state.float.cwd = nil
+          elseif snacks_term.id == 102 then
+            agent_state.right.cwd = nil
+          end
+          break
+        end
       end
     end
   end,
@@ -47,7 +57,7 @@ local function agent_opts(kind)
     cwd = state.cwd,
     win = kind == 'right' and {
       position = 'right',
-      width = math.floor(vim.o.columns * 0.3),
+      width = math.floor(vim.o.columns * 0.4),
     } or float_win(),
   }
 end
@@ -74,8 +84,8 @@ local function pick_agent_and_cwd(callback)
 end
 
 local function hide_agent_coding(kind)
-  for _, agent in ipairs({ 'agy', 'claude' }) do
-    local term = Snacks.terminal.get(agent, vim.tbl_extend('force', agent_opts(kind), { create = false }))
+  for _, cmd in pairs(agent_cmds) do
+    local term = Snacks.terminal.get(cmd, vim.tbl_extend('force', agent_opts(kind), { create = false }))
     if term and term:win_valid() then
       term:hide()
     end
@@ -97,11 +107,12 @@ local function open_agent_coding(kind)
   hide_agent_coding(other_kind)
 
   local function open()
+    local cmd = agent_cmds[current_agent] or current_agent
     if kind == 'float' then
       hide_other_floating_terminals(nil)
-      Snacks.terminal.focus(current_agent, agent_opts(kind))
+      Snacks.terminal.focus(cmd, agent_opts(kind))
     else
-      Snacks.terminal(current_agent, agent_opts(kind))
+      Snacks.terminal(cmd, agent_opts(kind))
     end
   end
 
@@ -117,8 +128,8 @@ local function open_agent_coding(kind)
 end
 
 local function get_active_agent_kind()
-  for _, agent in ipairs({ 'agy', 'claude' }) do
-    local right = Snacks.terminal.get(agent, vim.tbl_extend('force', agent_opts 'right', { create = false }))
+  for _, cmd in pairs(agent_cmds) do
+    local right = Snacks.terminal.get(cmd, vim.tbl_extend('force', agent_opts 'right', { create = false }))
     if right and right:win_valid() then
       return 'right'
     end
@@ -131,7 +142,8 @@ local function send_to_agent_coding(text)
   local state = agent_state[kind]
 
   local function send()
-    local term = Snacks.terminal.get(current_agent, agent_opts(kind))
+    local cmd = agent_cmds[current_agent] or current_agent
+    local term = Snacks.terminal.get(cmd, agent_opts(kind))
     if term then
       if kind == 'float' then
         hide_other_floating_terminals(term)

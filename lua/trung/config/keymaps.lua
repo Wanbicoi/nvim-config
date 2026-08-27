@@ -119,5 +119,5 @@ vim.keymap.set('n', '<leader>cp', function()
   vim.notify('Relative path copied to clipboard', vim.log.levels.INFO, { title = 'Path Copied' })
 end, { desc = '[C]opy relative current file path' })
 
-vim.keymap.set('n', 'q', '<cmd>q<CR>', { noremap = true })
+vim.keymap.set({ 'n', 'x', 'v' }, 'q', '<cmd>q<CR>', { noremap = true })
 vim.keymap.set('n', '<esc>', '<cmd>noh<CR>', { noremap = true })

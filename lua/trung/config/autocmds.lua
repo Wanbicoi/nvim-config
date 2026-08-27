@@ -129,6 +129,13 @@ vim.api.nvim_create_autocmd({ 'TermOpen', 'BufEnter' }, {
     vim.cmd 'startinsert'
   end,
 })
+vim.keymap.set('n', '<LeftMouse>', function()
+  if vim.bo.buftype == 'terminal' then
+    vim.cmd 'startinsert'
+  end
+  -- Let the normal mouse click happen
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<LeftMouse>', true, false, true), 'n', false)
+end, { silent = true })
 
 vim.api.nvim_create_autocmd('FileType', {
   pattern = 'json',

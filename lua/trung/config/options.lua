@@ -78,11 +78,13 @@ vim.o.wrap = false
 vim.o.linebreak = true -- only applied when wrap is on
 vim.o.cursorlineopt = 'both'
 vim.o.swapfile = false
-vim.wo.foldmethod = 'indent'
+
+-- Fold settings
 vim.wo.foldenable = true
 vim.wo.foldlevel = 99
--- vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-vim.o.foldenable = false -- avoid auto close all on load
+vim.wo.foldmethod = 'expr'
+vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+
 vim.o.winwidth = 40
 vim.o.winminwidth = 20
 

@@ -74,8 +74,8 @@ vim.api.nvim_create_autocmd('BufEnter', {
     end
 
     vim.cmd.nmenu [[100.200 PopUp.-File- :]]
-    vim.cmd.nmenu [[100.201 PopUp.󰒊\ Send\ This To Agent<cmd>lua _G.agent_coding.send_line()<CR>]]
-    vim.cmd.vmenu [[100.202 PopUp.󰒊\ Send\ This To Agent:<C-U>lua _G.agent_coding.send_selection()<CR>]]
+    vim.cmd.nmenu [[100.201 PopUp.󰒊\ Send\ This\ To\ Agent<cmd>lua _G.agent_coding.send_line()<CR>]]
+    vim.cmd.vmenu [[100.202 PopUp.󰒊\ Send\ This\ To\ Agent:<C-U>lua _G.agent_coding.send_selection()<CR>]]
     vim.cmd.nmenu [[100.205 PopUp.󰈞\ Open\ File\ Under\ Cursor <cmd>lua _G.OpenFileUnderCursor()<CR>]]
     vim.cmd.nmenu [[100.206 PopUp.󰆏\ Copy\ All <cmd>%y+<CR>]]
     vim.cmd.nmenu [[100.211 PopUp.󰘲\ Copy\ Word\ Under\ Cursor yiw]]
@@ -141,5 +141,13 @@ vim.api.nvim_create_autocmd('FileType', {
   pattern = 'json',
   callback = function()
     vim.api.nvim_buf_create_user_command(0, 'JsonSort', '%!jq -S .', {})
+  end,
+})
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'http',
+  callback = function()
+    vim.wo.foldmethod = 'expr'
+    vim.wo.foldexpr = [[getline(v:lnum) =~ '^### ' ? '>1' : '1']]
   end,
 })

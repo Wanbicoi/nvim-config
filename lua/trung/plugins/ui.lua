@@ -598,15 +598,15 @@ return {
           desc = 'Copy Windows path to clipboard',
           mode = 'n',
           callback = function()
-            local oil = require('oil')
+            local oil = require 'oil'
             local entry = oil.get_cursor_entry()
             local dir = oil.get_current_dir()
             if not entry or not dir then
               return
             end
             local path = dir .. entry.name .. (entry.type == 'directory' and '/' or '')
-            if vim.fn.has('wsl') == 1 or vim.fn.executable('wslpath') == 1 then
-              local win_path = vim.fn.system({ 'wslpath', '-w', path })
+            if vim.fn.has 'wsl' == 1 or vim.fn.executable 'wslpath' == 1 then
+              local win_path = vim.fn.system { 'wslpath', '-w', path }
               if vim.v.shell_error == 0 then
                 path = vim.trim(win_path)
               end
@@ -654,6 +654,9 @@ return {
       bypass_save_filetypes = {
         'BookmarksTree',
         'kulala_ui',
+        'snacks_picker_list',
+        'OverseerList',
+        'OverseerOutput',
       },
     },
     -- init = function()

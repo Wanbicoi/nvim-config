@@ -1,6 +1,6 @@
 local snacks_search = require 'trung.utils.snacks_search'
 
-local function set_wezterm_title(session_name)
+local function set_tab_title(session_name)
   local title = session_name
   if type(title) ~= 'string' or title == '' then
     title = vim.fn.fnamemodify(vim.fn.getcwd(), ':t')
@@ -9,6 +9,10 @@ local function set_wezterm_title(session_name)
   end
 
   if title and title ~= '' then
+    if vim.env.TMUX and vim.fn.executable 'tmux' == 1 then
+      vim.fn.system { 'tmux', 'rename-window', title }
+    end
+
     local wezterm_bin = vim.fn.executable 'wezterm.exe' == 1 and 'wezterm.exe' or (vim.fn.executable 'wezterm' == 1 and 'wezterm' or nil)
     if wezterm_bin then
       vim.fn.system { wezterm_bin, 'cli', 'set-tab-title', title }
@@ -58,7 +62,8 @@ return {
         { '<leader>c', group = '[C]ode', mode = { 'n', 'x' } },
         { '<leader>d', group = '[D]iff' },
         { '<leader>w', group = '[W]orkspace' },
-        { '<leader>t', group = '[T]est / [T]oggle' },
+        -- { '<leader>t', group = '[T]est / [T]oggle' },
+        { '<leader>t', group = '[T]est' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
         { '<leader>o', group = '[O]verseer' },
       },
@@ -644,8 +649,8 @@ return {
     opts = {
       -- auto_restore_last_session = true,
       auto_create = false,
-      post_restore_cmds = { set_wezterm_title },
-      post_save_cmds = { set_wezterm_title },
+      post_restore_cmds = { set_tab_title },
+      post_save_cmds = { set_tab_title },
       legacy_cmds = false,
       cwd_change_handling = true,
       session_lens = {

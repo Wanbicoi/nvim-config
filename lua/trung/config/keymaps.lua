@@ -109,10 +109,10 @@ vim.keymap.set('n', '<C-Down>', '<C-w>5-')
 vim.keymap.set('n', '<C-Left>', '<C-w>20<')
 vim.keymap.set('n', '<C-Right>', '<C-w>20>')
 
-vim.keymap.set('n', '<a-Up>', '<C-w>k')
-vim.keymap.set('n', '<a-Down>', '<C-w>j')
-vim.keymap.set('n', '<a-Left>', '<C-w>h')
-vim.keymap.set('n', '<a-Right>', '<C-w>l')
+vim.keymap.set({ 'n', 't' }, '<a-Up>', '<C-w>k')
+vim.keymap.set({ 'n', 't' }, '<a-Down>', '<C-w>j')
+vim.keymap.set({ 'n', 't' }, '<a-Left>', '<C-w>h')
+vim.keymap.set({ 'n', 't' }, '<a-Right>', '<C-w>l')
 
 vim.keymap.set('n', '<leader>cP', function()
   vim.cmd 'let @+ = expand("%:p")'

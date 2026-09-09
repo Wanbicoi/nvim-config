@@ -829,11 +829,11 @@ return {
   --   opts = {},
   --   event = 'VeryLazy',
   -- },
-  {
-    'lewis6991/satellite.nvim',
-    opts = {},
-    event = 'VeryLazy',
-  },
+  -- {
+  --   'lewis6991/satellite.nvim',
+  --   opts = {},
+  --   event = 'VeryLazy',
+  -- },
   {
     'glacambre/firenvim',
     build = ':call firenvim#install(0)',

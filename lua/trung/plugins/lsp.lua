@@ -37,6 +37,14 @@ return {
           map('grd', function()
             Snacks.picker.lsp_definitions()
           end, '[G]oto [D]efinition')
+          map('<C-LeftMouse>', function()
+            local mouse = vim.fn.getmousepos()
+            if mouse.winid > 0 then
+              vim.api.nvim_set_current_win(mouse.winid)
+              vim.api.nvim_win_set_cursor(mouse.winid, { mouse.line, math.max(0, mouse.column - 1) })
+            end
+            Snacks.picker.lsp_definitions()
+          end, '[G]oto [D]efinition (Mouse)')
           map('grD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
           map('gO', function()
             Snacks.picker.lsp_symbols()

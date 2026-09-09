@@ -74,11 +74,29 @@ return {
   {
     'rose-pine/neovim',
     name = 'rose-pine',
+    priority = 1000,
     opts = {
-      variant = "dawn",
+      variant = 'dawn',
     },
+    -- config = function()
+    --   vim.cmd 'colorscheme rose-pine-dawn'
+    -- end,
+  },
+  {
+    'Mofiqul/vscode.nvim',
+    priority = 1000,
+    opts = {},
     config = function()
-      vim.cmd 'colorscheme rose-pine-dawn'
+      require('vscode').setup {
+        underline_links = false,
+        group_overrides = {
+          markdownUrl = { underline = false },
+          Underlined = { underline = false },
+          ['@markup.link.url'] = { underline = false },
+          ['@markup.link.label'] = { underline = false },
+        },
+      }
+      vim.cmd 'colorscheme vscode'
     end,
   },
 }

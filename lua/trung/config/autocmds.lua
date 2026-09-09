@@ -79,8 +79,9 @@ vim.api.nvim_create_autocmd('BufEnter', {
     vim.cmd.nmenu [[100.205 PopUp.󰈞\ Open\ File\ Under\ Cursor <cmd>lua _G.OpenFileUnderCursor()<CR>]]
     vim.cmd.nmenu [[100.206 PopUp.󰆏\ Copy\ All <cmd>%y+<CR>]]
     vim.cmd.nmenu [[100.211 PopUp.󰘲\ Copy\ Word\ Under\ Cursor yiw]]
-    vim.cmd.nmenu [[100.212 PopUp.󰈔\ Copy\ File\ Name <cmd>let @+=expand('%:t')<CR>]]
-    vim.cmd.nmenu [[100.213 PopUp.󰈙\ Copy\ Code\ Position <cmd>let @+=expand('%') . ':' . line('.')<CR>]]
+    vim.cmd.nmenu [[100.212 PopUp.󰛄\ Replace\ Word\ Under\ Cursor viwP]]
+    vim.cmd.nmenu [[100.213 PopUp.󰈔\ Copy\ File\ Name <cmd>let @+=expand('%:t')<CR>]]
+    vim.cmd.nmenu [[100.214 PopUp.󰈙\ Copy\ Code\ Position <cmd>let @+=expand('%') . ':' . line('.')<CR>]]
     vim.cmd.nmenu [[100.215 PopUp.󰝰\ New\ Empty\ File <cmd>vnew<CR>]]
     vim.cmd.nmenu [[100.218 PopUp.-AgentSep- :]]
 
@@ -129,11 +130,15 @@ vim.api.nvim_create_autocmd({ 'TermOpen', 'BufEnter' }, {
     vim.cmd 'startinsert'
   end,
 })
+
 vim.keymap.set('n', '<LeftMouse>', function()
   if vim.bo.buftype == 'terminal' then
-    vim.cmd 'startinsert'
+    local name = vim.api.nvim_buf_get_name(0):lower()
+    if name:match ':claude' or name:match ':pi' or name:match ':agy' then
+      vim.cmd 'startinsert'
+    end
   end
-  -- Let the normal mouse click happen
+
   vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<LeftMouse>', true, false, true), 'n', false)
 end, { silent = true })
 

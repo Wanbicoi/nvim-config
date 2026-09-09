@@ -276,7 +276,7 @@ return {
         backdrop = false,
         border = 'single',
         wo = {
-          number = true,
+          -- number = true,
           relativenumber = false,
         },
       })

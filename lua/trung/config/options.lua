@@ -1,6 +1,6 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
-
+vim.o.background = 'light'
 -- split help to right
 vim.cmd [[
   cabbrev h vert h

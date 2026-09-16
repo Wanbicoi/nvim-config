@@ -374,9 +374,25 @@ return {
       {
         '<leader>gS',
         function()
-          snacks_search.project 'git_stash'
+          Snacks.picker.git_status {
+            layout = {
+              preset = 'sidebar',
+              preview = nil
+            },
+            auto_close = false,
+            jump = { close = false },
+            focus = 'list',
+            confirm = function(picker)
+              picker:action 'jump'
+              vim.schedule(function()
+                pcall(function()
+                  require('gitsigns').diffthis '~'
+                end)
+              end)
+            end,
+          }
         end,
-        desc = 'Git Stash',
+        desc = 'Git Status Explorer (Sidebar with Diff)',
       },
       {
         '<leader>gd',

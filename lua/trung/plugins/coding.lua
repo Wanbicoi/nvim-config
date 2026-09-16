@@ -297,6 +297,7 @@ return {
         sql = { 'sleek' },
         bash = { 'beautysh' },
         zsh = { 'beautysh' },
+        sh = { 'beautysh' },
         markdown = { 'prettierd', 'prettier', stop_after_first = true },
         make = { 'cmakelang' },
         xml = { 'xmlformatter' },

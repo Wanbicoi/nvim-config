@@ -664,15 +664,6 @@ return {
         'OverseerOutput',
       },
     },
-    -- init = function()
-    --   vim.api.nvim_create_autocmd('VimEnter', {
-    --     desc = 'Auto call auto-session',
-    --     group = vim.api.nvim_create_augroup('trung-autosave', { clear = true }),
-    --     callback = function()
-    --       vim.cmd [[AutoSession search]]
-    --     end,
-    --   })
-    -- end,
     keys = {
       { '<leader>fs', '<cmd>AutoSession search<CR>', desc = 'Session search' },
     },
@@ -818,17 +809,24 @@ return {
   --     }
   --   end,
   -- },
+  -- {
+  --   'MeanderingProgrammer/render-markdown.nvim',
+  --   dependencies = { 'nvim-mini/mini.nvim' }, -- if you use the mini.nvim suite
+  --   -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.icons' },        -- if you use standalone mini plugins
+  --   -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
+  --   ---@module 'render-markdown'
+  --   ---@type render.md.UserConfig
+  --   opts = {
+  --     file_types = { 'markdown', 'practice-description' },
+  --   },
+  -- For `plugins/markview.lua` users.
   {
-    'MeanderingProgrammer/render-markdown.nvim',
-    dependencies = { 'nvim-mini/mini.nvim' }, -- if you use the mini.nvim suite
-    -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.icons' },        -- if you use standalone mini plugins
-    -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
-    ---@module 'render-markdown'
-    ---@type render.md.UserConfig
-    opts = {
-      file_types = { 'markdown', 'practice-description' },
-    },
+    'OXY2DEV/markview.nvim',
+    lazy = false,
+    -- Completion for `blink.cmp`
+    dependencies = { 'saghen/blink.cmp' },
   },
+  -- },
   -- {
   --   'soulis-1256/eagle.nvim',
   --   opts = {},

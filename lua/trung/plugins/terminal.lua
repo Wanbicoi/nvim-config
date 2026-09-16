@@ -183,20 +183,20 @@ end
 local function agent_coding_send_file()
   local file = vim.fn.expand '%'
   local line = vim.fn.line '.'
-  send_to_agent_coding(string.format('@%s:L%d\n', file, line))
+  send_to_agent_coding(string.format('%s:L%d\n', file, line))
 end
 
 local function agent_coding_send_selection()
   local start_pos = vim.fn.getpos "'<"
   local end_pos = vim.fn.getpos "'>"
   local file = vim.fn.expand '%'
-  send_to_agent_coding(string.format('@%s:L%d-L%d\n', file, start_pos[2], end_pos[2]))
+  send_to_agent_coding(string.format('%s:L%d-L%d\n', file, start_pos[2], end_pos[2]))
 end
 
 local function agent_coding_send_line()
   local file = vim.fn.expand '%'
   local line = vim.fn.line '.'
-  send_to_agent_coding(string.format('@%s:L%d\n', file, line))
+  send_to_agent_coding(string.format('%s:L%d\n', file, line))
 end
 
 local keys = {

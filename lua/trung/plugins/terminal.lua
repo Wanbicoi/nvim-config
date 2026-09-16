@@ -199,6 +199,65 @@ local function agent_coding_send_line()
   send_to_agent_coding(string.format('%s:L%d\n', file, line))
 end
 
+local function format_diagnostic(diag, file)
+  local severity_names = {
+    [vim.diagnostic.severity.ERROR] = 'ERROR',
+    [vim.diagnostic.severity.WARN] = 'WARN',
+    [vim.diagnostic.severity.INFO] = 'INFO',
+    [vim.diagnostic.severity.HINT] = 'HINT',
+  }
+  local sev = severity_names[diag.severity] or 'DIAGNOSTIC'
+  local code = diag.code and string.format(' (%s)', diag.code) or (diag.source and string.format(' (%s)', diag.source) or '')
+  local line = (diag.lnum or 0) + 1
+  local col = (diag.col or 0) + 1
+  return string.format('%s:L%d:C%d [%s] %s%s', file, line, col, sev, vim.trim(diag.message or ''), code)
+end
+
+local function agent_coding_send_diagnostic()
+  local bufnr = vim.api.nvim_get_current_buf()
+  local file = vim.fn.expand '%'
+  if file == '' then
+    file = vim.api.nvim_buf_get_name(bufnr)
+  end
+
+  local mode = vim.fn.mode()
+  local diags = {}
+
+  if mode == 'v' or mode == 'V' or mode == '\22' then
+    local start_line = vim.fn.getpos("'<")[2] - 1
+    local end_line = vim.fn.getpos("'>")[2] - 1
+    if start_line > end_line then
+      start_line, end_line = end_line, start_line
+    end
+    for _, d in ipairs(vim.diagnostic.get(bufnr)) do
+      if d.lnum >= start_line and d.lnum <= end_line then
+        table.insert(diags, d)
+      end
+    end
+  else
+    local cur_line = vim.fn.line '.' - 1
+    local line_diags = vim.diagnostic.get(bufnr, { lnum = cur_line })
+    diags = #line_diags > 0 and line_diags or vim.diagnostic.get(bufnr)
+  end
+
+  if #diags == 0 then
+    vim.notify('No diagnostics found', vim.log.levels.INFO, { title = 'Agent Coding' })
+    return
+  end
+
+  local lines = {}
+  for _, diag in ipairs(diags) do
+    table.insert(lines, format_diagnostic(diag, file))
+  end
+
+  local text = string.format('Fix the following diagnostic%s:\n%s\n', #diags > 1 and 's' or '', table.concat(lines, '\n'))
+  send_to_agent_coding(text)
+end
+
+vim.api.nvim_create_user_command('AgentSendDiagnostic', agent_coding_send_diagnostic, {
+  desc = 'Send diagnostics to agent terminal',
+})
+
 local keys = {
   {
     '<a-l>',
@@ -247,6 +306,12 @@ local keys = {
     mode = 'v',
     desc = '[A]gentCoding send [T]his',
   },
+  {
+    '<leader>ad',
+    agent_coding_send_diagnostic,
+    mode = { 'n', 'v' },
+    desc = '[A]gentCoding send [D]iagnostic',
+  },
 }
 
 for i = 1, 9 do
@@ -263,6 +328,8 @@ end
 _G.agent_coding = {
   send_line = agent_coding_send_line,
   send_selection = agent_coding_send_selection,
+  send_file = agent_coding_send_file,
+  send_diagnostic = agent_coding_send_diagnostic,
 }
 
 return {

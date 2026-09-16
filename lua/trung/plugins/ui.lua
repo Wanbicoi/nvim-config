@@ -377,19 +377,19 @@ return {
           Snacks.picker.git_status {
             layout = {
               preset = 'sidebar',
-              preview = nil
+              hidden = { 'preview' },
             },
             auto_close = false,
             jump = { close = false },
             focus = 'list',
-            confirm = function(picker)
-              picker:action 'jump'
-              vim.schedule(function()
-                pcall(function()
-                  require('gitsigns').diffthis '~'
-                end)
-              end)
-            end,
+            -- confirm = function(picker)
+            --   picker:action 'jump'
+            --   vim.schedule(function()
+            --     pcall(function()
+            --       require('gitsigns').diffthis '~'
+            --     end)
+            --   end)
+            -- end,
           }
         end,
         desc = 'Git Status Explorer (Sidebar with Diff)',

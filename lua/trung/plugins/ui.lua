@@ -350,15 +350,15 @@ return {
         end,
         desc = 'Git Branches',
       },
+      -- {
+      --   '<leader>gl',
+      --   function()
+      --     snacks_search.project 'git_log'
+      --   end,
+      --   desc = 'Git Log',
+      -- },
       {
         '<leader>gl',
-        function()
-          snacks_search.project 'git_log'
-        end,
-        desc = 'Git Log',
-      },
-      {
-        '<leader>gL',
         function()
           snacks_search.project 'git_log_line'
         end,

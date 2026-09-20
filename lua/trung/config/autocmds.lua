@@ -222,10 +222,39 @@ vim.api.nvim_create_autocmd('FileType', {
 --     end
 --   end
 -- end
---
--- vim.api.nvim_create_autocmd({ 'BufDelete', 'BufWipeout', 'BufWinLeave', 'WinClosed' }, {
---   group = vim.api.nvim_create_augroup('trung-gitsigns-autoclose', { clear = true }),
---   callback = function()
---     cleanup_gitsigns_diffs()
---   end,
--- })
+-- Clean up tool windows (edgy, overseer, terminals, pickers) before restart
+vim.api.nvim_create_user_command('Restart', function(opts)
+  pcall(function()
+    require('edgy').close()
+  end)
+  pcall(function()
+    require('overseer').close()
+  end)
+  pcall(function()
+    for _, term in ipairs(Snacks.terminal.list()) do
+      if term:win_valid() then
+        term:hide()
+      end
+    end
+  end)
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    local buf = vim.api.nvim_win_get_buf(win)
+    local ft = vim.bo[buf].filetype
+    local bt = vim.bo[buf].buftype
+    if bt == 'terminal' or bt == 'nofile' or vim.tbl_contains({
+      'snacks_terminal',
+      'snacks_layout_box',
+      'snacks_picker_list',
+      'snacks_picker_input',
+      'OverseerList',
+      'OverseerOutput',
+      'aerial',
+      'qf',
+      'help',
+    }, ft) then
+      pcall(vim.api.nvim_win_close, win, true)
+    end
+  end
+  vim.cmd('restart ' .. (opts.bang and '!' or '') .. ' ' .. opts.args)
+end, { bang = true, nargs = '*' })
+

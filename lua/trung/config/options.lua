@@ -6,6 +6,7 @@ vim.o.background = 'light'
 vim.cmd [[
   " cabbrev h vert h
   cabbrev term vsplit term://zsh
+  cabbrev restart Restart
 ]]
 vim.opt.shada = "!,'100000,<50,s10,h,r/tmp/,r/private"
 vim.o.termguicolors = true

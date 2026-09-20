@@ -486,7 +486,22 @@ return {
       options = {
         globalstatus = true,
         disabled_filetypes = {
-          winbar = { 'OverseerList', 'OverseerOutput', 'BookmarksTree', 'qf', 'kulala_ui' },
+          winbar = {
+            'OverseerList',
+            'OverseerOutput',
+            'BookmarksTree',
+            'qf',
+            'kulala_ui',
+            'help',
+            'neotest-output-panel',
+            'neotest-summary',
+            'snacks_layout_box',
+            'snacks_picker_list',
+            'snacks_picker_input',
+            'snacks_terminal',
+            'aerial',
+            'edgy',
+          },
         },
       },
       sections = {
@@ -672,10 +687,26 @@ return {
       session_lens = {
         picker = 'snacks',
       },
+      close_filetypes_on_save = {
+        'checkhealth',
+        'snacks_terminal',
+        'snacks_layout_box',
+        'snacks_picker_list',
+        'snacks_picker_input',
+        'OverseerList',
+        'OverseerOutput',
+        'aerial',
+        'neotest-output-panel',
+        'neotest-summary',
+        'qf',
+        'help',
+      },
       bypass_save_filetypes = {
         'BookmarksTree',
         'kulala_ui',
         'snacks_picker_list',
+        'snacks_terminal',
+        'snacks_layout_box',
         'OverseerList',
         'OverseerOutput',
       },
@@ -725,7 +756,7 @@ return {
       end,
     },
     dependencies = { 'nvim-tree/nvim-web-devicons' },
-    cmd = { 'AerialToggle' },
+    cmd = { 'AerialToggle', 'AerialOpen' },
     keys = {
       {
         '<leader>A',
@@ -890,5 +921,87 @@ return {
       })
       vim.o.guifont = 'JetBrainsMono Nerd Font Propo:h9.5'
     end,
+  },
+  {
+    'folke/edgy.nvim',
+    event = 'VeryLazy',
+    init = function()
+      vim.opt.laststatus = 3
+      vim.opt.splitkeep = 'screen'
+    end,
+    opts = {
+      bottom = {
+        {
+          ft = 'qf',
+          title = 'QuickFix',
+          size = { height = 10 },
+        },
+        {
+          ft = 'help',
+          size = { height = 10 },
+          filter = function(buf)
+            return vim.bo[buf].buftype == 'help'
+          end,
+        },
+        {
+          ft = 'neotest-output-panel',
+          title = 'Neotest Output',
+          size = { height = 10 },
+        },
+        {
+          ft = 'OverseerOutput',
+          title = 'Overseer Output',
+          size = { height = 7 },
+        },
+      },
+      left = {
+        {
+          ft = 'snacks_layout_box',
+          title = 'Explorer',
+          filter = function(_, win)
+            return vim.api.nvim_win_get_config(win).relative == ''
+          end,
+        },
+        {
+          ft = 'aerial',
+          -- pinned = true,
+          title = 'Symbols (Aerial)',
+          open = 'AerialOpen',
+        },
+        {
+          ft = 'OverseerList',
+          title = 'Overseer',
+          open = function()
+            require('overseer').open()
+          end,
+          size = { height = 10 },
+          pinned = false,
+        },
+      },
+      right = {
+        {
+          ft = 'snacks_terminal',
+          title = '%{b:snacks_terminal.id}: %{b:term_title}',
+          size = { width = 0.4 },
+          filter = function(_, win)
+            return vim.w[win].snacks_win
+              and vim.w[win].snacks_win.position == 'right'
+              and vim.w[win].snacks_win.relative == 'editor'
+              and not vim.w[win].trouble_preview
+          end,
+        },
+        {
+          ft = 'neotest-summary',
+          title = 'Neotest Summary',
+          size = { width = 35 },
+        },
+      },
+      animate = {
+        enabled = false,
+      },
+      wo = {
+        winbar = false,
+      },
+    },
   },
 }

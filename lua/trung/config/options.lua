@@ -4,16 +4,15 @@ vim.g.maplocalleader = ' '
 vim.o.background = 'light'
 -- split help to right
 vim.cmd [[
-  cabbrev h vert h
+  " cabbrev h vert h
   cabbrev term vsplit term://zsh
-  cabbrev help vert help
 ]]
 vim.opt.shada = "!,'100000,<50,s10,h,r/tmp/,r/private"
 vim.o.termguicolors = true
 vim.o.autowriteall = true
 vim.o.exrc = true
 vim.opt.tabstop = 2
-vim.o.sessionoptions = 'blank,curdir,folds,help,tabpages,winsize,winpos,localoptions'
+vim.o.sessionoptions = 'blank,curdir,folds,help,tabpages,winsize,winpos'
 vim.o.shiftwidth = 2
 vim.opt.number = true
 vim.opt.relativenumber = true
@@ -85,9 +84,6 @@ vim.wo.foldenable = true
 vim.wo.foldlevel = 99
 vim.wo.foldmethod = 'expr'
 vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-
-vim.o.winwidth = 40
-vim.o.winminwidth = 20
 
 if vim.fn.has 'win32' == 1 then
   vim.opt.shell = 'pwsh'

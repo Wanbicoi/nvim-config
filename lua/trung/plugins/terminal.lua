@@ -8,8 +8,8 @@ local agent_cmds = {
 }
 
 local agent_state = {
-  float = { count = 101 },
-  right = { count = 102 },
+  count = 101,
+  cwd = nil,
 }
 
 vim.api.nvim_create_autocmd({ 'TermClose', 'BufWipeout' }, {
@@ -20,12 +20,8 @@ vim.api.nvim_create_autocmd({ 'TermClose', 'BufWipeout' }, {
     end)
     if ok and snacks_term then
       for _, cmd in pairs(agent_cmds) do
-        if snacks_term.cmd == cmd then
-          if snacks_term.id == 101 then
-            agent_state.float.cwd = nil
-          elseif snacks_term.id == 102 then
-            agent_state.right.cwd = nil
-          end
+        if snacks_term.cmd == cmd and snacks_term.id == agent_state.count then
+          agent_state.cwd = nil
           break
         end
       end
@@ -50,15 +46,14 @@ local function shell_float_opts(opts)
   }, opts or {})
 end
 
-local function agent_opts(kind)
-  local state = agent_state[kind]
+local function agent_opts()
   return {
-    count = state.count,
-    cwd = state.cwd,
-    win = kind == 'right' and {
+    count = agent_state.count,
+    cwd = agent_state.cwd,
+    win = {
       position = 'right',
       width = math.floor(vim.o.columns * 0.4),
-    } or float_win(),
+    },
   }
 end
 
@@ -83,71 +78,28 @@ local function pick_agent_and_cwd(callback)
   end)
 end
 
-local function hide_agent_coding(kind)
-  for _, cmd in pairs(agent_cmds) do
-    local term = Snacks.terminal.get(cmd, vim.tbl_extend('force', agent_opts(kind), { create = false }))
-    if term and term:win_valid() then
-      term:hide()
-    end
-  end
-end
-
-local function hide_other_floating_terminals(current)
-  for _, term in ipairs(Snacks.terminal.list()) do
-    if term ~= current and term:win_valid() and term.opts.position == 'float' then
-      term:hide()
-    end
-  end
-end
-
-local function open_agent_coding(kind)
-  local state = agent_state[kind]
-  local other_kind = kind == 'right' and 'float' or 'right'
-
-  hide_agent_coding(other_kind)
-
+local function open_agent_coding()
   local function open()
     local cmd = agent_cmds[current_agent] or current_agent
-    if kind == 'float' then
-      hide_other_floating_terminals(nil)
-      Snacks.terminal.focus(cmd, agent_opts(kind))
-    else
-      Snacks.terminal(cmd, agent_opts(kind))
-    end
+    Snacks.terminal(cmd, agent_opts())
   end
 
-  if state.cwd then
+  if agent_state.cwd then
     open()
     return
   end
 
   pick_agent_and_cwd(function(cwd)
-    state.cwd = cwd
+    agent_state.cwd = cwd
     open()
   end)
 end
 
-local function get_active_agent_kind()
-  for _, cmd in pairs(agent_cmds) do
-    local right = Snacks.terminal.get(cmd, vim.tbl_extend('force', agent_opts 'right', { create = false }))
-    if right and right:win_valid() then
-      return 'right'
-    end
-  end
-  return 'right'
-end
-
 local function send_to_agent_coding(text)
-  local kind = get_active_agent_kind()
-  local state = agent_state[kind]
-
   local function send()
     local cmd = agent_cmds[current_agent] or current_agent
-    local term = Snacks.terminal.get(cmd, agent_opts(kind))
+    local term = Snacks.terminal.get(cmd, agent_opts())
     if term then
-      if kind == 'float' then
-        hide_other_floating_terminals(term)
-      end
       if not term:win_valid() then
         term:show()
       end
@@ -169,13 +121,13 @@ local function send_to_agent_coding(text)
     end, 100)
   end
 
-  if state.cwd then
+  if agent_state.cwd then
     send()
     return
   end
 
   pick_agent_and_cwd(function(cwd)
-    state.cwd = cwd
+    agent_state.cwd = cwd
     send()
   end)
 end
@@ -273,20 +225,12 @@ local keys = {
     desc = 'Open lazygit',
   },
   {
-    '<a-A>',
-    function()
-      open_agent_coding 'float'
-    end,
-    mode = { 'n' },
-    desc = 'Open floating coding agent terminal',
-  },
-  {
     '<a-a>',
     function()
-      open_agent_coding 'right'
+      open_agent_coding()
     end,
     mode = { 'n' },
-    desc = 'Open split right coding agent terminal',
+    desc = 'Open coding agent terminal',
   },
   {
     '<leader>af',

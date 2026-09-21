@@ -157,71 +157,6 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
--- -- Auto-close gitsigns diff revision buffer when main file buffer is closed or navigated away
--- local function get_gitsigns_main_path(gitsigns_bufname)
---   local gitdir, relpath = gitsigns_bufname:match '^gitsigns://(.-)/?%.git//.-:(.+)$'
---   if gitdir and relpath then
---     return vim.fs.normalize(gitdir .. '/' .. relpath)
---   end
---   local base_dir, rel = gitsigns_bufname:match '^gitsigns://(.*)//.-:(.+)$'
---   if base_dir and rel then
---     base_dir = base_dir:gsub('/%.git/?$', '')
---     return vim.fs.normalize(base_dir .. '/' .. rel)
---   end
---   return nil
--- end
---
--- local function cleanup_gitsigns_diffs()
---   for _, dbuf in ipairs(vim.api.nvim_list_bufs()) do
---     if vim.api.nvim_buf_is_valid(dbuf) then
---       local name = vim.api.nvim_buf_get_name(dbuf)
---       if name:match '^gitsigns://' then
---         local main_path = get_gitsigns_main_path(name)
---         if main_path then
---           local wins_to_close = {}
---           for _, win in ipairs(vim.api.nvim_list_wins()) do
---             if vim.api.nvim_win_is_valid(win) and vim.api.nvim_win_get_buf(win) == dbuf then
---               local tab = vim.api.nvim_win_get_tabpage(win)
---               local main_is_visible_in_tab = false
---               for _, twin in ipairs(vim.api.nvim_tabpage_list_wins(tab)) do
---                 if vim.api.nvim_win_is_valid(twin) and twin ~= win then
---                   local b = vim.api.nvim_win_get_buf(twin)
---                   if vim.api.nvim_buf_is_loaded(b) and vim.fs.normalize(vim.api.nvim_buf_get_name(b)) == main_path then
---                     main_is_visible_in_tab = true
---                     break
---                   end
---                 end
---               end
---               if not main_is_visible_in_tab then
---                 table.insert(wins_to_close, win)
---               end
---             end
---           end
---
---           for _, win in ipairs(wins_to_close) do
---             if #vim.api.nvim_list_wins() > 1 then
---               pcall(vim.api.nvim_win_close, win, true)
---             end
---           end
---
---           local main_loaded = false
---           for _, b in ipairs(vim.api.nvim_list_bufs()) do
---             if vim.api.nvim_buf_is_valid(b) and vim.api.nvim_buf_is_loaded(b) then
---               if vim.fs.normalize(vim.api.nvim_buf_get_name(b)) == main_path then
---                 main_loaded = true
---                 break
---               end
---             end
---           end
---
---           if not main_loaded or #wins_to_close > 0 then
---             pcall(vim.api.nvim_buf_delete, dbuf, { force = true })
---           end
---         end
---       end
---     end
---   end
--- end
 -- Clean up tool windows (edgy, overseer, terminals, pickers) before restart
 vim.api.nvim_create_user_command('Restart', function(opts)
   pcall(function()
@@ -241,20 +176,21 @@ vim.api.nvim_create_user_command('Restart', function(opts)
     local buf = vim.api.nvim_win_get_buf(win)
     local ft = vim.bo[buf].filetype
     local bt = vim.bo[buf].buftype
-    if bt == 'terminal' or bt == 'nofile' or vim.tbl_contains({
-      'snacks_terminal',
-      'snacks_layout_box',
-      'snacks_picker_list',
-      'snacks_picker_input',
-      'OverseerList',
-      'OverseerOutput',
-      'aerial',
-      'qf',
-      'help',
-    }, ft) then
+    if
+      bt == 'terminal'
+      or bt == 'nofile'
+      or vim.tbl_contains({
+        'snacks_terminal',
+        'snacks_layout_box',
+        'snacks_picker_list',
+        'snacks_picker_input',
+        'OverseerList',
+        'OverseerOutput',
+        'aerial',
+      }, ft)
+    then
       pcall(vim.api.nvim_win_close, win, true)
     end
   end
   vim.cmd('restart ' .. (opts.bang and '!' or '') .. ' ' .. opts.args)
 end, { bang = true, nargs = '*' })
-

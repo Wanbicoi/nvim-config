@@ -126,3 +126,8 @@ end, { desc = '[C]opy relative current file path' })
 
 vim.keymap.set({ 'n', 'x', 'v' }, 'q', '<cmd>q<CR>', { noremap = true })
 vim.keymap.set('n', '<esc>', '<cmd>noh<CR>', { noremap = true })
+
+vim.keymap.set({ 'n', 'v', 'o' }, '<ScrollWheelDown>', '3j')
+vim.keymap.set({ 'n', 'v', 'o' }, '<ScrollWheelUp>', '3k')
+vim.keymap.set('i', '<ScrollWheelDown>', '<C-o>3j')
+vim.keymap.set('i', '<ScrollWheelUp>', '<C-o>3k')

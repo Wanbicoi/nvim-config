@@ -132,13 +132,80 @@ local function send_to_agent_coding(text)
   end)
 end
 
+local function is_term_or_overseer(bufnr)
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
+  local bt = vim.bo[bufnr].buftype
+  local ft = (vim.bo[bufnr].filetype or ''):lower()
+  local name = vim.api.nvim_buf_get_name(bufnr):lower()
+
+  if bt == 'terminal' or ft == 'terminal' or name:match '^term://' then
+    return true
+  end
+  if ft:find 'overseer' or vim.b[bufnr].overseer_task ~= nil or name:match '^overseer://' then
+    return true
+  end
+  if vim.b[bufnr].snacks_terminal ~= nil then
+    return true
+  end
+  return false
+end
+
+local function get_last_lines(bufnr, count)
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
+  count = count or 50
+  local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+  while #lines > 0 and vim.trim(lines[#lines]) == '' do
+    table.remove(lines)
+  end
+  if #lines == 0 then
+    return ''
+  end
+  local start_idx = math.max(1, #lines - count + 1)
+  local last_lines = {}
+  for i = start_idx, #lines do
+    table.insert(last_lines, lines[i])
+  end
+  return table.concat(last_lines, '\n')
+end
+
+local function get_visual_selection_text()
+  local mode = vim.fn.mode()
+  if mode:match '[vV\22]' then
+    vim.cmd 'normal! \27'
+  end
+  local start_pos = vim.fn.getpos "'<"
+  local end_pos = vim.fn.getpos "'>"
+  if start_pos[2] == 0 or end_pos[2] == 0 then
+    return ''
+  end
+  local vmode = vim.fn.visualmode()
+  local lines = vim.fn.getregion(start_pos, end_pos, { type = vmode ~= '' and vmode or 'v' })
+  return table.concat(lines, '\n')
+end
+
 local function agent_coding_send_file()
+  local bufnr = vim.api.nvim_get_current_buf()
+  if is_term_or_overseer(bufnr) then
+    local text = get_last_lines(bufnr, 50)
+    if vim.trim(text) ~= '' then
+      send_to_agent_coding(text .. '\n')
+    end
+    return
+  end
   local file = vim.fn.expand '%'
   local line = vim.fn.line '.'
   send_to_agent_coding(string.format('%s:L%d\n', file, line))
 end
 
 local function agent_coding_send_selection()
+  local bufnr = vim.api.nvim_get_current_buf()
+  if is_term_or_overseer(bufnr) then
+    local text = get_visual_selection_text()
+    if vim.trim(text) ~= '' then
+      send_to_agent_coding(text .. '\n')
+    end
+    return
+  end
   local start_pos = vim.fn.getpos "'<"
   local end_pos = vim.fn.getpos "'>"
   local file = vim.fn.expand '%'
@@ -146,6 +213,14 @@ local function agent_coding_send_selection()
 end
 
 local function agent_coding_send_line()
+  local bufnr = vim.api.nvim_get_current_buf()
+  if is_term_or_overseer(bufnr) then
+    local text = get_last_lines(bufnr, 50)
+    if vim.trim(text) ~= '' then
+      send_to_agent_coding(text .. '\n')
+    end
+    return
+  end
   local file = vim.fn.expand '%'
   local line = vim.fn.line '.'
   send_to_agent_coding(string.format('%s:L%d\n', file, line))
@@ -229,7 +304,7 @@ local keys = {
     function()
       open_agent_coding()
     end,
-    mode = { 'n' },
+    mode = { 'n', 't' },
     desc = 'Open coding agent terminal',
   },
   {

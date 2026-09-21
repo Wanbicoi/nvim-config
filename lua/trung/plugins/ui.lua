@@ -20,6 +20,27 @@ local function set_tab_title(session_name)
   end
 end
 
+local get_git_nodes = function(root_path)
+  local Tree = require 'snacks.explorer.tree'
+  local nodes = {}
+  Tree:walk(Tree:find(root_path), function(node)
+    if node.status then
+      table.insert(nodes, node)
+    end
+  end)
+
+  return nodes
+end
+
+local is_git_item = function(item, git_nodes)
+  return vim.iter(git_nodes):any(function(node)
+    if node.dir_status then
+      return vim.fs.relpath(node.path, item.file) ~= nil
+    end
+    return vim.fs.relpath(item.file, node.path) ~= nil
+  end)
+end
+
 return {
   {
     'folke/which-key.nvim',
@@ -144,10 +165,47 @@ return {
             dev = { '~/Repos' },
             patterns = { '.git', '_darcs', '.hg', '.bzr', '.svn', 'package.json', 'Makefile', 'be-group' },
           },
+          explorer = {
+            finder = function(opts, ctx)
+              if ctx.picker.opts.git_filter then
+                ---@diagnostic disable-next-line: inject-field
+                ctx.picker.git_nodes = get_git_nodes(ctx.filter.cwd)
+              else
+                ---@diagnostic disable-next-line: inject-field
+                ctx.picker.git_nodes = nil
+              end
+              return require('snacks.picker.source.explorer').explorer(opts, ctx)
+            end,
+            transform = function(item, ctx)
+              if ctx.picker.git_nodes then
+                ---@diagnostic disable-next-line: undefined-field
+                return is_git_item(item, ctx.picker.git_nodes)
+              end
+              return true
+            end,
+            toggles = {
+              git_filter = { icon = '', value = false },
+            },
+            win = {
+              list = {
+                keys = {
+                  ['gs'] = 'toggle_git_filter',
+                },
+              },
+            },
+          },
         },
       },
     },
     keys = {
+      {
+        '<a-f>',
+        function()
+          Snacks.zen.zoom()
+        end,
+        mode = { 'n', 't' },
+        desc = 'Toggle Full Screen / Zoom',
+      },
       {
         '<leader>e',
         function()
@@ -371,29 +429,20 @@ return {
         end,
         desc = 'Git Status',
       },
-      {
-        '<leader>gS',
-        function()
-          Snacks.picker.git_status {
-            layout = {
-              preset = 'sidebar',
-              hidden = { 'preview' },
-            },
-            auto_close = false,
-            jump = { close = false },
-            focus = 'list',
-            -- confirm = function(picker)
-            --   picker:action 'jump'
-            --   vim.schedule(function()
-            --     pcall(function()
-            --       require('gitsigns').diffthis '~'
-            --     end)
-            --   end)
-            -- end,
-          }
-        end,
-        desc = 'Git Status Explorer (Sidebar with Diff)',
-      },
+      -- {
+      --   '<leader>gS',
+      --   function()
+      --     local explorer = Snacks.picker.get({ source = 'explorer' })[1]
+      --     if explorer and not explorer.closed then
+      --       explorer:action 'toggle_git_filter'
+      --       return
+      --     end
+      --     Snacks.picker.explorer {
+      --       git_filter = true,
+      --     }
+      --   end,
+      --   desc = 'Toggle Git Status Explorer Filter',
+      -- },
       {
         '<leader>gd',
         function()
@@ -719,12 +768,6 @@ return {
     'stevearc/aerial.nvim',
     opts = {
       backends = { 'lsp', 'treesitter', 'markdown', 'asciidoc', 'man' },
-      layout = {
-        max_width = { 0.3 },
-        min_width = { 48, 0.2 },
-        width = 48,
-        default_direction = 'prefer_left',
-      },
       -- 1. Ensure Variable and Constant are permitted for JS/TS
       filter_kind = {
         'Class',
@@ -740,20 +783,20 @@ return {
         'Constant',
       },
 
-      post_parse_symbol = function(bufnr, item, _)
-        local filetype = vim.bo[bufnr].filetype
-        if filetype == 'typescript' or filetype == 'typescriptreact' or filetype == 'javascript' or filetype == 'javascriptreact' then
-          -- If it's a constant or variable, only keep it if it acts like a function component or block (has children)
-          if item.kind == 'Constant' or item.kind == 'Variable' then
-            return item.children and #item.children > 0
-          end
-          if item.kind == 'Function' and (string.match(item.name, ' callback$') or item.name == '<function>') then
-            return false
-          end
-        end
-
-        return true -- Keep everything else intact
-      end,
+      -- post_parse_symbol = function(bufnr, item, _)
+      --   local filetype = vim.bo[bufnr].filetype
+      --   if filetype == 'typescript' or filetype == 'typescriptreact' or filetype == 'javascript' or filetype == 'javascriptreact' then
+      --     -- If it's a constant or variable, only keep it if it acts like a function component or block (has children)
+      --     if item.kind == 'Constant' or item.kind == 'Variable' then
+      --       return item.children and #item.children > 0
+      --     end
+      --     if item.kind == 'Function' and (string.match(item.name, ' callback$') or item.name == '<function>') then
+      --       return false
+      --     end
+      --   end
+      --
+      --   return true -- Keep everything else intact
+      -- end,
     },
     dependencies = { 'nvim-tree/nvim-web-devicons' },
     cmd = { 'AerialToggle', 'AerialOpen' },
@@ -930,6 +973,9 @@ return {
       vim.opt.splitkeep = 'screen'
     end,
     opts = {
+      options = {
+        left = { size = 35 },
+      },
       bottom = {
         {
           ft = 'qf',
@@ -938,7 +984,7 @@ return {
         },
         {
           ft = 'help',
-          size = { height = 10 },
+          size = { height = 15 },
           filter = function(buf)
             return vim.bo[buf].buftype == 'help'
           end,

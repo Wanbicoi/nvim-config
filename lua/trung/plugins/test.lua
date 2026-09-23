@@ -12,6 +12,7 @@ return {
     },
     -- { 'StevanFreeborn/neotest-playwright', branch = 'fork' },
     'nvim-neotest/neotest-jest',
+    'marilari88/neotest-vitest',
   },
   config = function()
     local snacks_search = require 'trung.utils.snacks_search'
@@ -39,6 +40,11 @@ return {
             return snacks_search.get_project_root(path)
           end,
           isTestFile = require('neotest-jest.jest-util').defaultIsTestFile,
+        },
+        require 'neotest-vitest' {
+          cwd = function(path)
+            return snacks_search.get_project_root(path)
+          end,
         },
       },
     }

@@ -74,8 +74,8 @@ vim.api.nvim_create_autocmd('BufEnter', {
     end
 
     vim.cmd.nmenu [[100.200 PopUp.-File- :]]
-    vim.cmd.nmenu [[100.201 PopUp.󰒊\ Send\ This\ To\ Agent <cmd>lua _G.agent_coding.send_line()<CR>]]
-    vim.cmd.vmenu [[100.202 PopUp.󰒊\ Send\ This\ To\ Agent <cmd>lua _G.agent_coding.send_selection()<CR>]]
+    vim.cmd.nmenu [[100.201 PopUp.󰒊\ Send\ This\ To\ Agent <cmd>lua require('trung.plugins.terminal.agent').send_line()<CR>]]
+    vim.cmd.vmenu [[100.202 PopUp.󰒊\ Send\ This\ To\ Agent <cmd>lua require('trung.plugins.terminal.agent').send_selection()<CR>]]
     vim.cmd.nmenu [[100.205 PopUp.󰈞\ Open\ File\ Under\ Cursor <cmd>lua _G.OpenFileUnderCursor()<CR>]]
     vim.cmd.nmenu [[100.206 PopUp.󰆏\ Copy\ All <cmd>%y+<CR>]]
     vim.cmd.nmenu [[100.211 PopUp.󰘲\ Copy\ Word\ Under\ Cursor yiw]]
@@ -132,14 +132,16 @@ vim.api.nvim_create_autocmd({ 'TermOpen', 'BufEnter' }, {
 })
 
 vim.keymap.set('n', '<LeftMouse>', function()
-  if vim.bo.buftype == 'terminal' then
-    local name = vim.api.nvim_buf_get_name(0):lower()
-    if name:match ':claude' or name:match ':pi' or name:match ':agy' then
-      vim.cmd 'startinsert'
+  local mouse_keys = vim.api.nvim_replace_termcodes('<LeftMouse>', true, false, true)
+  vim.api.nvim_feedkeys(mouse_keys, 'n', false)
+  vim.schedule(function()
+    if vim.bo.buftype == 'terminal' then
+      local name = vim.api.nvim_buf_get_name(0):lower()
+      if name:match 'claude' or name:match 'pi' or name:match 'agy' then
+        vim.cmd 'startinsert'
+      end
     end
-  end
-
-  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<LeftMouse>', true, false, true), 'n', false)
+  end)
 end, { silent = true })
 
 vim.api.nvim_create_autocmd('FileType', {

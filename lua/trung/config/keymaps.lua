@@ -124,10 +124,28 @@ vim.keymap.set('n', '<leader>cp', function()
   vim.notify('Relative path copied to clipboard', vim.log.levels.INFO, { title = 'Path Copied' })
 end, { desc = '[C]opy relative current file path' })
 
-vim.keymap.set({ 'n', 'x', 'v' }, 'q', '<cmd>q<CR>', { noremap = true })
+vim.keymap.set({ 'n', 'x', 'v' }, 'q', '<Nop>', { noremap = true })
+vim.api.nvim_create_autocmd('WinEnter', {
+  callback = function()
+    if vim.api.nvim_win_get_config(0).relative ~= '' then
+      vim.keymap.set({ 'n', 'x', 'v' }, 'q', '<cmd>close<CR>', { buffer = true, nowait = true })
+    end
+  end,
+})
 vim.keymap.set('n', '<esc>', '<cmd>noh<CR>', { noremap = true })
 
-vim.keymap.set({ 'n', 'v', 'o' }, '<ScrollWheelDown>', '3j')
-vim.keymap.set({ 'n', 'v', 'o' }, '<ScrollWheelUp>', '3k')
-vim.keymap.set('i', '<ScrollWheelDown>', '<C-o>3j')
-vim.keymap.set('i', '<ScrollWheelUp>', '<C-o>3k')
+vim.api.nvim_create_autocmd({ 'TermOpen', 'BufEnter' }, {
+  group = vim.api.nvim_create_augroup('TerminalInsertFocus', { clear = true }),
+  pattern = 'term://*', -- Target only terminal buffers
+  callback = function()
+    vim.keymap.set({ 'n', 'v', 'o' }, '<ScrollWheelDown>', 'L3j')
+    vim.keymap.set({ 'n', 'v', 'o' }, '<ScrollWheelUp>', 'H3k')
+  end,
+})
+
+-- vim.keymap.set('t', '<ScrollWheelDown>', [[<C-\><C-n>H3j]], { silent = true })
+-- vim.keymap.set('t', '<ScrollWheelUp>', [[<C-\><C-n>J3k]], { silent = true })
+-- vim.keymap.set('i', '<ScrollWheelDown>', '<Nop>')
+-- vim.keymap.set('i', '<ScrollWheelUp>', '<Nop>')
+-- vim.keymap.set('i', '<ScrollWheelLeft>', '<Nop>')
+-- vim.keymap.set('i', '<ScrollWheelRight>', '<Nop>')

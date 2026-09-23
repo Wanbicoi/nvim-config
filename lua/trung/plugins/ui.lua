@@ -102,7 +102,17 @@ return {
       },
       explorer = { enabled = true },
       words = { enabled = true },
-      gitbrowse = { enabled = true },
+      gitbrowse = {
+        enabled = true,
+        url_patterns = {
+          ['gitlab.i*%.com'] = {
+            branch = '/tree/{branch}',
+            file = '/blob/{branch}/{file}#L{line_start}-L{line_end}',
+            permalink = '/blob/{commit}/{file}#L{line_start}-L{line_end}',
+            commit = '/commit/{commit}',
+          },
+        },
+      },
       quickfile = { enabled = true },
       notifier = { enabled = true, top_down = false },
       indent = {
@@ -167,6 +177,7 @@ return {
           },
           explorer = {
             finder = function(opts, ctx)
+              ---@diagnostic disable-next-line: undefined-field
               if ctx.picker.opts.git_filter then
                 ---@diagnostic disable-next-line: inject-field
                 ctx.picker.git_nodes = get_git_nodes(ctx.filter.cwd)
@@ -177,6 +188,7 @@ return {
               return require('snacks.picker.source.explorer').explorer(opts, ctx)
             end,
             transform = function(item, ctx)
+              ---@diagnostic disable-next-line: undefined-field
               if ctx.picker.git_nodes then
                 ---@diagnostic disable-next-line: undefined-field
                 return is_git_item(item, ctx.picker.git_nodes)
@@ -976,7 +988,25 @@ return {
       options = {
         left = { size = 35 },
       },
+      right = {
+        {
+          ft = 'snacks_terminal',
+          title = '%{b:snacks_terminal.id}: %{b:term_title}',
+          size = { width = 0.4 },
+          filter = function(_, win)
+            return vim.w[win].snacks_win
+              and vim.w[win].snacks_win.position == 'right'
+              and vim.w[win].snacks_win.relative == 'editor'
+              and not vim.w[win].trouble_preview
+          end,
+        },
+      },
       bottom = {
+        {
+          ft = 'OverseerOutput',
+          title = 'Overseer Output',
+          size = { height = 7 },
+        },
         {
           ft = 'qf',
           title = 'QuickFix',
@@ -990,14 +1020,8 @@ return {
           end,
         },
         {
-          ft = 'neotest-output-panel',
-          title = 'Neotest Output',
-          size = { height = 10 },
-        },
-        {
-          ft = 'OverseerOutput',
-          title = 'Overseer Output',
-          size = { height = 7 },
+          ft = 'neotest-summary',
+          title = 'Neotest Summary',
         },
       },
       left = {
@@ -1022,24 +1046,6 @@ return {
           end,
           size = { height = 10 },
           pinned = false,
-        },
-      },
-      right = {
-        {
-          ft = 'snacks_terminal',
-          title = '%{b:snacks_terminal.id}: %{b:term_title}',
-          size = { width = 0.4 },
-          filter = function(_, win)
-            return vim.w[win].snacks_win
-              and vim.w[win].snacks_win.position == 'right'
-              and vim.w[win].snacks_win.relative == 'editor'
-              and not vim.w[win].trouble_preview
-          end,
-        },
-        {
-          ft = 'neotest-summary',
-          title = 'Neotest Summary',
-          size = { width = 35 },
         },
       },
       animate = {

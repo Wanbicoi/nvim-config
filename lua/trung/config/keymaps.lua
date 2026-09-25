@@ -138,8 +138,8 @@ vim.api.nvim_create_autocmd({ 'TermOpen', 'BufEnter' }, {
   group = vim.api.nvim_create_augroup('TerminalInsertFocus', { clear = true }),
   pattern = 'term://*', -- Target only terminal buffers
   callback = function()
-    vim.keymap.set({ 'n', 'v', 'o' }, '<ScrollWheelDown>', 'L3j')
-    vim.keymap.set({ 'n', 'v', 'o' }, '<ScrollWheelUp>', 'H3k')
+    vim.keymap.set({ 'n', 'v', 'o' }, '<ScrollWheelDown>', 'L3j', { buffer = true })
+    vim.keymap.set({ 'n', 'v', 'o' }, '<ScrollWheelUp>', 'H3k', { buffer = true })
   end,
 })
 

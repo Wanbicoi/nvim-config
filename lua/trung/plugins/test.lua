@@ -29,23 +29,35 @@ return {
         --     enable_dynamic_test_discovery = true,
         --   },
         -- },
-        require 'neotest-jest' {
-          jestCommand = 'npm test --',
-          jestArguments = function(defaultArguments, context)
-            return defaultArguments
-          end,
-          jestConfigFile = 'custom.jest.config.ts',
-          env = { CI = true },
-          cwd = function(path)
+        (function()
+          local adapter = require 'neotest-jest' {
+            jestCommand = 'npm test --',
+            jestArguments = function(defaultArguments, context)
+              return defaultArguments
+            end,
+            jestConfigFile = 'custom.jest.config.ts',
+            env = { CI = true },
+            cwd = function(path)
+              return snacks_search.get_project_root(path)
+            end,
+            isTestFile = require('neotest-jest.jest-util').defaultIsTestFile,
+          }
+          adapter.root = function(path)
             return snacks_search.get_project_root(path)
-          end,
-          isTestFile = require('neotest-jest.jest-util').defaultIsTestFile,
-        },
-        require 'neotest-vitest' {
-          cwd = function(path)
+          end
+          return adapter
+        end)(),
+        (function()
+          local adapter = require 'neotest-vitest' {
+            cwd = function(path)
+              return snacks_search.get_project_root(path)
+            end,
+          }
+          adapter.root = function(path)
             return snacks_search.get_project_root(path)
-          end,
-        },
+          end
+          return adapter
+        end)(),
       },
     }
   end,

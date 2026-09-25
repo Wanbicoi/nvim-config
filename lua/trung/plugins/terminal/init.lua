@@ -125,6 +125,10 @@ return {
         wo = {
           relativenumber = false,
         },
+        keys = {
+          -- Disable snacks' "double <esc> to normal mode" mapping
+          term_normal = false,
+        },
       })
 
       opts.lazygit = {

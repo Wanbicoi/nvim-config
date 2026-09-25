@@ -6,6 +6,7 @@ M.agent_cmds = {
   agy = 'agy --dangerously-skip-permissions',
   claude = 'claude --dangerously-skip-permissions',
   codex = 'codex --dangerously-bypass-approvals-and-sandbox',
+  opencode = 'opencode',
 }
 
 ---@class AgentSession
@@ -400,7 +401,9 @@ end
 --- UI prompt to pick agent type and cwd
 ---@param callback fun(agent_choice: string, cwd: string)
 function M.pick_agent_and_cwd(callback)
-  local choices = { 'agy', 'claude', 'Both (agy & claude)' }
+  local choices = vim.tbl_keys(M.agent_cmds)
+  table.sort(choices)
+
   vim.ui.select(choices, {
     prompt = 'Select Coding Agent:',
   }, function(agent_choice)
@@ -427,30 +430,12 @@ function M.pick_agent_and_cwd(callback)
   end)
 end
 
---- Open agent session(s)
---- Supports single agent or multiple agents at once ('Both (agy & claude)')
+--- Open agent session
 ---@param agent_choice string
 ---@param cwd string
 ---@param cb? fun(term: snacks.terminal)
 function M.open_agent(agent_choice, cwd, cb)
-  if agent_choice:lower():find 'both' then
-    local s1 = create_session('agy', cwd)
-    if s1 and s1.term and s1.term:win_valid() then
-      s1.term:hide()
-    end
-    local s2 = create_session('claude', cwd)
-    if s2 and s2.term and s2.term:win_valid() then
-      s2.term:hide()
-    end
-    M.switch_to_session(s1.id)
-    if cb then
-      cb(s1.term)
-    end
-    return
-  end
-
-  local agent_key = agent_choice:lower():find 'claude' and 'claude' or 'agy'
-  local s = create_session(agent_key, cwd)
+  local s = create_session(agent_choice, cwd)
   M.switch_to_session(s.id)
   if cb then
     cb(s.term)
@@ -623,7 +608,7 @@ function M.send_selection()
   local start_pos = vim.fn.getpos "'<"
   local end_pos = vim.fn.getpos "'>"
   local file = vim.fn.expand '%'
-  M.send(string.format('%s:L%d-L%d\n', file, start_pos[2], end_pos[2]))
+  M.send(string.format('@%s:L%d-L%d\n', file, start_pos[2], end_pos[2]))
 end
 
 function M.send_line()
@@ -640,7 +625,7 @@ function M.send_line()
   end
   local file = vim.fn.expand '%'
   local line = vim.fn.line '.'
-  M.send(string.format('%s:L%d\n', file, line))
+  M.send(string.format('@%s:L%d\n', file, line))
 end
 
 local function format_diagnostic(diag, file)
@@ -654,7 +639,7 @@ local function format_diagnostic(diag, file)
   local code = diag.code and string.format(' (%s)', diag.code) or (diag.source and string.format(' (%s)', diag.source) or '')
   local line = (diag.lnum or 0) + 1
   local col = (diag.col or 0) + 1
-  return string.format('%s:L%d:C%d [%s] %s%s', file, line, col, sev, vim.trim(diag.message or ''), code)
+  return string.format('@%s:L%d:C%d [%s] %s%s', file, line, col, sev, vim.trim(diag.message or ''), code)
 end
 
 function M.send_diagnostic()

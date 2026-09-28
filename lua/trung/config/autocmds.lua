@@ -65,7 +65,6 @@ vim.api.nvim_create_autocmd('BufEnter', {
       vim.cmd.vmenu [[100.284 PopUp.󰏑\ Diff\ Get <cmd>'<,'>diffget<CR>]]
       vim.cmd.vmenu [[100.285 PopUp.󰏒\ Diff\ Put <cmd>'<,'>diffput<CR>]]
     else
-      vim.opt.mouse = 'ni'
       vim.cmd.nmenu [[100.281 PopUp.\ Diff\ This <cmd>diffthis<CR>]]
       vim.cmd [[silent! aunmenu PopUp.󰦫\ Diff\ Off]]
 
@@ -74,8 +73,8 @@ vim.api.nvim_create_autocmd('BufEnter', {
     end
 
     vim.cmd.nmenu [[100.200 PopUp.-File- :]]
-    vim.cmd.nmenu [[100.201 PopUp.󰒊\ Send\ This\ To\ Agent <cmd>lua require('trung.plugins.terminal.agent').send_line()<CR>]]
-    vim.cmd.vmenu [[100.202 PopUp.󰒊\ Send\ This\ To\ Agent <cmd>lua require('trung.plugins.terminal.agent').send_selection()<CR>]]
+    vim.cmd.nmenu [[100.201 PopUp.󰒊\ Send\ This\ To\ Agent <cmd>lua require('trung.plugins.extras.tmux_agent').send_line()<CR>]]
+    vim.cmd.vmenu [[100.202 PopUp.󰒊\ Send\ This\ To\ Agent <cmd>lua require('trung.plugins.extras.tmux_agent').send_selection()<CR>]]
     vim.cmd.nmenu [[100.205 PopUp.󰈞\ Open\ File\ Under\ Cursor <cmd>lua _G.OpenFileUnderCursor()<CR>]]
     vim.cmd.nmenu [[100.206 PopUp.󰆏\ Copy\ All <cmd>%y+<CR>]]
     vim.cmd.nmenu [[100.211 PopUp.󰘲\ Copy\ Word\ Under\ Cursor yiw]]

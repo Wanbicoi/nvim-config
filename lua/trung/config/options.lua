@@ -1,4 +1,4 @@
-vim.env.TMUX = nil
+-- vim.env.TMUX = nil
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 vim.o.background = 'light'
@@ -17,7 +17,7 @@ vim.o.sessionoptions = 'blank,curdir,folds,help,tabpages,winsize,winpos'
 vim.o.shiftwidth = 2
 vim.opt.number = true
 vim.opt.relativenumber = true
-vim.opt.mouse = 'ni'
+vim.opt.mouse = 'a'
 vim.opt.mousemodel = 'popup_setpos'
 vim.opt.mousetime = 240
 vim.opt.mousemoveevent = true

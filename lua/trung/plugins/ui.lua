@@ -791,8 +791,8 @@ return {
         'Method',
         'Struct',
         -- Required to catch arrow functions:
-        'Variable',
-        'Constant',
+        -- 'Variable',
+        -- 'Constant',
       },
 
       -- post_parse_symbol = function(bufnr, item, _)

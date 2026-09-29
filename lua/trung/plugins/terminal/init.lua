@@ -24,21 +24,22 @@ local function shell_float_opts(opts)
 end
 
 local keys = {
-  -- NOTE: lazygit is now opened from zellij as a floating pane (Alt+g).
-  -- See ~/.config/zellij/config.kdl: bind "Alt g" { Run "lazygit" { floating true ... } }
-  -- {
-  --   '<a-l>',
-  --   function()
-  --     Snacks.lazygit.open {
-  --       cwd = snacks_search.get_project_root(),
-  --       win = vim.tbl_deep_extend('force', float_win(), {
-  --         border = 'rounded',
-  --       }),
-  --     }
-  --   end,
-  --   mode = { 'n' },
-  --   desc = 'Open lazygit',
-  -- },
+  -- NOTE: lazygit is back in Neovim (moved out of zellij). Bound to <a-g>:
+  -- Alt+g is free in zellij now, whereas Alt+h/j/k/l are captured by zellij for
+  -- focus movement even in locked mode, so those would never reach Neovim.
+  {
+    '<a-g>',
+    function()
+      Snacks.lazygit.open {
+        cwd = snacks_search.get_project_root(),
+        win = vim.tbl_deep_extend('force', float_win(), {
+          border = 'rounded',
+        }),
+      }
+    end,
+    mode = { 'n' },
+    desc = 'Open lazygit',
+  },
   -- NOTE: in-Neovim agent keymaps disabled in favour of zellij-agent
   -- (see lua/trung/plugins/extras/zellij_agent.lua). Uncomment to restore.
   -- {

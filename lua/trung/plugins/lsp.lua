@@ -37,14 +37,23 @@ return {
           map('grd', function()
             Snacks.picker.lsp_definitions()
           end, '[G]oto [D]efinition')
-          map('<C-LeftMouse>', function()
+          -- Zellij swallows Ctrl+LeftPress (zellij-server/src/tab/mouse_handler.rs
+          -- :1438-1460) but forwards Ctrl+LeftRelease (:1564-1579), so inside Zellij
+          -- we key off the release event instead of the press. Without Zellij the
+          -- press works normally, so pick the binding based on the environment.
+          local goto_definition_mouse = function()
             local mouse = vim.fn.getmousepos()
             if mouse.winid > 0 then
               vim.api.nvim_set_current_win(mouse.winid)
               vim.api.nvim_win_set_cursor(mouse.winid, { mouse.line, math.max(0, mouse.column - 1) })
             end
             Snacks.picker.lsp_definitions()
-          end, '[G]oto [D]efinition (Mouse)')
+          end
+          if vim.env.ZELLIJ then
+            map('<C-LeftRelease>', goto_definition_mouse, '[G]oto [D]efinition (Mouse, Zellij)')
+          else
+            map('<C-LeftMouse>', goto_definition_mouse, '[G]oto [D]efinition (Mouse)')
+          end
           map('grD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
           map('gO', function()
             Snacks.picker.lsp_symbols()

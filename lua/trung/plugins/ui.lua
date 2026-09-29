@@ -105,7 +105,7 @@ return {
       gitbrowse = {
         enabled = true,
         url_patterns = {
-          ['gitlab.i*%.com'] = {
+          ['gitlab.*%.com'] = {
             branch = '/tree/{branch}',
             file = '/blob/{branch}/{file}#L{line_start}-L{line_end}',
             permalink = '/blob/{commit}/{file}#L{line_start}-L{line_end}',

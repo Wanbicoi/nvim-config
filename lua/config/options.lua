@@ -1,17 +1,15 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 vim.o.background = 'light'
--- split help to right
-vim.cmd [[
-  " cabbrev h vert h
-  " cabbrev term vsplit term://zsh
-  " cabbrev restart Restart
-]]
 vim.opt.shada = "!,'100000,<50,s10,h,r/tmp/,r/private"
 vim.o.termguicolors = true
 vim.o.autowriteall = true
+-- exrc allows a project-local `.nvim.lua` to run. Keep it on only if you trust
+-- every repo you open; see `:help 'exrc'`.
 vim.o.exrc = true
 vim.opt.tabstop = 2
+vim.opt.softtabstop = 2
+vim.opt.expandtab = true
 vim.o.sessionoptions = 'blank,curdir,folds,help,tabpages,winsize,winpos'
 vim.o.shiftwidth = 2
 vim.opt.number = true
@@ -25,20 +23,6 @@ vim.cmd.aunmenu 'PopUp' -- Remove all default menu items for PopUp
 vim.opt.showmode = false
 vim.schedule(function()
   vim.opt.clipboard = 'unnamedplus'
-  -- if vim.fn.has 'wsl' == 1 then
-  --   vim.g.clipboard = {
-  --     name = 'WslClipboard',
-  --     copy = {
-  --       ['+'] = 'clip.exe',
-  --       ['*'] = 'clip.exe',
-  --     },
-  --     paste = {
-  --       ['+'] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("r", ""))',
-  --       ['*'] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("r", ""))',
-  --     },
-  --     cache_enabled = 0,
-  --   }
-  -- end
 end)
 
 -- Enable break indent
@@ -94,53 +78,49 @@ if vim.fn.has 'win32' == 1 then
   vim.opt.shellxquote = ''
 end
 
-vim.defer_fn(function()
-  if vim.g.neovide then
+local function paste_into_terminal()
+  vim.api.nvim_chan_send(vim.b.terminal_job_id, vim.fn.getreg '+')
+end
+
+local function set_paste_keys(key)
+  vim.keymap.set('n', key, '"+P')
+  vim.keymap.set('v', key, '"+P')
+  vim.keymap.set('c', key, '<C-R>+')
+  vim.keymap.set('i', key, '<ESC>"+pa')
+  vim.keymap.set('t', key, paste_into_terminal, { desc = 'Paste clipboard into terminal' })
+end
+
+-- Neovide-specific setup, applied once the GUI attaches.
+vim.api.nvim_create_autocmd('UIEnter', {
+  once = true,
+  callback = function()
+    if not vim.g.neovide then
+      return
+    end
+
     vim.o.guifont = 'JetBrainsMono Nerd Font:h10'
-    -- vim.o.guifont = 'UbuntuMono Nerd Font Propo:h10.5'
     vim.g.neovide_cursor_vfx_mode = 'pixiedust'
-    -- vim.g.neovide_cursor_vfx_mode = 'sonicboom'
     vim.g.neovide_floating_shadow = false
-    -- vim.g.neovide_floating_z_height = 10
     vim.g.neovide_floating_blur_amount_x = 2
     vim.g.neovide_floating_blur_amount_y = 2
-
     vim.g.neovide_remember_window_size = true
-
     vim.g.neovide_scroll_animation_length = 0.2
     vim.g.neovide_text_contrast = 0.6
     vim.g.neovide_text_gamma = 1
     vim.g.neovide_cursor_animation_length = 0.02
-
     vim.g.neovide_title_background_color = '#faf4ed'
     vim.g.neovide_title_text_color = 'black'
-
     vim.g.neovide_progress_bar_enabled = true
     vim.g.neovide_progress_bar_height = 5.0
     vim.g.neovide_progress_bar_animation_speed = 200.0
     vim.g.neovide_progress_bar_hide_delay = 0.2
 
-    vim.keymap.set('n', '<c-s-v>', '"+P') -- Paste normal mode
-    vim.keymap.set('v', '<c-s-v>', '"+P')
-    vim.keymap.set('c', '<c-s-v>', '<C-R>+') -- Paste command mode
-    vim.keymap.set('i', '<c-s-v>', '<ESC>"+pa') -- Paste insert mode
-    vim.keymap.set('t', '<c-s-v>', function()
-      local text = vim.fn.getreg '+'
-      vim.api.nvim_chan_send(vim.b.terminal_job_id, text)
-    end, { desc = 'Paste clipboard into terminal' })
+    set_paste_keys '<c-s-v>'
+    set_paste_keys '<s-insert>'
+  end,
+})
 
-    vim.keymap.set('n', '<s-insert>', '"+P') -- Paste normal mode
-    vim.keymap.set('v', '<s-insert>', '"+P')
-    vim.keymap.set('c', '<s-insert>', '<C-R>+') -- Paste command mode
-    vim.keymap.set('i', '<s-insert>', '<ESC>"+pa') -- Paste insert mode
-    vim.keymap.set('t', '<s-insert>', function()
-      local text = vim.fn.getreg '+'
-      vim.api.nvim_chan_send(vim.b.terminal_job_id, text)
-    end, { desc = 'Paste clipboard into terminal' })
-  end
-end, 50)
-
--- disable builtin colorscheme
+-- Hide builtin colorschemes from `:colorscheme` completion
 vim.opt.wildignore:append {
   'blue.vim',
   'darkblue.vim',
@@ -173,9 +153,9 @@ vim.opt.wildignore:append {
   'minispring.lua',
   'miniwinter.lua',
   'minisummer.lua',
-  'default.vim',
   'minicyan.lua',
   'zellner.vim',
 }
 
+-- Builtin with Neovim; provides :Undotree
 vim.cmd [[packadd nvim.undotree]]

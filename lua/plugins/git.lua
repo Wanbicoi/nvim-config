@@ -1,35 +1,4 @@
 return {
-  -- {
-  --   'sindrets/diffview.nvim',
-  --   cmd = { 'DiffviewOpen', 'DiffviewFileHistory', 'DiffviewClose', 'DiffviewToggleFiles', 'DiffviewFocusFiles', 'DiffviewRefresh' },
-  --   keys = {
-  --     { '<leader>dd', '<cmd>DiffviewOpen<cr>', desc = 'Diffview Open' },
-  --     { '<leader>dc', '<cmd>DiffviewClose<cr>', desc = 'Diffview Close' },
-  --     { '<leader>dh', '<cmd>DiffviewFileHistory<cr>', desc = 'Diffview File History' },
-  --     { '<leader>dt', '<cmd>DiffviewToggleFiles<cr>', desc = 'Diffview Toggle Files' },
-  --     { '<leader>df', '<cmd>DiffviewFocusFiles<cr>', desc = 'Diffview Focus Files' },
-  --     { '<leader>dr', '<cmd>DiffviewRefresh<cr>', desc = 'Diffview Refresh' },
-  --   },
-  --   config = function()
-  --     local actions = require 'diffview.actions'
-  --     require('diffview').setup {
-  --       keymaps = {
-  --         view = {
-  --           ['<C-j>'] = actions.scroll_view(0.25),
-  --           ['<C-k>'] = actions.scroll_view(-0.25),
-  --         },
-  --         file_panel = {
-  --           ['<C-j>'] = actions.scroll_view(0.25),
-  --           ['<C-k>'] = actions.scroll_view(-0.25),
-  --         },
-  --         file_history_panel = {
-  --           ['<C-j>'] = actions.scroll_view(0.25),
-  --           ['<C-k>'] = actions.scroll_view(-0.25),
-  --         },
-  --       },
-  --     }
-  --   end,
-  -- },
   {
     'lewis6991/gitsigns.nvim',
     event = 'VeryLazy',
@@ -61,15 +30,15 @@ return {
           end
         end, { desc = 'Jump to previous git [c]hange' })
 
-        -- Actions
-        -- visual mode
+        -- Actions (visual mode)
         map('v', '<leader>hs', function()
           gitsigns.stage_hunk { vim.fn.line '.', vim.fn.line 'v' }
         end, { desc = 'git [s]tage hunk' })
         map('v', '<leader>hr', function()
           gitsigns.reset_hunk { vim.fn.line '.', vim.fn.line 'v' }
         end, { desc = 'git [r]eset hunk' })
-        -- normal mode
+
+        -- Actions (normal mode)
         map('n', '<leader>hs', gitsigns.stage_hunk, { desc = 'git [s]tage hunk' })
         map('n', '<leader>hr', gitsigns.reset_hunk, { desc = 'git [r]eset hunk' })
         map('n', '<leader>hS', gitsigns.stage_buffer, { desc = 'git [S]tage buffer' })
@@ -81,10 +50,6 @@ return {
           gitsigns.diffthis '~'
         end, { desc = 'git [d]iff against index' })
         map('n', '<leader>hf', gitsigns.refresh, { desc = 'git re[f]resh' })
-        -- Toggles
-        -- map('n', '<leader>tb', gitsigns.toggle_current_line_blame, { desc = '[T]oggle git show [b]lame line' })
-        -- map('n', '<leader>tB', gitsigns.blame, { desc = '[T]oggle git [B]lame file' })
-        -- map('n', '<leader>tD', gitsigns.preview_hunk_inline, { desc = '[T]oggle git show [D]eleted' })
       end,
     },
   },

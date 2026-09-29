@@ -1,7 +1,7 @@
-local snacks_search = require 'trung.utils.snacks_search'
+local snacks_search = require 'utils.snacks_search'
 -- NOTE: in-Neovim agent terminals disabled in favour of zellij-agent.
--- See lua/trung/plugins/extras/zellij_agent.lua
--- local agent = require 'trung.plugins.terminal.agent'
+-- See lua/plugins/extras/zellij_agent.lua
+-- local agent = require 'plugins.terminal.agent'
 
 -- Initialize agent module (autocmds, commands, global dispatchers)
 -- agent.setup()
@@ -41,7 +41,7 @@ local keys = {
     desc = 'Open lazygit',
   },
   -- NOTE: in-Neovim agent keymaps disabled in favour of zellij-agent
-  -- (see lua/trung/plugins/extras/zellij_agent.lua). Uncomment to restore.
+  -- (see lua/plugins/extras/zellij_agent.lua). Uncomment to restore.
   -- {
   --   '<a-a>',
   --   function()

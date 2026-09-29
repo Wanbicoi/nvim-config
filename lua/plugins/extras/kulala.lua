@@ -63,7 +63,7 @@ return {
 
     vim.api.nvim_create_autocmd('BufEnter', {
       desc = 'Setup kulala popup menu',
-      group = vim.api.nvim_create_augroup('trung-kulala-popup-menu', { clear = true }),
+      group = vim.api.nvim_create_augroup('cfg-kulala-popup-menu', { clear = true }),
       callback = function()
         local ft = vim.bo.filetype
         if ft == 'http' or ft == 'rest' then

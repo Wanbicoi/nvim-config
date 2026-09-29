@@ -15,7 +15,7 @@ return {
     'marilari88/neotest-vitest',
   },
   config = function()
-    local snacks_search = require 'trung.utils.snacks_search'
+    local snacks_search = require 'utils.snacks_search'
 
     require('neotest').setup {
       adapters = {

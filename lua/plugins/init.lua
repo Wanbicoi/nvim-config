@@ -11,22 +11,22 @@ end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup({
-  require 'trung.plugins.coding',
-  require 'trung.plugins.ui',
-  require 'trung.plugins.colorscheme',
-  require 'trung.plugins.git',
-  require 'trung.plugins.lsp',
-  require 'trung.plugins.test',
-  require 'trung.plugins.terminal',
+  require 'plugins.coding',
+  require 'plugins.ui',
+  require 'plugins.colorscheme',
+  require 'plugins.git',
+  require 'plugins.lsp',
+  require 'plugins.test',
+  require 'plugins.terminal',
 
   -- Optional extras
-  -- require 'trung.plugins.extras.debug',
-  -- require 'trung.plugins.extras.lint',
-  -- require 'trung.plugins.extras.ctags',
-  -- require 'trung.plugins.extras.avante',
-  -- require 'trung.plugins.extras.bookmarks',
-  require 'trung.plugins.extras.kulala',
-  require 'trung.plugins.extras.zellij_agent',
+  -- require 'plugins.extras.debug',
+  -- require 'plugins.extras.lint',
+  -- require 'plugins.extras.ctags',
+  -- require 'plugins.extras.avante',
+  -- require 'plugins.extras.bookmarks',
+  require 'plugins.extras.kulala',
+  require 'plugins.extras.zellij_agent',
 }, {
   performance = {
     rtp = {

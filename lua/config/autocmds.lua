@@ -12,7 +12,7 @@ vim.api.nvim_create_autocmd('ColorScheme', {
 -- Autosave on focus lost
 vim.api.nvim_create_autocmd('TextChanged', {
   desc = 'Autosave when focus is lost or buffer is left',
-  group = vim.api.nvim_create_augroup('trung-autosave', { clear = true }),
+  group = vim.api.nvim_create_augroup('cfg-autosave', { clear = true }),
   callback = function()
     local buftype = vim.bo.buftype
     local filetype = vim.bo.filetype
@@ -28,7 +28,7 @@ vim.api.nvim_create_autocmd('TextChanged', {
 -- Auto-reload files when they change on disk
 vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter', 'CursorHold', 'CursorHoldI' }, {
   desc = 'Reload file when focus is gained or buffer is entered',
-  group = vim.api.nvim_create_augroup('trung-autoreload', { clear = true }),
+  group = vim.api.nvim_create_augroup('cfg-autoreload', { clear = true }),
   callback = function()
     local buftype = vim.bo.buftype
     if vim.api.nvim_buf_get_name(0) ~= '' and buftype == '' then
@@ -42,7 +42,7 @@ vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter', 'CursorHold', 'CursorHo
 --  See `:help vim.highlight.on_yank()`
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
-  group = vim.api.nvim_create_augroup('trung-highlight-yank', { clear = true }),
+  group = vim.api.nvim_create_augroup('cfg-highlight-yank', { clear = true }),
   callback = function()
     vim.highlight.on_yank()
   end,
@@ -52,7 +52,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 -- Always use 100 for PopUp menu
 vim.api.nvim_create_autocmd('BufEnter', {
   desc = 'Setup custom popup menu',
-  group = vim.api.nvim_create_augroup('trung-popup-search-menu', { clear = true }),
+  group = vim.api.nvim_create_augroup('cfg-popup-search-menu', { clear = true }),
   callback = function()
     vim.cmd.nmenu [[100.280 PopUp.-DiffSep- :]]
     if vim.wo.diff then
@@ -73,8 +73,8 @@ vim.api.nvim_create_autocmd('BufEnter', {
     end
 
     vim.cmd.nmenu [[100.200 PopUp.-File- :]]
-    vim.cmd.nmenu [[100.201 PopUp.󰒊\ Send\ This\ To\ Agent <cmd>lua require('trung.plugins.extras.zellij_agent').send_line()<CR>]]
-    vim.cmd.vmenu [[100.202 PopUp.󰒊\ Send\ This\ To\ Agent <cmd>lua require('trung.plugins.extras.zellij_agent').send_selection()<CR>]]
+    vim.cmd.nmenu [[100.201 PopUp.󰒊\ Send\ This\ To\ Agent <cmd>lua require('plugins.extras.zellij_agent').send_line()<CR>]]
+    vim.cmd.vmenu [[100.202 PopUp.󰒊\ Send\ This\ To\ Agent <cmd>lua require('plugins.extras.zellij_agent').send_selection()<CR>]]
     vim.cmd.nmenu [[100.205 PopUp.󰈞\ Open\ File\ Under\ Cursor <cmd>lua _G.OpenFileUnderCursor()<CR>]]
     vim.cmd.nmenu [[100.206 PopUp.󰆏\ Copy\ All <cmd>%y+<CR>]]
     vim.cmd.nmenu [[100.211 PopUp.󰘲\ Copy\ Word\ Under\ Cursor yiw]]
@@ -84,10 +84,10 @@ vim.api.nvim_create_autocmd('BufEnter', {
     vim.cmd.nmenu [[100.215 PopUp.󰝰\ New\ Empty\ File <cmd>vnew<CR>]]
     vim.cmd.nmenu [[100.218 PopUp.-AgentSep- :]]
 
-    vim.cmd.nmenu [[100.107 PopUp.󰈗\ Grep\ Word\ (Project\ Root) <cmd>lua require('trung.utils.snacks_search').grep_cword_project()<CR>]]
-    vim.cmd.nmenu [[100.108 PopUp.󰈻\ Grep\ Word\ (CWD) <cmd>lua require('trung.utils.snacks_search').grep_cword_pwd()<CR>]]
-    vim.cmd.vmenu [[100.107 PopUp.󰈗\ Grep\ Selection\ (Project\ Root) :<C-U>lua require('trung.utils.snacks_search').grep_visual_project()<CR>]]
-    vim.cmd.vmenu [[100.108 PopUp.󰈻\ Grep\ Selection\ (CWD) :<C-U>lua require('trung.utils.snacks_search').grep_visual_pwd()<CR>]]
+    vim.cmd.nmenu [[100.107 PopUp.󰈗\ Grep\ Word\ (Project\ Root) <cmd>lua require('utils.snacks_search').grep_cword_project()<CR>]]
+    vim.cmd.nmenu [[100.108 PopUp.󰈻\ Grep\ Word\ (CWD) <cmd>lua require('utils.snacks_search').grep_cword_pwd()<CR>]]
+    vim.cmd.vmenu [[100.107 PopUp.󰈗\ Grep\ Selection\ (Project\ Root) :<C-U>lua require('utils.snacks_search').grep_visual_project()<CR>]]
+    vim.cmd.vmenu [[100.108 PopUp.󰈻\ Grep\ Selection\ (CWD) :<C-U>lua require('utils.snacks_search').grep_visual_pwd()<CR>]]
     vim.cmd.amenu [[100.109 PopUp.-SearchSep- :]]
   end,
 })

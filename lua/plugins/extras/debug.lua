@@ -101,7 +101,7 @@ return {
 
     vim.api.nvim_create_autocmd('FileType', {
       pattern = { 'python', 'javascript', 'typescript' },
-      group = vim.api.nvim_create_augroup('trung-python-dap-popup', { clear = true }),
+      group = vim.api.nvim_create_augroup('cfg-python-dap-popup', { clear = true }),
       callback = function()
         vim.cmd.amenu [[100.300 PopUp.-DapSep- :]]
         vim.cmd.nmenu [[100.310 PopUp.\ DAP\ Start <cmd>lua require('dap').continue()<CR>]]

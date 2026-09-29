@@ -1,0 +1,6 @@
+require 'config.options'
+require 'config.autocmds'
+require 'config.keymaps'
+require 'config.filetypes'
+-- require 'config.extras.marks'
+require 'config.extras.highlight_calls'

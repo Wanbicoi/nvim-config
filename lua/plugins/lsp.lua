@@ -18,7 +18,7 @@ return {
     },
     config = function()
       vim.api.nvim_create_autocmd('LspAttach', {
-        group = vim.api.nvim_create_augroup('trung-lsp-attach', { clear = true }),
+        group = vim.api.nvim_create_augroup('cfg-lsp-attach', { clear = true }),
         callback = function(event)
           local map = function(keys, func, desc, mode)
             mode = mode or 'n'

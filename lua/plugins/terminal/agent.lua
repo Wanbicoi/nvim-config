@@ -1,4 +1,4 @@
-local snacks_search = require 'trung.utils.snacks_search'
+local snacks_search = require 'utils.snacks_search'
 
 local M = {}
 
@@ -65,7 +65,7 @@ local function agent_opts(id, cwd)
       width = math.floor(vim.o.columns * 0.4),
       stack = false,
       wo = {
-        winbar = "%{%v:lua.require'trung.plugins.terminal.agent'.render_winbar()%}",
+        winbar = "%{%v:lua.require'plugins.terminal.agent'.render_winbar()%}",
       },
     },
   }
@@ -156,15 +156,15 @@ function M.render_winbar()
     local close_hl = is_active and '%#AgentWinBarActiveClose#' or '%#AgentWinBarInactiveClose#'
 
     local label = string.format(' %d:%s ', i, s.agent)
-    local tab_item = string.format("%s%%%d@v:lua.require'trung.plugins.terminal.agent'.on_click@%s%%X", tab_hl, i, label)
-    local close_item = string.format("%s%%%d@v:lua.require'trung.plugins.terminal.agent'.on_click@× %%X", close_hl, 1000 + i)
+    local tab_item = string.format("%s%%%d@v:lua.require'plugins.terminal.agent'.on_click@%s%%X", tab_hl, i, label)
+    local close_item = string.format("%s%%%d@v:lua.require'plugins.terminal.agent'.on_click@× %%X", close_hl, 1000 + i)
 
     table.insert(parts, tab_item .. close_item)
     table.insert(parts, '%#AgentWinBarFill# ')
   end
 
   -- [+] Button to create new agent
-  table.insert(parts, "%#AgentWinBarBtn#%9999@v:lua.require'trung.plugins.terminal.agent'.on_click@ + %X")
+  table.insert(parts, "%#AgentWinBarBtn#%9999@v:lua.require'plugins.terminal.agent'.on_click@ + %X")
 
   -- Right-aligned info
   table.insert(parts, '%#AgentWinBarFill#%=')

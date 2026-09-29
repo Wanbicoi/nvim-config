@@ -1,2 +1,2 @@
-require 'trung.config'
-require 'trung.plugins'
+require 'config'
+require 'plugins'

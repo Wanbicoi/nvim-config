@@ -1,4 +1,4 @@
-local snacks_search = require 'trung.utils.snacks_search'
+local snacks_search = require 'utils.snacks_search'
 
 local function set_tab_title(session_name)
   local title = session_name

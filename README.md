@@ -25,7 +25,7 @@ on first run. `:Lazy` shows plugin status.
 init.lua              -- bootstraps config + plugins
 lua/config/           -- options, keymaps, autocmds, filetypes
 lua/plugins/          -- lazy.nvim specs (one concern per file)
-lua/integrations/     -- terminal/multiplexer adapters (zellij, tmux, wezterm)
+lua/integrations/     -- environment adapters (zellij, tmux, wezterm, neovide)
 lua/utils/            -- shared helpers
 after/queries/        -- treesitter query overrides
 ```

@@ -3,56 +3,65 @@
 --- Picks the first available adapter (zellij > tmux > wezterm > none) and
 --- exposes a single environment-agnostic API. Callers never branch on
 --- `$ZELLIJ`/`$TMUX` themselves.
+---
+--- Requiring this module has no side effects: adapter detection is resolved
+--- lazily on first use and memoized. Adapter modules are only loaded when
+--- needed.
 local M = {}
 
-local candidates = {
-  require 'integrations.zellij',
-  require 'integrations.tmux',
-  require 'integrations.wezterm',
-}
+local ADAPTERS = { 'integrations.zellij', 'integrations.tmux', 'integrations.wezterm' }
 
-local function pick()
-  for _, adapter in ipairs(candidates) do
-    if adapter.available() then
-      return adapter
+local active
+
+local function adapter()
+  if active then
+    return active
+  end
+
+  for _, module in ipairs(ADAPTERS) do
+    local candidate = require(module)
+    if candidate.available() then
+      active = candidate
+      return active
     end
   end
-  return require 'integrations.none'
-end
 
-M.active = pick()
+  active = require 'integrations.none'
+  return active
+end
 
 ---@return string
 function M.name()
-  return M.active.name
+  return adapter().name
 end
 
 ---@return table
 function M.capabilities()
-  return M.active.capabilities
+  return adapter().capabilities
 end
 
 ---@param title string
 function M.set_title(title)
-  return M.active.set_title(title)
+  return adapter().set_title(title)
 end
 
 ---@return table[]
 function M.panes()
-  return M.active.panes()
+  return adapter().panes()
 end
 
 --- Find the best agent pane, preferring one on the editor's own tab.
 ---@return string|nil pane_id
 ---@return string|nil reason
 function M.find_agent_pane()
-  if not M.capabilities().panes then
-    return nil, 'Agent discovery is not supported in ' .. M.name()
+  local a = adapter()
+  if not a.capabilities.panes then
+    return nil, 'Agent discovery is not supported in ' .. a.name
   end
 
   local agents = require 'integrations.agents'
-  local panes = M.panes()
-  local current = M.active.current_pane_id()
+  local panes = a.panes()
+  local current = a.current_pane_id()
 
   local current_tab
   for _, pane in ipairs(panes) do
@@ -93,8 +102,9 @@ function M.send_to_agent(text)
     return
   end
 
-  M.active.send(pane, text)
-  M.active.focus(pane)
+  local a = adapter()
+  a.send(pane, text)
+  a.focus(pane)
 end
 
 return M

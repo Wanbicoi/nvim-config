@@ -1,13 +1,58 @@
---- Bridge that sends editor context (file, line, selection, diagnostics) to a
---- coding-agent pane in the active multiplexer.
+--- Minimal in-Neovim coding-agent terminal.
+---
+--- Runs the agent in a Snacks terminal (one per project root) and routes editor
+--- context (file, line, selection, diagnostics) into it, so no external
+--- multiplexer pane is needed.
 local M = {}
 
-local mx = require 'integrations'
+--- Change this to the agent you use (eg. 'claude', 'codex', 'agy').
+local AGENT_CMD = 'opencode'
+
+local snacks_search = require 'utils.snacks_search'
 local buf = require 'utils.buffers'
 local diagnostics = require 'utils.diagnostics'
 
-local function send(text)
-  mx.send_to_agent(text)
+local function term_opts()
+  return {
+    count = 1,
+    cwd = snacks_search.get_project_root(),
+    auto_close = false,
+    win = {
+      position = 'right',
+      width = 0.4,
+      wo = { winbar = "%{get(b:, 'term_title', 'agent')}" },
+    },
+  }
+end
+
+--- Get or create the agent terminal for the current project root.
+---@return snacks.terminal|nil
+function M.get()
+  return Snacks.terminal.get(AGENT_CMD, term_opts())
+end
+
+--- Toggle (show/focus or hide) the agent terminal.
+function M.toggle()
+  Snacks.terminal.toggle(AGENT_CMD, term_opts())
+end
+
+--- Send text to the agent terminal, opening it if needed.
+---@param text string
+function M.send(text)
+  if not text or text == '' then
+    return
+  end
+
+  local term = M.get()
+  if not term or not term:buf_valid() then
+    return
+  end
+
+  if text:sub(-1) ~= '\n' then
+    text = text .. '\n'
+  end
+  vim.api.nvim_chan_send(vim.b[term.buf].terminal_job_id, text)
+  term:focus()
 end
 
 local function is_visual(mode)
@@ -20,11 +65,11 @@ function M.send_file()
   if buf.is_term_or_overseer(bufnr) then
     local text = buf.last_lines(bufnr, 50)
     if vim.trim(text) ~= '' then
-      send(text)
+      M.send(text)
     end
     return
   end
-  send('@' .. vim.fn.expand '%')
+  M.send('@' .. vim.fn.expand '%')
 end
 
 --- Send the current file:line, or the tail of a terminal/overseer buffer.
@@ -33,11 +78,11 @@ function M.send_line()
   if buf.is_term_or_overseer(bufnr) then
     local text = buf.last_lines(bufnr, 50)
     if vim.trim(text) ~= '' then
-      send(text)
+      M.send(text)
     end
     return
   end
-  send(string.format('@%s:L%d', vim.fn.expand '%', vim.fn.line '.'))
+  M.send(string.format('@%s:L%d', vim.fn.expand '%', vim.fn.line '.'))
 end
 
 --- Send the current selection, or selected text from a terminal buffer.
@@ -46,7 +91,7 @@ function M.send_selection()
   if buf.is_term_or_overseer(bufnr) then
     local text = buf.visual_selection_text()
     if vim.trim(text) ~= '' then
-      send(text)
+      M.send(text)
     end
     return
   end
@@ -56,7 +101,7 @@ function M.send_selection()
   end
   local start_pos = vim.fn.getpos "'<"
   local end_pos = vim.fn.getpos "'>"
-  send(string.format('@%s:L%d-L%d', vim.fn.expand '%', start_pos[2], end_pos[2]))
+  M.send(string.format('@%s:L%d-L%d', vim.fn.expand '%', start_pos[2], end_pos[2]))
 end
 
 --- Send diagnostics for the cursor line, selection, or whole buffer.
@@ -96,7 +141,7 @@ function M.send_diagnostic()
     lines[#lines + 1] = diagnostics.format(diag, file)
   end
 
-  send(string.format('Fix the following diagnostic%s:\n%s', #diags > 1 and 's' or '', table.concat(lines, '\n')))
+  M.send(string.format('Fix the following diagnostic%s:\n%s', #diags > 1 and 's' or '', table.concat(lines, '\n')))
 end
 
 return M

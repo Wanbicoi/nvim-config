@@ -7,6 +7,6 @@ return {
   require 'plugins.ui.session',
   require 'plugins.ui.aerial',
   require 'plugins.ui.editor_extras',
-  require 'plugins.ui.firenvim',
+  -- require 'plugins.ui.firenvim',
   require 'plugins.ui.edgy',
 }

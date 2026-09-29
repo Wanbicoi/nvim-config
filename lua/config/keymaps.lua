@@ -113,19 +113,22 @@ vim.api.nvim_create_autocmd('WinEnter', {
     end
   end,
 })
--- Agent bridge: send editor context to a coding-agent pane.
--- Multiplexer-agnostic; see lua/integrations/agent.lua
+-- Agent: open the in-Neovim agent terminal, and send editor context to it.
+-- See lua/agent.lua
+vim.keymap.set('n', '<a-a>', function()
+  require('agent').toggle()
+end, { desc = 'Toggle coding agent terminal' })
 vim.keymap.set('n', '<leader>af', function()
-  require('integrations.agent').send_file()
+  require('agent').send_file()
 end, { desc = '[A]gent: send file' })
 vim.keymap.set('n', '<leader>at', function()
-  require('integrations.agent').send_line()
+  require('agent').send_line()
 end, { desc = '[A]gent: send line' })
 vim.keymap.set('x', '<leader>at', function()
-  require('integrations.agent').send_selection()
+  require('agent').send_selection()
 end, { desc = '[A]gent: send selection' })
 vim.keymap.set({ 'n', 'x' }, '<leader>ad', function()
-  require('integrations.agent').send_diagnostic()
+  require('agent').send_diagnostic()
 end, { desc = '[A]gent: send diagnostic' })
 
 vim.keymap.set('n', '<esc>', '<cmd>noh<CR>', { noremap = true })

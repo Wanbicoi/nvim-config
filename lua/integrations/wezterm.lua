@@ -1,12 +1,8 @@
---- WezTerm adapter. WezTerm cannot report the foreground command of a pane, so
---- only tab-title support is exposed; pane discovery/send is left to the
---- multiplexer running inside WezTerm (zellij/tmux).
+--- WezTerm adapter (tab title only).
 local M = { name = 'wezterm' }
 
 M.capabilities = {
   title = true,
-  panes = false,
-  send = false,
   captures_ctrl_left_press = false,
 }
 
@@ -31,17 +27,5 @@ function M.set_title(title)
   end
   vim.fn.system { bin, 'cli', 'set-tab-title', title }
 end
-
-function M.current_pane_id()
-  return vim.env.WEZTERM_PANE
-end
-
-function M.panes()
-  return {}
-end
-
-function M.send() end
-
-function M.focus() end
 
 return M

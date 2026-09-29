@@ -2,11 +2,10 @@ local float = require 'utils.float'
 local snacks_search = require 'utils.snacks_search'
 
 local keys = {
-  -- lazygit lives in Neovim (not zellij). Bound to <a-g>: Alt+h/j/k/l are
-  -- captured by zellij for focus movement even in locked mode, but Alt+g is
-  -- free.
+  -- lazygit lives in Neovim (not the multiplexer), on <a-l>:
+  -- Alt+h/j/k/l are used by Neovim for window movement in this config.
   {
-    '<a-g>',
+    '<a-l>',
     function()
       Snacks.lazygit.open {
         cwd = snacks_search.get_project_root(),

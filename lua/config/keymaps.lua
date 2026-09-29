@@ -1,5 +1,5 @@
 vim.keymap.set('t', '<c-q>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
-vim.keymap.set('n', '<c-s>', '<cmd>:w<cr>', { desc = 'Save all files' })
+vim.keymap.set('n', '<c-s>', '<cmd>w<cr>', { desc = 'Save file' })
 vim.keymap.set('v', '<leader>r', '"0y:%s/\\V<C-r>0//g<Left><Left>')
 vim.keymap.set('x', 'p', '"_dP', { desc = 'Paste without overwriting clipboard' })
 
@@ -132,10 +132,26 @@ vim.api.nvim_create_autocmd('WinEnter', {
     end
   end,
 })
+-- Agent bridge: send editor context to a coding-agent pane.
+-- Multiplexer-agnostic; see lua/integrations/agent.lua
+vim.keymap.set('n', '<leader>af', function()
+  require('integrations.agent').send_file()
+end, { desc = '[A]gent: send file' })
+vim.keymap.set('n', '<leader>at', function()
+  require('integrations.agent').send_line()
+end, { desc = '[A]gent: send line' })
+vim.keymap.set('x', '<leader>at', function()
+  require('integrations.agent').send_selection()
+end, { desc = '[A]gent: send selection' })
+vim.keymap.set({ 'n', 'x' }, '<leader>ad', function()
+  require('integrations.agent').send_diagnostic()
+end, { desc = '[A]gent: send diagnostic' })
+
 vim.keymap.set('n', '<esc>', '<cmd>noh<CR>', { noremap = true })
 
 vim.api.nvim_create_autocmd({ 'TermOpen', 'BufEnter' }, {
-  group = vim.api.nvim_create_augroup('TerminalInsertFocus', { clear = true }),
+  group = vim.api.nvim_create_augroup('cfg-terminal-scroll', { clear = true }),
+  desc = 'Scroll terminal buffers with the mouse wheel',
   pattern = 'term://*', -- Target only terminal buffers
   callback = function()
     vim.keymap.set({ 'n', 'v', 'o' }, '<ScrollWheelDown>', 'L3j', { buffer = true })

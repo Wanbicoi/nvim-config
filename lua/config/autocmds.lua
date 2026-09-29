@@ -1,7 +1,8 @@
--- set underline for CursorHoldI reference
+-- Underline LSP references on every colorscheme change
 vim.api.nvim_create_autocmd('ColorScheme', {
+  desc = 'Underline LSP reference highlights',
+  group = vim.api.nvim_create_augroup('cfg-lsp-reference-hl', { clear = true }),
   callback = function()
-    -- Link all reference types to a clean underline style
     vim.api.nvim_set_hl(0, 'LspReferenceText', { underline = true })
     vim.api.nvim_set_hl(0, 'LspReferenceRead', { underline = true })
     vim.api.nvim_set_hl(0, 'LspReferenceWrite', { underline = true })
@@ -9,15 +10,15 @@ vim.api.nvim_create_autocmd('ColorScheme', {
   end,
 })
 
--- Autosave on focus lost
+-- Autosave modified buffers on text change
 vim.api.nvim_create_autocmd('TextChanged', {
-  desc = 'Autosave when focus is lost or buffer is left',
+  desc = 'Autosave modified buffers on text change',
   group = vim.api.nvim_create_augroup('cfg-autosave', { clear = true }),
   callback = function()
     local buftype = vim.bo.buftype
     local filetype = vim.bo.filetype
     local bufname = vim.api.nvim_buf_get_name(0)
-    local ignore_filetypes = { 'oil', 'help', 'diffview', 'gitcommit', 'gitrebase', 'TelescopePrompt', 'snacks_picker_input' }
+    local ignore_filetypes = { 'oil', 'help', 'diffview', 'gitcommit', 'gitrebase', 'snacks_picker_input' }
 
     if vim.bo.modified and bufname ~= '' and buftype == '' and not vim.tbl_contains(ignore_filetypes, filetype) then
       vim.cmd 'silent! wall'
@@ -73,8 +74,8 @@ vim.api.nvim_create_autocmd('BufEnter', {
     end
 
     vim.cmd.nmenu [[100.200 PopUp.-File- :]]
-    vim.cmd.nmenu [[100.201 PopUp.󰒊\ Send\ This\ To\ Agent <cmd>lua require('plugins.extras.zellij_agent').send_line()<CR>]]
-    vim.cmd.vmenu [[100.202 PopUp.󰒊\ Send\ This\ To\ Agent <cmd>lua require('plugins.extras.zellij_agent').send_selection()<CR>]]
+    vim.cmd.nmenu [[100.201 PopUp.󰒊\ Send\ This\ To\ Agent <cmd>lua require('integrations.agent').send_line()<CR>]]
+    vim.cmd.vmenu [[100.202 PopUp.󰒊\ Send\ This\ To\ Agent <cmd>lua require('integrations.agent').send_selection()<CR>]]
     vim.cmd.nmenu [[100.205 PopUp.󰈞\ Open\ File\ Under\ Cursor <cmd>lua _G.OpenFileUnderCursor()<CR>]]
     vim.cmd.nmenu [[100.206 PopUp.󰆏\ Copy\ All <cmd>%y+<CR>]]
     vim.cmd.nmenu [[100.211 PopUp.󰘲\ Copy\ Word\ Under\ Cursor yiw]]
@@ -92,28 +93,23 @@ vim.api.nvim_create_autocmd('BufEnter', {
   end,
 })
 
--- Auto load script
--- vim.api.nvim_create_autocmd('DirChanged', {
---   callback = function()
---     local file = vim.fn.getcwd() .. '/.nvim.lua'
---     if vim.fn.filereadable(file) == 1 and vim.secure.trust { action = 'allow', path = file } then
---       dofile(file)
---       print('Loaded local config: ' .. file)
---     end
---   end,
--- })
-
--- lsp rename file
+-- Keep LSP renamed/moved files in sync
 vim.api.nvim_create_autocmd('User', {
+  desc = 'Notify LSP on oil rename/move actions',
+  group = vim.api.nvim_create_augroup('cfg-oil-rename', { clear = true }),
   pattern = 'OilActionsPost',
   callback = function(event)
-    if event.data.actions[1].type == 'move' then
-      Snacks.rename.on_rename_file(event.data.actions[1].src_url, event.data.actions[1].dest_url)
+    local action = event.data and event.data.actions and event.data.actions[1]
+    if action and action.type == 'move' then
+      Snacks.rename.on_rename_file(action.src_url, action.dest_url)
     end
   end,
 })
 
+-- Wrap prose filetypes
 vim.api.nvim_create_autocmd('FileType', {
+  desc = 'Wrap help and markdown buffers',
+  group = vim.api.nvim_create_augroup('cfg-wrap-text', { clear = true }),
   pattern = { 'help', 'markdown' },
   callback = function()
     vim.opt_local.wrap = true
@@ -122,8 +118,10 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
+-- Focus terminal buffers when they open
 vim.api.nvim_create_autocmd({ 'TermOpen', 'BufEnter' }, {
-  group = vim.api.nvim_create_augroup('TerminalInsertFocus', { clear = true }),
+  desc = 'Enter insert mode in terminal buffers',
+  group = vim.api.nvim_create_augroup('cfg-terminal-insert', { clear = true }),
   pattern = 'term://*', -- Target only terminal buffers
   callback = function()
     vim.cmd 'startinsert'
@@ -136,62 +134,30 @@ vim.keymap.set('n', '<LeftMouse>', function()
   vim.schedule(function()
     if vim.bo.buftype == 'terminal' then
       local name = vim.api.nvim_buf_get_name(0):lower()
-      if name:match 'claude' or name:match 'pi' or name:match 'agy' then
+      if require('integrations.agents').is_agent_text(name) then
         vim.cmd 'startinsert'
       end
     end
   end)
 end, { silent = true })
 
+-- Sort JSON with jq
 vim.api.nvim_create_autocmd('FileType', {
+  desc = 'Add :JsonSort for json buffers',
+  group = vim.api.nvim_create_augroup('cfg-json-sort', { clear = true }),
   pattern = 'json',
   callback = function()
     vim.api.nvim_buf_create_user_command(0, 'JsonSort', '%!jq -S .', {})
   end,
 })
 
+-- Fold http request files on `### ` separators
 vim.api.nvim_create_autocmd('FileType', {
+  desc = 'Fold http buffers on request separators',
+  group = vim.api.nvim_create_augroup('cfg-http-folds', { clear = true }),
   pattern = 'http',
   callback = function()
     vim.wo.foldmethod = 'expr'
     vim.wo.foldexpr = [[getline(v:lnum) =~ '^### ' ? '>1' : '1']]
   end,
 })
-
--- Clean up tool windows (edgy, overseer, terminals, pickers) before restart
--- vim.api.nvim_create_user_command('Restart', function(opts)
---   pcall(function()
---     require('edgy').close()
---   end)
---   pcall(function()
---     require('overseer').close()
---   end)
---   pcall(function()
---     for _, term in ipairs(Snacks.terminal.list()) do
---       if term:win_valid() then
---         term:hide()
---       end
---     end
---   end)
---   for _, win in ipairs(vim.api.nvim_list_wins()) do
---     local buf = vim.api.nvim_win_get_buf(win)
---     local ft = vim.bo[buf].filetype
---     local bt = vim.bo[buf].buftype
---     if
---       bt == 'terminal'
---       or bt == 'nofile'
---       or vim.tbl_contains({
---         'snacks_terminal',
---         'snacks_layout_box',
---         'snacks_picker_list',
---         'snacks_picker_input',
---         'OverseerList',
---         'OverseerOutput',
---         'aerial',
---       }, ft)
---     then
---       pcall(vim.api.nvim_win_close, win, true)
---     end
---   end
---   vim.cmd('restart ' .. (opts.bang and '!' or '') .. ' ' .. opts.args)
--- end, { bang = true, nargs = '*' })

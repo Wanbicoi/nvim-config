@@ -9,14 +9,7 @@ local function set_tab_title(session_name)
   end
 
   if title and title ~= '' then
-    if vim.env.ZELLIJ and vim.fn.executable 'zellij' == 1 then
-      vim.fn.system { 'zellij', 'action', 'rename-pane', title }
-    end
-
-    local wezterm_bin = vim.fn.executable 'wezterm.exe' == 1 and 'wezterm.exe' or (vim.fn.executable 'wezterm' == 1 and 'wezterm' or nil)
-    if wezterm_bin then
-      vim.fn.system { wezterm_bin, 'cli', 'set-tab-title', title }
-    end
+    require('integrations').set_title(title)
   end
 end
 

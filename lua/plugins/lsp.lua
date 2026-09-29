@@ -49,7 +49,7 @@ return {
             end
             Snacks.picker.lsp_definitions()
           end
-          if vim.env.ZELLIJ then
+          if require('integrations').capabilities().captures_ctrl_left_press then
             map('<C-LeftRelease>', goto_definition_mouse, '[G]oto [D]efinition (Mouse, Zellij)')
           else
             map('<C-LeftMouse>', goto_definition_mouse, '[G]oto [D]efinition (Mouse)')

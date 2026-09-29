@@ -1,87 +1,101 @@
 local M = {}
 
-local ai_patterns = { 'claude', 'codex', 'agy', 'opencode', 'gemini' }
+local ai_patterns = { 'claude', 'codex', 'agy', 'opencode'}
 
---- Parse tmux list-panes output
----@param args string[]
+--- Parse zellij list-panes JSON output
 ---@return table[]
-local function get_tmux_panes(args)
-  local cmd = vim.list_extend({ 'tmux', 'list-panes' }, args)
-  local out = vim.fn.system(cmd)
+local function get_zellij_panes()
+  local out = vim.fn.system { 'zellij', 'action', 'list-panes', '-a', '-j' }
   if vim.v.shell_error ~= 0 then
     return {}
   end
-  local panes = {}
-  for line in out:gmatch '[^\r\n]+' do
-    local id, tty, command = line:match '^%s*(%%%d+):(%S+)%s+(.-)%s*$'
-    if id then
-      table.insert(panes, { id = id, tty = tty, cmd = command })
-    end
+
+  local ok, panes = pcall(vim.json.decode, out)
+  if not ok or type(panes) ~= 'table' then
+    return {}
   end
   return panes
 end
 
 --- Check if command matches known AI agent patterns
----@param cmd string
+---@param cmd string|nil
 ---@return boolean
 local function is_ai_cmd(cmd)
-  if not cmd or cmd == '' then
+  -- `terminal_command` is JSON null for panes with no running command (eg. a
+  -- plain shell or a plugin). vim.json.decode turns that null into vim.NIL,
+  -- which is truthy, so a nil check is not enough -- `cmd:match` would then
+  -- blow up with "attempt to index vim.NIL". Guard on the type instead.
+  if type(cmd) ~= 'string' or cmd == '' then
     return false
   end
-  local lower = cmd:lower()
+
+  -- Match only the executable name, not the whole command line. A substring
+  -- search would also hit paths and arguments (e.g. a pane whose cwd or file
+  -- argument contains "opencode" would be mistaken for the agent).
+  local exe = cmd:match '^%s*(%S+)' or ''
+  exe = exe:match '[^/]+$' or exe -- strip any directory part
+  exe = exe:lower()
+
   for _, pat in ipairs(ai_patterns) do
-    if lower:find(pat, 1, true) then
+    if exe == pat then
       return true
     end
   end
   return false
 end
 
---- Find target AI tmux pane without prompting
----@return string|nil pane_id
+--- Find target AI zellij pane without prompting
+---@return string|nil pane_id e.g. "terminal_3"
 ---@return string|nil cmd_or_err
 function M.find_target_pane()
-  if not vim.env.TMUX or vim.env.TMUX == '' then
-    return nil, 'Not running inside tmux'
+  if not vim.env.ZELLIJ or vim.env.ZELLIJ == '' then
+    return nil, 'Not running inside zellij'
   end
 
-  local current_pane = vim.env.TMUX_PANE
+  local panes = get_zellij_panes()
+  local current_id = vim.env.ZELLIJ_PANE_ID
 
-  -- 1. Search current window panes first
-  local window_panes = get_tmux_panes { '-F', '#{pane_id}:#{pane_tty} #{pane_current_command}' }
-  local candidates = {}
-  local other_panes = {}
+  -- Find which tab Neovim itself runs in, so we can prefer an agent on the
+  -- same tab over one that happens to be elsewhere in the session.
+  local current_tab
+  for _, pane in ipairs(panes) do
+    if not pane.is_plugin and tostring(pane.id) == current_id then
+      current_tab = pane.tab_id
+      break
+    end
+  end
 
-  for _, p in ipairs(window_panes) do
-    if p.id ~= current_pane then
-      table.insert(other_panes, p)
-      if is_ai_cmd(p.cmd) then
-        table.insert(candidates, p)
+  local same_tab = {}
+  local other_tab = {}
+
+  for _, pane in ipairs(panes) do
+    -- Skip plugins and the pane Neovim itself runs in
+    if not pane.is_plugin and tostring(pane.id) ~= current_id then
+      -- zellij 0.45+ reports the running command as `pane_command`; the legacy
+      -- `terminal_command` field is still present but is always null. Fall back
+      -- to it so this keeps working on older zellij builds.
+      local cmd = pane.pane_command or pane.terminal_command
+
+      if is_ai_cmd(cmd) then
+        local entry = { id = 'terminal_' .. pane.id, cmd = cmd }
+        if current_tab ~= nil and pane.tab_id == current_tab then
+          table.insert(same_tab, entry)
+        else
+          table.insert(other_tab, entry)
+        end
       end
     end
   end
 
-  if #candidates > 0 then
-    return candidates[1].id, candidates[1].cmd
+  local best = same_tab[1] or other_tab[1]
+  if best then
+    return best.id, best.cmd
   end
 
-  -- 2. If no AI pane in current window, search all panes in current tmux session
-  local all_panes = get_tmux_panes { '-a', '-F', '#{pane_id}:#{pane_tty} #{pane_current_command}' }
-  for _, p in ipairs(all_panes) do
-    if p.id ~= current_pane and is_ai_cmd(p.cmd) then
-      return p.id, p.cmd
-    end
-  end
-
-  -- 3. Fallback to the other pane in current window
-  if #other_panes > 0 then
-    return other_panes[1].id, other_panes[1].cmd
-  end
-
-  return nil, 'No target tmux pane found'
+  return nil, 'No AI agent pane found'
 end
 
---- Send text to target tmux pane
+--- Send text to target zellij pane
 ---@param text string
 function M.send(text)
   if not text or text == '' then
@@ -90,7 +104,7 @@ function M.send(text)
 
   local target_pane, cmd_or_err = M.find_target_pane()
   if not target_pane then
-    vim.notify(cmd_or_err or 'No target tmux pane found', vim.log.levels.WARN, { title = 'Tmux Agent' })
+    vim.notify(cmd_or_err or 'No target zellij pane found', vim.log.levels.WARN, { title = 'Zellij Agent' })
     return
   end
 
@@ -98,22 +112,19 @@ function M.send(text)
     text = text .. '\n'
   end
 
-  vim.fn.system({ 'tmux', 'load-buffer', '-' }, text)
-  vim.fn.system { 'tmux', 'paste-buffer', '-p', '-t', target_pane }
+  -- Use bracketed paste so TUI agents receive the text as a single payload.
+  vim.fn.system { 'zellij', 'action', 'paste', '-p', target_pane, text }
 
   M.focus_pane(target_pane)
 end
 
---- Focus the given tmux pane, selecting its window if needed
+--- Focus the given zellij pane
 ---@param pane_id string
 function M.focus_pane(pane_id)
   if not pane_id then
     return
   end
-
-  -- Select the pane's window first (no-op when it is already the current one)
-  vim.fn.system { 'tmux', 'select-window', '-t', pane_id }
-  vim.fn.system { 'tmux', 'select-pane', '-t', pane_id }
+  vim.fn.system { 'zellij', 'action', 'focus-pane-id', pane_id }
 end
 
 local function is_term_or_overseer(bufnr)
@@ -256,7 +267,7 @@ function M.send_diagnostic()
   end
 
   if #diags == 0 then
-    vim.notify('No diagnostics found', vim.log.levels.INFO, { title = 'Tmux Agent' })
+    vim.notify('No diagnostics found', vim.log.levels.INFO, { title = 'Zellij Agent' })
     return
   end
 
@@ -270,7 +281,7 @@ function M.send_diagnostic()
 end
 
 return {
-  'tmux-agent',
+  'zellij-agent',
   dir = vim.fn.stdpath 'config',
   -- expose the helpers so popup-menu entries and other callers can reach them
   send = M.send,
@@ -285,25 +296,25 @@ return {
       '<leader>af',
       M.send_file,
       mode = 'n',
-      desc = '[A]gent tmux: send file',
+      desc = '[A]gent zellij: send file',
     },
     {
       '<leader>at',
       M.send_line,
       mode = 'n',
-      desc = '[A]gent tmux: send line',
+      desc = '[A]gent zellij: send line',
     },
     {
       '<leader>at',
       M.send_selection,
       mode = 'x',
-      desc = '[A]gent tmux: send selection',
+      desc = '[A]gent zellij: send selection',
     },
     {
       '<leader>ad',
       M.send_diagnostic,
       mode = { 'n', 'x' },
-      desc = '[A]gent tmux: send diagnostic',
+      desc = '[A]gent zellij: send diagnostic',
     },
   },
 }

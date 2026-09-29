@@ -1,4 +1,3 @@
--- vim.env.TMUX = nil
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 vim.o.background = 'light'

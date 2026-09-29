@@ -9,8 +9,8 @@ local function set_tab_title(session_name)
   end
 
   if title and title ~= '' then
-    if vim.env.TMUX and vim.fn.executable 'tmux' == 1 then
-      vim.fn.system { 'tmux', 'rename-window', title }
+    if vim.env.ZELLIJ and vim.fn.executable 'zellij' == 1 then
+      vim.fn.system { 'zellij', 'action', 'rename-pane', title }
     end
 
     local wezterm_bin = vim.fn.executable 'wezterm.exe' == 1 and 'wezterm.exe' or (vim.fn.executable 'wezterm' == 1 and 'wezterm' or nil)

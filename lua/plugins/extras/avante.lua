@@ -1,4 +1,4 @@
-return {
+local spec = {
   'yetone/avante.nvim',
   version = false, -- Never set this value to "*"! Never!
   cmd = { 'AvanteToggle' },
@@ -41,3 +41,5 @@ return {
     -- "zbirenbaum/copilot.lua", -- for providers='copilot'
   },
 }
+
+return { spec }

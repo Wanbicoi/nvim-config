@@ -1,4 +1,4 @@
-return {
+local spec = {
   'mfussenegger/nvim-dap',
   cmd = { 'DapNew' },
   dependencies = {
@@ -116,3 +116,5 @@ return {
     dap.listeners.before.event_exited['dapview_config'] = dapview.close
   end,
 }
+
+return { spec }

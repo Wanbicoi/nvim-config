@@ -1,6 +1,6 @@
 local snacks_search = require 'utils.snacks_search'
 
-return {
+local spec = {
   'nvim-neotest/neotest',
   dependencies = {
     'nvim-neotest/nvim-nio',
@@ -53,3 +53,5 @@ return {
     },
   },
 }
+
+return { spec }

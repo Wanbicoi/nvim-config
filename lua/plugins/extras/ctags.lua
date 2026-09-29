@@ -1,4 +1,4 @@
-return {
+local spec = {
   'ludovicchabant/vim-gutentags',
   event = 'VeryLazy',
   config = function()
@@ -68,3 +68,5 @@ return {
     }
   end,
 }
+
+return { spec }

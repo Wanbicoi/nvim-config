@@ -1,4 +1,4 @@
-return {
+local spec = {
   'mistweaverco/kulala.nvim',
   ft = { 'http', 'rest' },
   -- Load before session save/restore hooks run
@@ -81,3 +81,5 @@ return {
     })
   end,
 }
+
+return { spec }

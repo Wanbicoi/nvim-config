@@ -1,4 +1,4 @@
-return {
+local spec = {
   'LintaoAmons/bookmarks.nvim',
   -- pin the plugin at specific version for stability
   -- backup your bookmark sqlite db when there are breaking changes (major version change)
@@ -26,3 +26,5 @@ return {
     } -- you must call setup to init sqlite db
   end,
 }
+
+return { spec }

@@ -4,6 +4,7 @@ local M = {}
 
 local mx = require 'integrations'
 local buf = require 'utils.buffers'
+local diagnostics = require 'utils.diagnostics'
 
 local function send(text)
   mx.send_to_agent(text)
@@ -58,21 +59,6 @@ function M.send_selection()
   send(string.format('@%s:L%d-L%d', vim.fn.expand '%', start_pos[2], end_pos[2]))
 end
 
-local SEVERITY = {
-  [vim.diagnostic.severity.ERROR] = 'ERROR',
-  [vim.diagnostic.severity.WARN] = 'WARN',
-  [vim.diagnostic.severity.INFO] = 'INFO',
-  [vim.diagnostic.severity.HINT] = 'HINT',
-}
-
-local function format_diagnostic(diag, file)
-  local sev = SEVERITY[diag.severity] or 'DIAGNOSTIC'
-  local code = diag.code and string.format(' (%s)', diag.code) or (diag.source and string.format(' (%s)', diag.source) or '')
-  local line = (diag.lnum or 0) + 1
-  local col = (diag.col or 0) + 1
-  return string.format('@%s:L%d:C%d [%s] %s%s', file, line, col, sev, vim.trim(diag.message or ''), code)
-end
-
 --- Send diagnostics for the cursor line, selection, or whole buffer.
 function M.send_diagnostic()
   local bufnr = vim.api.nvim_get_current_buf()
@@ -107,7 +93,7 @@ function M.send_diagnostic()
 
   local lines = {}
   for _, diag in ipairs(diags) do
-    lines[#lines + 1] = format_diagnostic(diag, file)
+    lines[#lines + 1] = diagnostics.format(diag, file)
   end
 
   send(string.format('Fix the following diagnostic%s:\n%s', #diags > 1 and 's' or '', table.concat(lines, '\n')))

@@ -12,7 +12,7 @@ function M.available()
   return false
 end
 
-function M.set_title() end
+function M.set_title(_) end
 
 function M.current_pane_id()
   return nil

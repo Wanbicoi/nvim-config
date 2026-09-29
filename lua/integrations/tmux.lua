@@ -12,6 +12,6 @@ function M.available()
   return vim.env.TMUX ~= nil and vim.env.TMUX ~= '' and vim.fn.executable 'tmux' == 1
 end
 
-function M.set_title() end
+function M.set_title(_) end
 
 return M

@@ -26,9 +26,10 @@ local function term_opts()
 end
 
 --- Get or create the agent terminal for the current project root.
----@return snacks.terminal|nil
+---@return snacks.win|nil
 function M.get()
-  return Snacks.terminal.get(AGENT_CMD, term_opts())
+  local term = Snacks.terminal.get(AGENT_CMD, term_opts())
+  return term
 end
 
 --- Toggle (show/focus or hide) the agent terminal.
@@ -52,7 +53,7 @@ function M.send(text)
     text = text .. '\n'
   end
   vim.api.nvim_chan_send(vim.b[term.buf].terminal_job_id, text)
-  term:focus()
+  term:show()
 end
 
 local function is_visual(mode)

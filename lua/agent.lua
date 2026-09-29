@@ -54,6 +54,7 @@ function M.send(text)
   end
   vim.api.nvim_chan_send(vim.b[term.buf].terminal_job_id, text)
   term:show()
+  term:focus()
 end
 
 local function is_visual(mode)

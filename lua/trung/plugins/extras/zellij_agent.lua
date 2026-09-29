@@ -1,6 +1,6 @@
 local M = {}
 
-local ai_patterns = { 'claude', 'codex', 'agy', 'opencode'}
+local ai_patterns = { 'claude', 'codex', 'agy', 'opencode' }
 
 --- Parse zellij list-panes JSON output
 ---@return table[]

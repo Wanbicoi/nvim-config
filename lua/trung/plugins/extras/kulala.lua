@@ -23,7 +23,7 @@ return {
   config = function(_, opts)
     require('kulala').setup(opts)
 
-    local winbar = require('kulala.ui.winbar')
+    local winbar = require 'kulala.ui.winbar'
     local orig_toggle = winbar.toggle_winbar_tab
 
     winbar.show_previous = function()
@@ -41,8 +41,7 @@ return {
         local ok, winbar_val = pcall(vim.api.nvim_get_option_value, 'winbar', { win = win_id })
         if ok and type(winbar_val) == 'string' and winbar_val ~= '' then
           local config = require('kulala.config').get()
-          local keymaps = type(config.kulala_keymaps) == 'table' and config.kulala_keymaps
-            or require('kulala.config.keymaps').setup_kulala_keymaps(buf)
+          local keymaps = type(config.kulala_keymaps) == 'table' and config.kulala_keymaps or require('kulala.config.keymaps').setup_kulala_keymaps(buf)
           if keymaps['Previous response'] and keymaps['Previous response'][1] and keymaps['Next response'] and keymaps['Next response'][1] then
             local prev_key = keymaps['Previous response'][1]
             local next_key = keymaps['Next response'][1]
@@ -54,9 +53,7 @@ return {
                 .. " %X%* %#KulalaTab#%@v:lua.require'kulala.ui.winbar'.show_next@ "
                 .. next_key
                 .. ' -> %X%*'
-              local new_winbar_val = string.sub(winbar_val, 1, start_idx - 1)
-                .. replacement
-                .. string.sub(winbar_val, end_idx + 1)
+              local new_winbar_val = string.sub(winbar_val, 1, start_idx - 1) .. replacement .. string.sub(winbar_val, end_idx + 1)
               pcall(vim.api.nvim_set_option_value, 'winbar', new_winbar_val, { win = win_id })
             end
           end

@@ -32,7 +32,7 @@ return {
     }
 
     -- 1. Configure the js-debug-adapter
-    local dap_debug_server = vim.fn.stdpath("data") .. "/mason/packages/js-debug-adapter/js-debug/src/dapDebugServer.js"
+    local dap_debug_server = vim.fn.stdpath 'data' .. '/mason/packages/js-debug-adapter/js-debug/src/dapDebugServer.js'
 
     dap.adapters['pwa-node'] = {
       type = 'server',
@@ -41,12 +41,12 @@ return {
       executable = {
         command = 'node',
         args = { dap_debug_server, '${port}', '127.0.0.1' },
-      }
+      },
     }
 
     -- Helper to find the nearest package.json directory for monorepo setups
     local get_cwd = function()
-      local package_json = vim.fs.find({ 'package.json' }, { path = vim.fn.expand('%:p:h'), upward = true })[1]
+      local package_json = vim.fs.find({ 'package.json' }, { path = vim.fn.expand '%:p:h', upward = true })[1]
       if package_json then
         return vim.fs.dirname(package_json)
       end
@@ -92,10 +92,10 @@ return {
         sourceMaps = true,
         protocol = 'inspector',
         autoAttachChildProcesses = true,
-      }
+      },
     }
 
-    for _, lang in ipairs({ 'javascript', 'typescript', 'javascriptreact', 'typescriptreact' }) do
+    for _, lang in ipairs { 'javascript', 'typescript', 'javascriptreact', 'typescriptreact' } do
       dap.configurations[lang] = js_config
     end
 

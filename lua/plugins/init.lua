@@ -26,6 +26,7 @@ require('lazy').setup({
   -- require 'plugins.extras.ctags',
   -- require 'plugins.extras.avante',
   -- require 'plugins.extras.bookmarks',
+  require 'plugins.extras.dotnet',
   require 'plugins.extras.kulala',
 }, {
   performance = {

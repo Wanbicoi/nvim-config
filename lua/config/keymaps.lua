@@ -115,7 +115,7 @@ vim.api.nvim_create_autocmd('WinEnter', {
 })
 -- Agent: open the in-Neovim agent terminal, and send editor context to it.
 -- See lua/agent.lua
-vim.keymap.set('n', '<a-a>', function()
+vim.keymap.set({ 'n', 't' }, '<a-a>', function()
   require('agent').toggle()
 end, { desc = 'Toggle coding agent terminal' })
 vim.keymap.set('n', '<leader>af', function()

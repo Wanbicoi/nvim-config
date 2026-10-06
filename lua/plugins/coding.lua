@@ -70,7 +70,16 @@ return {
   {
     'catgoose/nvim-colorizer.lua',
     event = 'BufReadPre',
-    opts = {},
+    opts = {
+      filetypes = {
+        '*',
+        '!snacks_terminal',
+      },
+      buftypes = {
+        '*',
+        '!terminal',
+      },
+    },
   },
   {
     'danymat/neogen',

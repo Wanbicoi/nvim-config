@@ -155,10 +155,41 @@ return {
             toggles = {
               git_filter = { icon = '', value = false },
             },
+            actions = {
+              explorer_open_all = function(picker)
+                local Tree = require 'snacks.explorer.tree'
+                local Explorer = require 'snacks.explorer.actions'
+
+                local seen = {}
+                local function expand(node)
+                  node.open = true
+                  if not node.dir then
+                    return
+                  end
+                  -- Guard against symlink cycles by tracking real paths.
+                  local real = vim.uv.fs_realpath(node.path) or node.path
+                  if seen[real] then
+                    return
+                  end
+                  seen[real] = true
+
+                  Tree:expand(node)
+                  for _, child in pairs(node.children) do
+                    if child.dir then
+                      expand(child)
+                    end
+                  end
+                end
+
+                expand(Tree:find(picker:cwd()))
+                Explorer.update(picker, { refresh = true })
+              end,
+            },
             win = {
               list = {
                 keys = {
                   ['gs'] = 'toggle_git_filter',
+                  ['z'] = 'explorer_open_all',
                 },
               },
             },

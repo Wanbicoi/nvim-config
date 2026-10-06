@@ -101,7 +101,18 @@ return {
           },
           {
             function()
-              return '󰏖 '
+              return '󰈆'
+            end,
+            separator = '',
+            on_click = function()
+              vim.cmd('q')
+              -- pcall(vim.cmd, 'q')
+            end,
+          },
+
+          {
+            function()
+              return '󰏖'
             end,
             separator = '',
             on_click = function()

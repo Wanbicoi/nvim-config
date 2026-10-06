@@ -3,12 +3,12 @@ local M = {}
 
 ---@return table
 function M.float_win()
-  local width = vim.o.columns > 180 and 160 or math.floor(vim.o.columns * 0.9)
+  -- local width = vim.o.columns > 180 and 160 or math.floor(vim.o.columns * 0.9)
   return {
     position = 'float',
     backdrop = false,
     border = 'rounded',
-    width = width,
+    width = math.floor(vim.o.columns * 0.9),
     height = math.floor(vim.o.lines * 0.9),
   }
 end

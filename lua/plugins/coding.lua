@@ -313,6 +313,7 @@ return {
         http = { 'kulala-fmt' },
         go = { 'goimports', 'gofmt' },
         toml = { 'taplo' },
+        nix = { 'nixfmt' }
       },
     },
   },

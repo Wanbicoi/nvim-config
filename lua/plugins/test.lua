@@ -52,6 +52,7 @@ local spec = {
       desc = '[T]est Summary',
     },
   },
+  cmd = { 'Neotest' },
 }
 
 return { spec }

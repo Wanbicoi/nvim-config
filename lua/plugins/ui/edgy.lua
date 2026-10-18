@@ -11,17 +11,17 @@ return {
         left = { size = 35 },
       },
       right = {
-        {
-          ft = 'snacks_terminal',
-          title = '%{b:snacks_terminal.id}: %{b:term_title}',
-          size = { width = 0.4 },
-          filter = function(_, win)
-            return vim.w[win].snacks_win
-              and vim.w[win].snacks_win.position == 'right'
-              and vim.w[win].snacks_win.relative == 'editor'
-              and not vim.w[win].trouble_preview
-          end,
-        },
+        -- {
+        --   ft = 'snacks_terminal',
+        --   title = '%{b:snacks_terminal.id}: %{b:term_title}',
+        --   size = { width = 0.4 },
+        --   filter = function(_, win)
+        --     return vim.w[win].snacks_win
+        --       and vim.w[win].snacks_win.position == 'right'
+        --       and vim.w[win].snacks_win.relative == 'editor'
+        --       and not vim.w[win].trouble_preview
+        --   end,
+        -- },
       },
       bottom = {
         {

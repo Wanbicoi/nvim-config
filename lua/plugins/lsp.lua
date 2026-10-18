@@ -115,39 +115,28 @@ return {
         },
       }
 
-      local servers = {
-        cssls = {},
-        pyright = {},
-        jsonls = {},
-        yamlls = {},
-        lua_ls = {
-          settings = {
-            Lua = {
-              completion = {
-                callSnippet = 'Replace',
-              },
-            },
-          },
-        },
-      }
-
       require('mason-lspconfig').setup {
-        ensure_installed = vim.tbl_keys(servers),
+        ensure_installed = {
+          'tsc',
+          'cssls',
+          'pyright',
+          'jsonls',
+          'yamlls',
+          'lua_ls',
+        },
         automatic_installation = false,
         automatic_enable = {
-          exclude = { 'rust_analyzer', 'ts_ls', 'copilot' },
+          exclude = { 'rust_analyzer', 'copilot' },
         },
       }
 
       vim.lsp.config('cds_lsp', {
-        capabilities = require('blink.cmp').get_lsp_capabilities(),
         settings = {
           cds = {
             validate = true,
           },
         },
       })
-      vim.lsp.enable 'cds_lsp'
     end,
   },
   {
@@ -159,16 +148,6 @@ return {
         'snacks.nvim',
       },
     },
-  },
-  {
-    'pmizio/typescript-tools.nvim',
-    dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
-    opts = {
-      settings = {
-        expose_as_code_action = 'all',
-      },
-    },
-    ft = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'json' },
   },
   {
     'saghen/blink.cmp',

@@ -239,14 +239,14 @@ return {
       {
         '<F2>',
         function()
-          snacks_search.pwd('files', { hidden = true, ignored = true })
+          snacks_search.pwd('files', { hidden = true, ignored = true, exclude = EXCLUDE })
         end,
         desc = '[F]ind [A]ll (cwd)',
       },
       {
         '<F3>',
         function()
-          snacks_search.pwd 'grep'
+          snacks_search.pwd('grep', { exclude = EXCLUDE })
         end,
         desc = '[G]rep (cwd)',
       },

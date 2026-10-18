@@ -137,6 +137,15 @@ return {
           },
         },
       })
+      vim.lsp.enable('cds_lsp')
+
+      vim.lsp.config('nixd', {
+        settings = { nixd = {
+          nixpkgs = { expr = 'import <nixpkgs> {}' },   -- or your flake's nixpkgs
+          formatting = { command = { 'nixfmt' } },
+        } },
+      })
+      vim.lsp.enable('nixd')
     end,
   },
   {

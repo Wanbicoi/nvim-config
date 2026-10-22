@@ -1,5 +1,7 @@
 --- Minimal in-Neovim coding-agent terminal.
 ---
+--- TODO: remove the custom agent when herd-nvim setting is mature
+---
 --- Runs the agent in a Snacks terminal (one per project root) and routes editor
 --- context (file, line, selection, diagnostics) into it, so no external
 --- multiplexer pane is needed.

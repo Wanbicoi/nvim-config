@@ -74,8 +74,9 @@ vim.api.nvim_create_autocmd('BufEnter', {
     end
 
     vim.cmd.nmenu [[100.200 PopUp.-File- :]]
-    vim.cmd.nmenu [[100.201 PopUp.󰒊\ Send\ This\ To\ Agent <cmd>lua require('agent').send_line()<CR>]]
-    vim.cmd.vmenu [[100.202 PopUp.󰒊\ Send\ This\ To\ Agent <cmd>lua require('agent').send_selection()<CR>]]
+    -- TODO: remove the custom agent when herd-nvim setting is mature
+    -- vim.cmd.nmenu [[100.201 PopUp.󰒊\ Send\ This\ To\ Agent <cmd>lua require('agent').send_line()<CR>]]
+    -- vim.cmd.vmenu [[100.202 PopUp.󰒊\ Send\ This\ To\ Agent <cmd>lua require('agent').send_selection()<CR>]]
     vim.cmd.nmenu [[100.205 PopUp.󰈞\ Open\ File\ Under\ Cursor <cmd>lua _G.OpenFileUnderCursor()<CR>]]
     vim.cmd.nmenu [[100.206 PopUp.󰆏\ Copy\ All <cmd>%y+<CR>]]
     vim.cmd.nmenu [[100.211 PopUp.󰘲\ Copy\ Word\ Under\ Cursor yiw]]

@@ -27,7 +27,7 @@ require('lazy').setup({
   -- require 'plugins.extras.avante',
   -- require 'plugins.extras.bookmarks',
   require 'plugins.extras.dotnet',
-  require 'plugins.extras.kulala',
+  -- require 'plugins.extras.kulala',
   require 'plugins.extras.herdr',
 }, {
   performance = {

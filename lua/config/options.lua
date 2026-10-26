@@ -21,6 +21,7 @@ vim.opt.mousemoveevent = true
 vim.cmd 'autocmd! nvim.popupmenu'
 vim.cmd.aunmenu 'PopUp' -- Remove all default menu items for PopUp
 vim.opt.showmode = false
+vim.g.clipboard = 'osc52'
 vim.schedule(function()
   vim.opt.clipboard = 'unnamedplus'
 end)

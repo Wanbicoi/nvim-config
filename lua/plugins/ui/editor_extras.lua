@@ -62,8 +62,21 @@ return {
     build = 'cd app && npm install',
     init = function()
       vim.g.mkdp_filetypes = { 'markdown' }
+      -- vim.env.NVIM_MKDP_LOG_FILE = vim.fn.stdpath 'state' .. '/mkdp-nvim.log'
+      _G.mkdp_browserfunc = function(url)
+        vim.ui.open(url)
+      end
+      vim.cmd [[
+        function! OpenMarkdownPreview(url) abort
+          call v:lua.mkdp_browserfunc(a:url)
+        endfunction
+      ]]
+      vim.g.mkdp_browserfunc = 'OpenMarkdownPreview'
     end,
     ft = { 'markdown' },
+    keys = {
+      { '<F4>', '<cmd>MarkdownPreview<cr>', ft = 'markdown', desc = 'Markdown Preview' },
+    },
   },
   {
     'OXY2DEV/markview.nvim',

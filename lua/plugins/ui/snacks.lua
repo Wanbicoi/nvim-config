@@ -54,7 +54,7 @@ return {
     opts = {
       bigfile = {
         size = 1.5 * 1024 * 1024, -- 1.5MB
-        line_length = 50000, -- average line length (useful for minified files)
+        line_length = 50000,      -- average line length (useful for minified files)
         enabled = true,
       },
       explorer = { enabled = true },
@@ -103,8 +103,8 @@ return {
                 border = true,
                 title = '{title} {live} {flags}',
                 title_pos = 'center',
-                { win = 'input', height = 1, border = 'bottom' },
-                { win = 'list', border = 'none' },
+                { win = 'input', height = 1,     border = 'bottom' },
+                { win = 'list',  border = 'none' },
               },
             },
           },
@@ -441,6 +441,43 @@ return {
     },
     config = function(_, opts)
       require('snacks').setup(opts)
+
+      vim.api.nvim_create_user_command('Explorer', function(arg)
+        Snacks.explorer {
+          cwd = arg.args ~= '' and arg.args or nil,
+          hidden = true,
+        }
+      end, {
+        nargs = '?',
+        complete = 'dir',
+        desc = 'Open Snacks explorer',
+      })
+
+      vim.api.nvim_create_autocmd('VimEnter', {
+        group = vim.api.nvim_create_augroup('cfg-open-explorer-flag', { clear = true }),
+        callback = function()
+          local open = vim.g.open_explorer or vim.env.NVIM_EXPLORER == '1'
+          if not open then
+            for _, arg in ipairs(vim.v.argv) do
+              if arg == '--explorer' or arg == '+explorer' then
+                open = true
+                break
+              end
+            end
+          end
+          if open then
+            for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+              local name = vim.api.nvim_buf_get_name(buf)
+              if name:match('%-%-explorer$') then
+                pcall(vim.api.nvim_buf_delete, buf, { force = true })
+              end
+            end
+            vim.schedule(function()
+              Snacks.explorer { hidden = true }
+            end)
+          end
+        end,
+      })
     end,
   },
 }

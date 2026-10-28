@@ -23,27 +23,48 @@ vim.cmd.aunmenu 'PopUp' -- Remove all default menu items for PopUp
 vim.opt.showmode = false
 
 -- OSC 52 clipboard: terminal emulators block OSC 52 read/paste queries for security,
--- causing a 10s timeout if Neovim queries the clipboard via OSC 52. Use OSC 52 for
--- copy, and use wl-paste (or empty) for paste to eliminate timeouts.
+-- causing a 10s timeout if Neovim queries the clipboard via OSC 52.
+-- Use OSC 52 for copy, and use wl-paste with cached regtype preservation ('V' vs 'v')
+-- so linewise yanks ('yy') create a new line on paste, and characterwise yanks ('yw') paste inline.
+local cached_clip = { lines = {}, regtype = 'v' }
+local osc52_copy_plus = require('vim.ui.clipboard.osc52').copy '+'
+local osc52_copy_star = require('vim.ui.clipboard.osc52').copy '*'
+
+local function paste_impl()
+  if vim.fn.executable 'wl-paste' == 1 then
+    local raw = vim.fn.system 'wl-paste 2>/dev/null'
+    if vim.v.shell_error == 0 and #raw > 0 then
+      local normalized = raw:gsub('\r\n', '\n'):gsub('\r', '\n')
+      local ends_with_newline = normalized:sub(-1) == '\n'
+      if ends_with_newline then
+        normalized = normalized:sub(1, -2)
+      end
+      local lines = vim.split(normalized, '\n', { plain = true })
+      if vim.deep_equal(lines, cached_clip.lines) then
+        return { lines, cached_clip.regtype }
+      end
+      return { lines, ends_with_newline and 'V' or 'v' }
+    end
+  end
+  return { cached_clip.lines, cached_clip.regtype }
+end
+
+local function make_copy_fn(osc52_fn)
+  return function(lines, regtype)
+    cached_clip = { lines = lines, regtype = regtype or 'v' }
+    osc52_fn(lines)
+  end
+end
+
 vim.g.clipboard = {
   name = 'OSC 52',
   copy = {
-    ['+'] = require('vim.ui.clipboard.osc52').copy '+',
-    ['*'] = require('vim.ui.clipboard.osc52').copy '*',
+    ['+'] = make_copy_fn(osc52_copy_plus),
+    ['*'] = make_copy_fn(osc52_copy_star),
   },
   paste = {
-    ['+'] = function()
-      if vim.fn.executable 'wl-paste' == 1 then
-        return vim.fn.systemlist 'wl-paste --no-newline 2>/dev/null'
-      end
-      return {}
-    end,
-    ['*'] = function()
-      if vim.fn.executable 'wl-paste' == 1 then
-        return vim.fn.systemlist 'wl-paste --no-newline 2>/dev/null'
-      end
-      return {}
-    end,
+    ['+'] = paste_impl,
+    ['*'] = paste_impl,
   },
 }
 vim.schedule(function()

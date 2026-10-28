@@ -64,7 +64,11 @@ return {
       vim.g.mkdp_filetypes = { 'markdown' }
       -- vim.env.NVIM_MKDP_LOG_FILE = vim.fn.stdpath 'state' .. '/mkdp-nvim.log'
       _G.mkdp_browserfunc = function(url)
-        vim.ui.open(url)
+        if vim.fn.has 'wsl' == 1 then
+          vim.ui.open(url, { cmd = { 'cmd.exe', '/c', 'start', '' } })
+        else
+          vim.ui.open(url)
+        end
       end
       vim.cmd [[
         function! OpenMarkdownPreview(url) abort

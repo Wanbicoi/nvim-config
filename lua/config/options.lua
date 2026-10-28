@@ -21,10 +21,48 @@ vim.opt.mousemoveevent = true
 vim.cmd 'autocmd! nvim.popupmenu'
 vim.cmd.aunmenu 'PopUp' -- Remove all default menu items for PopUp
 vim.opt.showmode = false
-vim.g.clipboard = 'osc52'
+
+-- OSC 52 clipboard: terminal emulators block OSC 52 read/paste queries for security,
+-- causing a 10s timeout if Neovim queries the clipboard via OSC 52. Use OSC 52 for
+-- copy, and use wl-paste (or empty) for paste to eliminate timeouts.
+vim.g.clipboard = {
+  name = 'OSC 52',
+  copy = {
+    ['+'] = require('vim.ui.clipboard.osc52').copy '+',
+    ['*'] = require('vim.ui.clipboard.osc52').copy '*',
+  },
+  paste = {
+    ['+'] = function()
+      if vim.fn.executable 'wl-paste' == 1 then
+        return vim.fn.systemlist 'wl-paste --no-newline 2>/dev/null'
+      end
+      return {}
+    end,
+    ['*'] = function()
+      if vim.fn.executable 'wl-paste' == 1 then
+        return vim.fn.systemlist 'wl-paste --no-newline 2>/dev/null'
+      end
+      return {}
+    end,
+  },
+}
 vim.schedule(function()
   vim.opt.clipboard = 'unnamedplus'
 end)
+
+-- On WSL, Neovim defaults to xdg-open which calls rundll32.exe. rundll32 fails silently
+-- across the WSL boundary for non-default WSL users (e.g. nixos when troy is defaultUser).
+-- Use Windows 'cmd.exe /c start ""' as the default opener on WSL.
+if vim.fn.has 'wsl' == 1 then
+  local orig_open = vim.ui.open
+  vim.ui.open = function(path, opt)
+    opt = opt or {}
+    if not opt.cmd then
+      opt.cmd = { 'cmd.exe', '/c', 'start', '' }
+    end
+    return orig_open(path, opt)
+  end
+end
 
 -- Enable break indent
 vim.opt.breakindent = true

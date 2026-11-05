@@ -73,6 +73,9 @@ vim.api.nvim_create_autocmd('BufEnter', {
       vim.cmd [[silent! aunmenu PopUp.󰏒\ Diff\ Put]]
     end
 
+    vim.cmd.nmenu [[100.286 PopUp.-ViewSep- :]]
+    vim.cmd.nmenu [[100.290 PopUp.󰴐\ Toggle\ Wrap <cmd>lua vim.wo.wrap = not vim.wo.wrap<CR>]]
+
     vim.cmd.nmenu [[100.200 PopUp.-File- :]]
     -- TODO: remove the custom agent when herd-nvim setting is mature
     -- vim.cmd.nmenu [[100.201 PopUp.󰒊\ Send\ This\ To\ Agent <cmd>lua require('agent').send_line()<CR>]]
@@ -84,13 +87,11 @@ vim.api.nvim_create_autocmd('BufEnter', {
     vim.cmd.nmenu [[100.213 PopUp.󰈔\ Copy\ File\ Name <cmd>let @+=expand('%:t')<CR>]]
     vim.cmd.nmenu [[100.214 PopUp.󰈙\ Copy\ Code\ Position <cmd>let @+=expand('%') . ':' . line('.')<CR>]]
     vim.cmd.nmenu [[100.215 PopUp.󰝰\ New\ Empty\ File <cmd>vnew<CR>]]
-    vim.cmd.nmenu [[100.218 PopUp.-AgentSep- :]]
 
     vim.cmd.nmenu [[100.107 PopUp.󰈗\ Grep\ Word\ (Project\ Root) <cmd>lua require('utils.snacks_search').grep_cword_project()<CR>]]
     vim.cmd.nmenu [[100.108 PopUp.󰈻\ Grep\ Word\ (CWD) <cmd>lua require('utils.snacks_search').grep_cword_pwd()<CR>]]
     vim.cmd.vmenu [[100.107 PopUp.󰈗\ Grep\ Selection\ (Project\ Root) :<C-U>lua require('utils.snacks_search').grep_visual_project()<CR>]]
     vim.cmd.vmenu [[100.108 PopUp.󰈻\ Grep\ Selection\ (CWD) :<C-U>lua require('utils.snacks_search').grep_visual_pwd()<CR>]]
-    vim.cmd.amenu [[100.109 PopUp.-SearchSep- :]]
   end,
 })
 

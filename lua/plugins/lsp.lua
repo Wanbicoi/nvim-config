@@ -65,6 +65,7 @@ return {
             Snacks.picker.lsp_type_definitions()
           end, '[G]oto [T]ype Definition')
 
+          vim.cmd.amenu [[100.109 PopUp.-LSP- :]]
           vim.cmd.nmenu [[100.110 PopUp.󰌷\ LSP\ References <cmd>lua Snacks.picker.lsp_references()<CR>]]
           vim.cmd.nmenu [[100.120 PopUp.󰡱\ LSP\ Implementations <cmd>lua Snacks.picker.lsp_implementations()<CR>]]
           vim.cmd.nmenu [[100.130 PopUp.󰳽\ LSP\ Definitions <cmd>lua Snacks.picker.lsp_definitions()<CR>]]
@@ -94,8 +95,10 @@ return {
           if vim.fn.has 'nvim-0.12' == 1 then
             if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_inlineCompletion, event.buf) then
               vim.lsp.inline_completion.enable(true, { bufnr = event.buf })
-              vim.keymap.set('i', '<c-f>', vim.lsp.inline_completion.get, { desc = 'LSP: accept inline completion', buffer = event.buf })
-              vim.keymap.set('i', '<c-g>', vim.lsp.inline_completion.select, { desc = 'LSP: switch inline completion', buffer = event.buf })
+              vim.keymap.set('i', '<c-f>', vim.lsp.inline_completion.get,
+                { desc = 'LSP: accept inline completion', buffer = event.buf })
+              vim.keymap.set('i', '<c-g>', vim.lsp.inline_completion.select,
+                { desc = 'LSP: switch inline completion', buffer = event.buf })
             end
           end
         end,
@@ -140,10 +143,12 @@ return {
       vim.lsp.enable('cds_lsp')
 
       vim.lsp.config('nixd', {
-        settings = { nixd = {
-          nixpkgs = { expr = 'import <nixpkgs> {}' },   -- or your flake's nixpkgs
-          formatting = { command = { 'nixfmt' } },
-        } },
+        settings = {
+          nixd = {
+            nixpkgs = { expr = 'import <nixpkgs> {}' }, -- or your flake's nixpkgs
+            formatting = { command = { 'nixfmt' } },
+          }
+        },
       })
       vim.lsp.enable('nixd')
     end,

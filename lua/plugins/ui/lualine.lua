@@ -101,17 +101,6 @@ return {
           },
           {
             function()
-              return '󰈆'
-            end,
-            separator = '',
-            on_click = function()
-              vim.cmd('q')
-              -- pcall(vim.cmd, 'q')
-            end,
-          },
-
-          {
-            function()
               return '󰏖'
             end,
             separator = '',
@@ -124,6 +113,26 @@ return {
           {
             'filename',
             path = 3,
+          },
+        },
+        lualine_z = {
+          {
+            function()
+              return '󰆴'
+            end,
+            separator = '',
+            on_click = function()
+              pcall(vim.cmd, 'q')
+            end,
+          },
+          {
+            function()
+              return '󰐥'
+            end,
+            separator = '',
+            on_click = function()
+              pcall(vim.cmd, 'qa')
+            end,
           },
         },
       },
